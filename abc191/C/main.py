@@ -21,13 +21,6 @@ def main():
                 c += 1
             if c == 1 or c == 3:
                 ans += 1
-    print
-
-
-
-
-
-
-
+    print(ans)
 if __name__ == '__main__':
     main()
