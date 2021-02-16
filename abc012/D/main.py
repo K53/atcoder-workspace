@@ -3,7 +3,7 @@ import heapq
 INF = 10 ** 9
 # ----------------------------------------------------------------
 # Input
-#   1. タプル(重み, 行先)の二次元配列(隣接リスト)
+#   1. タプル(重み, 行先)の二次元配列(隣接リスト) : 初期化時、有向無向に注意
 #   2. 探索開始ノード(番号)
 # Output
 #   スタートから各ノードへの最小コスト
@@ -29,15 +29,19 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
                 heapq.heappush(hq, (dist[next], next))
     return dist
 
-def main():    
-    V, E, r = map(int, input().split())
-    edges = [[] for _ in range(V)]
-    for _ in range(E):
-        s, t, d = map(int, input().split())
-        edges[s].append((d, t))
-    costs = dijkstra(edges, r)
-    for c in costs:
-        print("INF" if c == INF else c)
+def main():
+    N, M = map(int, input().split())
+    edges = [[] for _ in range(N)]
+    for _ in range(M):
+        a, b, c = map(int, input().split())
+        edges[a - 1].append((c, b - 1))
+        edges[b - 1].append((c, a - 1))
+    ans = INF
+    for start in range(N):
+        dist = dijkstra(edges, start)
+        # print(dist)
+        ans = min(max(dist), ans)
+    print(ans)
 
 if __name__ == '__main__':
     main()

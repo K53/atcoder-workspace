@@ -791,11 +791,65 @@ https://www.ioi-jp.org/joi/2007/2008-yo-prob_and_sol/2008-yo-t6/review/2008-yo-t
 
 ## 応用
 
+### 往復するケース
+
+問題
+https://atcoder.jp/contests/abc035/submissions/20218577
+
+有向グラフにおいて往復する場合、以下2つを求める必要がある。
+* 始点1 → 経由地i
+* 経由地i → 終点1
+前者は問題ないが、後者に関して、全ての経由地iについてダイクストラをすると計算量が膨大になる。
+その場合、各辺の向きを逆にして始点からダイクストラを行うことで経由地iからの帰りの経路を出すことができる。
+
+```python
+import heapq
+INF = 10 ** 9
+def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    dist = [INF] * len(edges)
+    heapq.heappush(hq, (0, start_node))
+    dist[start_node] = 0
+    # dijkstra
+    while hq:
+        min_cost, now = heapq.heappop(hq)
+        if min_cost > dist[now]:
+            continue
+        for cost, next in edges[now]:
+            if dist[next] > dist[now] + cost:
+                dist[next] = dist[now] + cost
+                heapq.heappush(hq, (dist[next], next))
+    return dist
+
+def main():
+    N, M = map(int, input().split())
+    edges = [[] for _ in range(N)]
+    for _ in range(M):
+        a, b, c = map(int, input().split())
+        edges[a - 1].append((c, b - 1))
+        edges[b - 1].append((c, a - 1))
+    ans = INF
+    for start in range(N):
+        dist = dijkstra(edges, start)
+        # print(dist)
+        ans = min(max(dist), ans)
+    print(ans)
+
+if __name__ == '__main__':
+    main()
+```
+
 ### 多始点ダイクストラ
 
 問題
 https://atcoder.jp/contests/abc191/tasks/abc191_e
-スタート地点=ゴール地点の場合、スタート地点をキューに入れるのではなく、スタート地点の次に移動可能なノードをキューに積みダイクストラする。
+同じく往復する問題で、始点に自己ループとなる経路がある場合、
+* 始点1 → 経由地i
+* 経由地i → 終点1
+同じ様にしてi=1として求めるとコスト0になってしまい、これは往復ではない。
+こういう場合にはスタート地点をキューに入れるのではなく、スタート地点の次に移動可能なノードをキューに積みダイクストラする。
 
 ```python
 import heapq

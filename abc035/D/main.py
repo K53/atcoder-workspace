@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
+import sys
 import heapq
 INF = 10 ** 9
 
-def dijkstra(edges: "List[List[(cost, to)]]", start_node: int):
-    import heapq
-    INF = 10 ** 9
+def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
     hq = []
     heapq.heapify(hq)
     # Set start info
@@ -22,27 +21,9 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int):
                 heapq.heappush(hq, (dist[next], next))
     return dist
 
-def dijkstras(edges: "List[List[(cost, to)]]", start: "(cost, to)"):
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    for cost, to in edges[start]:
-        heapq.heappush(hq, (cost, to))
-        dist[to] = min(cost, dist[to])
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, next in edges[now]:
-            if dist[next] > dist[now] + cost:
-                dist[next] = dist[now] + cost
-                heapq.heappush(hq, (dist[next], next))
-    return dist
-
 def main():
-    N, M = map(int, input().split())
+    N, M, T = map(int, input().split())
+    A =list(map(int, input().split()))
     edges = [[] for _ in range(N)]
     edges_inv = [[] for _ in range(N)]
     for _ in range(M):
@@ -52,15 +33,13 @@ def main():
     
     cost1 = dijkstra(edges, 0)
     cost2 = dijkstra(edges_inv, 0)
-    ans = []
+    ans = 0
     for i in range(N):
         cost = cost1[i] + cost2[i]
-        if cost > INF:
-            ans.append(-1)
+        if T - cost < 0:
             continue
-        ans.append(cost)
+        ans = max(ans, (T - cost) * A[i])
     print(ans)
-    return
 
 if __name__ == '__main__':
     main()
