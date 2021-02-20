@@ -44,22 +44,14 @@ def dijkstras(edges: "List[List[(cost, to)]]", start: "(cost, to)"):
 def main():
     N, M = map(int, input().split())
     edges = [[] for _ in range(N)]
-    edges_inv = [[] for _ in range(N)]
     for _ in range(M):
         a, b, c = map(int, input().split())
         edges[a - 1].append((c, b - 1))
-        edges_inv[b - 1].append((c, a - 1))
     
-    cost1 = dijkstra(edges, 0)
-    cost2 = dijkstra(edges_inv, 0)
-    ans = []
-    for i in range(N):
-        cost = cost1[i] + cost2[i]
-        if cost > INF:
-            ans.append(-1)
-            continue
-        ans.append(cost)
-    print(ans)
+    for start in range(N):
+        # set start info
+        dist = dijkstras(edges, start)
+        print(-1 if dist[start] == INF else dist[start])
     return
 
 if __name__ == '__main__':

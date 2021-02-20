@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+
 INF = 10 ** 16
 
 def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> list:
@@ -19,15 +20,18 @@ def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> 
     return costs
 
 def main():
-    N, M = map(int, input().split())
+    N, M, P = map(int, input().split())
     edges = []
-    costs = []
     for _ in range(M):
         a, b, c = map(int, input().split())
-        edges.append((a - 1, b - 1, -c))
+        edges.append((a - 1, b - 1, -(c - P)))
 
     costs = bellmanFord(edges, N, 0)
-    print("inf" if costs[-1] == -INF else -costs[N - 1])
+    if costs is None or costs[-1] == -INF:
+        print(-1)
+        return
+
+    print(0 if costs[N - 1] > 0 else -costs[N - 1])
     return
 
 if __name__ == '__main__':
