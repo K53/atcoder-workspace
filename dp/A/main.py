@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 import sys
-
+INF = 10 ** 12
 
 def solve(N: int, h: "List[int]"):
+    costs = [INF] * N
+    costs[0], costs[1] = 0, abs(h[0] - h[1])
+    for i in range(2, N):
+        costs[i] = min((costs[i - 1] + abs(h[i - 1] - h[i])), (costs[i - 2] + abs(h[i - 2] - h[i])))
+    print(costs[N - 1])
     return
 
 
