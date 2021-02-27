@@ -1,35 +1,28 @@
 #!/usr/bin/env python3
-import heapq
-INF = 10 ** 9
-def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0            # *1
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, next in edges[now]:
-            if dist[next] > dist[now] + cost:
-                dist[next] = dist[now] + cost
-                heapq.heappush(hq, (dist[next], next))
-    return dist
 
+# dp[{i個目まで選択可能な時}][{重さwまで選択可能な時}] = {最大価値}
+# 品物、重さ共に0-Indexedで用意するため大きさはdp[N+1][W+1]
+# ただし、0-Indexedでやると品物の番号ととずれるので注意。
+#   = i個目の品物の取る取らないを判別した結果はdp[i+1]の列に書き込むことになる。
+#
 def main():
-    n, k = map(int, input().split())
-    edge = [[] for _ in range(n)]
-    for _ in range(k):
-        i = list(map(int, input().split()))
-        if i[0] == 1:
-            edge[i[1] - 1].append((i[3], i[2] - 1))
-            edge[i[2] - 1].append((i[3], i[1] - 1))
-        else:
-            costs = dijkstra(edge ,i[1] - 1)
-            print(-1 if costs[i[2] - 1] == INF else costs[i[2] - 1])
+    N, W = map(int, input().split())
+    dp = []
+    for _ in range(N + 1):
+        dp.append([0] * (W + 1))
+    for i in range(N):
+        v, w = map(int, input().split())
+        for j in range(W + 1):
+            if j - w < 0:
+                dp[i + 1][j] = dp[i][j]
+            else:
+                dp[i + 1][j] = max(dp[i][j], dp[i][j - w] + v)
+    
+    print(dp[N][W])
+
+        
+    
+
     return
 if __name__ == '__main__':
     main()
