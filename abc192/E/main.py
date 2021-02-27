@@ -2,45 +2,23 @@
 import sys
 import heapq
 INF = 10 ** 18
-# ----------------------------------------------------------------
-# Input
-#   1. タプル(重み, 行先)の二次元配列(隣接リスト)
-#   2. 探索開始ノード(番号)
-# Output
-#   スタートから各ノードへの最小コスト
-# Env
-#   import heapq
-#   INF = 10 ** 9
-# Note
-#   *1 https://atcoder.jp/contests/abc191/tasks/abc191_e
-#       - 多始点ダイクストラの場合の注意。
-#       - コストの異なる並行な辺がある場合、小さい方を選択する必要あり。
-#       - dist[start_node] = min(cost, dist[start_node])
-# ----------------------------------------------------------------
-def dijkstra(edges: "List[List[(cost, st, to)]]", start_node: int) -> list:
+def dijkstra(edges: "List[List[(cost, departure, to)]]", start_node: int) -> list:
     hq = []
     heapq.heapify(hq)
     # Set start info
     dist = [INF] * len(edges)
     heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0            # *1
+    dist[start_node] = 0
     # dijkstra
     while hq:
-        # print("----")
-        # print(hq)
-        # print(dist)
         min_cost, now = heapq.heappop(hq)
         if min_cost > dist[now]:
             continue
-        for cost, st, next in edges[now]:
-            # print(cost, st, next)
-            rest = dist[now] % st
-            wait = 0 if rest == 0 else st - rest
-            # print(wait)
-            if dist[next] > dist[now] + cost + wait:
-                dist[next] = dist[now] + cost + wait
+        for cost, departure, next in edges[now]:
+            rest = 0 if min_cost % departure == 0 else departure - min_cost % departure
+            if dist[next] > dist[now] + cost + rest:
+                dist[next] = dist[now] + cost + rest
                 heapq.heappush(hq, (dist[next], next))
-        
     return dist
 
 def solve(N: int, M: int, X: int, Y: int, A: "List[int]", B: "List[int]", T: "List[int]", K: "List[int]"):

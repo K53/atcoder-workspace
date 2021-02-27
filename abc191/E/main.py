@@ -2,26 +2,6 @@
 import heapq
 INF = 10 ** 9
 
-def dijkstra(edges: "List[List[(cost, to)]]", start_node: int):
-    import heapq
-    INF = 10 ** 9
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, next in edges[now]:
-            if dist[next] > dist[now] + cost:
-                dist[next] = dist[now] + cost
-                heapq.heappush(hq, (dist[next], next))
-    return dist
-
 def dijkstras(edges: "List[List[(cost, to)]]", start: "(cost, to)"):
     hq = []
     heapq.heapify(hq)

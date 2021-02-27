@@ -1,41 +1,35 @@
 #!/usr/bin/env python3
+import heapq
 INF = 10 ** 9
+def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    dist = [INF] * len(edges)
+    heapq.heappush(hq, (0, start_node))
+    dist[start_node] = 0            # *1
+    # dijkstra
+    while hq:
+        min_cost, now = heapq.heappop(hq)
+        if min_cost > dist[now]:
+            continue
+        for cost, next in edges[now]:
+            if dist[next] > dist[now] + cost:
+                dist[next] = dist[now] + cost
+                heapq.heappush(hq, (dist[next], next))
+    return dist
 
-def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> list:
-    # Initialize
-    costs = [INF] * vertex
-    costs[start_node] = 0
-    for i in range(vertex * 2):
-        for f, t, c in edges:
-            if costs[f] != INF and costs[t] > costs[f] + c:
-                # 始点/終点ともに到達可能な負の閉路がある。
-                # if i == vertex - 1 and t == vertex - 1:
-                #      return None
-                # 始点/終点ともに到達可能な負の閉路がある。
-                if i >= vertex - 1:
-                    costs[t] = -INF
-                # 始点から到達する負の閉路(終点に至るかはこの時点では不明)
-                # if i == vertex - 1:
-                #     return None
-                else:
-                    costs[t] = costs[f] + c
-    return costs
-
-
-def main():    
-    V, E, r = map(int, input().split())
-    edges = []
-    for _ in range(E):
-        s, t, d = map(int, input().split())
-        edges.append((s, t, d))
-    costs = bellmanFord(edges, V, r)
-    
-    if -INF in costs:
-        print("NEGATIVE CYCLE")
-        return
-    
-    for c in costs:
-        print("INF" if c == INF else c)
-
+def main():
+    n, k = map(int, input().split())
+    edge = [[] for _ in range(n)]
+    for _ in range(k):
+        i = list(map(int, input().split()))
+        if i[0] == 1:
+            edge[i[1] - 1].append((i[3], i[2] - 1))
+            edge[i[2] - 1].append((i[3], i[1] - 1))
+        else:
+            costs = dijkstra(edge ,i[1] - 1)
+            print(-1 if costs[i[2] - 1] == INF else costs[i[2] - 1])
+    return
 if __name__ == '__main__':
     main()

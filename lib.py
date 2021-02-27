@@ -1,17 +1,42 @@
+def bfs(edges: "List[to]", start_node: int) -> list:
+    q = queue.Queue()
+    dist = [INF] * len(edges)
+    q.put(start_node)
+    dist[start_node] = 0
+    while not q.empty():
+        now = q.get()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.put(next)
+            dist[next] = dist[now] + 1
+    return dist
+
+def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
+    q = queue.Queue()
+    dist = [INF] * len(edges)
+    for start_node in start_nodes:
+        q.put(start_node)
+        dist[start_node] = 0
+    while not q.empty():
+        now = q.get()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.put(next)
+            dist[next] = dist[now] + 1
+    return dist
+
 
 # = dijkstra ===========================================================================
 
-import heapq
-INF = 10 ** 9
+
 # ----------------------------------------------------------------
 # Input
 #   1. タプル(重み, 行先)の二次元配列(隣接リスト)
 #   2. 探索開始ノード(番号)
 # Output
 #   スタートから各ノードへの最小コスト
-# Env
-#   import heapq
-#   INF = 10 ** 9
 # Order
 #   O(V + E * logV)
 # Note
@@ -19,7 +44,11 @@ INF = 10 ** 9
 #       - 多始点ダイクストラの場合の注意。
 #       - コストの異なる並行な辺がある場合、小さい方を選択する必要あり。
 #       - dist[start_node] = min(cost, dist[start_node])
+#   *2 https://atcoder.jp/contests/tkppc4-1/tasks/tkppc4_1_h
+#       - INFの値は毎回吟味すること。
 # ----------------------------------------------------------------
+import heapq
+INF = 10 ** 9       # *2
 def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
     hq = []
     heapq.heapify(hq)
@@ -38,11 +67,13 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
                 heapq.heappush(hq, (dist[next], next))
     return dist
 
+# Usage
+
+
 # ======================================================================================
 
 # = bellmanFord ========================================================================
 
-INF = 10 ** 16
 # ----------------------------------------------------------------
 # Input
 #   1. 辺のリスト: タプル(始点, 終点, 重み)
@@ -50,8 +81,6 @@ INF = 10 ** 16
 #   3. 探索開始ノード(番号)
 # Output
 #   リスト(スタートから各ノードへの最小コスト。ただし負閉路から到達可能なノードは-INF)
-# Env
-#   INF = 10 ** 16
 # Order
 #   O(V * E)
 # Note
@@ -59,6 +88,7 @@ INF = 10 ** 16
 #   始点から到達可能だが終点に影響ない負閉路の有無： ○ (出力のリストに-INFが含まれるかどうか)
 #   始点から到達可能で終点に到達する負閉路の有無：　○ (出力のリストの終点へのコストが-INFかどうか)
 # ----------------------------------------------------------------
+INF = 10 ** 16
 def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> list:
     # Initialize
     costs = [INF] * vertex

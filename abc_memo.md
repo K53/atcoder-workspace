@@ -702,30 +702,42 @@ BFSで頑張ってもいいが、重み次第では時間がかかるので一�
 http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_1_A&lang=ja
 
 ```python:
+#!/usr/bin/env python3
 import heapq
 INF = 10 ** 9
+def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    dist = [INF] * len(edges)
+    heapq.heappush(hq, (0, start_node))
+    dist[start_node] = 0            # *1
+    # dijkstra
+    while hq:
+        min_cost, now = heapq.heappop(hq)
+        if min_cost > dist[now]:
+            continue
+        for cost, next in edges[now]:
+            if dist[next] > dist[now] + cost:
+                dist[next] = dist[now] + cost
+                heapq.heappush(hq, (dist[next], next))
+    return dist
 
-V, E, r = map(int, input().split())
-edge = [[] for _ in range(V)]
-costs = []
-for _ in range(E):
-    s, t, d = map(int, input().split())
-    edge[s].append((d, t))
+def main():
+    V, E, r = map(int, input().split())
+    edge = [[] for _ in range(V)]
+    costs = []
+    for _ in range(E):
+        s, t, d = map(int, input().split())
+        edge[s].append((d, t))
 
-h = [(0, r)]                                # スタート地点をコスト0でヒープに入れておく。タプルでは1つ目の要素で優先度付けされることを利用。
-heapq.heapify(h)
-costs = [INF for _ in range(V)]
-costs[r] = 0                                # スタート地点の最短コストを0に設定し、他をINF。
-while len(h) > 0:
-    cost, now = heapq.heappop(h)            # 評価する頂点
-    if cost > costs[now]:                   # 既にそのノードまでの最短コストが書かれている場合はskip
-        continue
-    for d, next in edge[now]:               # その頂点から移動可能な頂点とコストを取得
-        if costs[now] + d < costs[next]:    # 移動先に最短コストで行けるなら上書きしてヒープにエンキュー
-            costs[next] =costs[now] + d
-            heapq.heappush(h, (costs[next], next)) # そのノードまでのコストで優先順位付け
-for c in costs:
-    print("INF" if c == INF else c)
+    dist = dijkstra(edge, r)
+
+    for c in dist:
+        print("INF" if c == INF else c)
+
+if __name__ == '__main__':
+    main()
 ```
 
 問題
@@ -734,31 +746,39 @@ https://atcoder.jp/contests/joi2008yo/tasks/joi2008yo_f
 ```python
 import heapq
 INF = 10 ** 9
+def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    dist = [INF] * len(edges)
+    heapq.heappush(hq, (0, start_node))
+    dist[start_node] = 0            # *1
+    # dijkstra
+    while hq:
+        min_cost, now = heapq.heappop(hq)
+        if min_cost > dist[now]:
+            continue
+        for cost, next in edges[now]:
+            if dist[next] > dist[now] + cost:
+                dist[next] = dist[now] + cost
+                heapq.heappush(hq, (dist[next], next))
+    return dist
 
-n, k = map(int, input().split())
-edge = [[] for _ in range(n)]
-costs = []
-for _ in range(k):
-    i = list(map(int, input().split()))
-    if i[0] == 1:
-        edge[i[1] - 1].append((i[3], i[2] - 1))
-        edge[i[2] - 1].append((i[3], i[1] - 1))
-    else:
-        h = [(0, i[1] - 1)]
-        heapq.heapify(h)
-        costs.clear()
-        costs = [INF for _ in range(n)]
-        costs[i[1] - 1] = 0
-        while len(h) > 0:
-            cost, now = heapq.heappop(h)
-            if cost > costs[now]:
-                continue
-            for d, next in edge[now]:
-                if costs[now] + d < costs[next]:
-                    costs[next] =costs[now] + d
-                    heapq.heappush(h, (costs[next], next))
-        print(-1 if costs[i[2] - 1] == INF else costs[i[2] - 1])
-return
+def main():
+    n, k = map(int, input().split())
+    edge = [[] for _ in range(n)]
+    for _ in range(k):
+        i = list(map(int, input().split()))
+        if i[0] == 1:
+            edge[i[1] - 1].append((i[3], i[2] - 1))
+            edge[i[2] - 1].append((i[3], i[1] - 1))
+        else:
+            costs = dijkstra(edge ,i[1] - 1)
+            print(-1 if costs[i[2] - 1] == INF else costs[i[2] - 1])
+    return
+    
+if __name__ == '__main__':
+    main()
 ```
 
 ## テンプレート
@@ -892,8 +912,7 @@ https://yttm-work.jp/algorithm/algorithm_0012.html
 ベルマンフォード法では、その時点で確定しているノードのコストを正としてそれぞれのノードから移動可能なノードのコストを決めていく。
 当然、既に評価したノードのコストを更新したことでそのノードを正として算出したノードのコストを再計算しないといけないケースが出てくる。
 そのため、ベルマンフォード法では全頂点からスタートを除いた(V-1)回まで、更新がある限りこの一連の処理を繰り返す。
-
-ただし、負閉路を含む場合、この更新は無限に終わらない。そのため、(V-1)回の更新に到達しても更新が終わらない場合は負閉路が含まれると判断する。
+ただし、負閉路を含む場合、この更新は無限に終わらない。そのため、(V-1)回の更新に到達しても更新が終わらない場合は負閉路が含まれると判断できる。
 
 問題
 http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_1_B&lang=ja
@@ -1017,8 +1036,6 @@ if __name__ == '__main__':
 https://atcoder.jp/contests/abc061/tasks/abc061_d
 
 ```python
-#!/usr/bin/env python3
-import sys
 INF = 10 ** 16
 
 def main():
