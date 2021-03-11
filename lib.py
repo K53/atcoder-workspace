@@ -29,8 +29,6 @@ def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
 
 
 # = dijkstra ===========================================================================
-
-
 # ----------------------------------------------------------------
 # Input
 #   1. タプル(重み, 行先)の二次元配列(隣接リスト)
@@ -69,11 +67,10 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
 
 # Usage
 
-
 # ======================================================================================
 
-# = bellmanFord ========================================================================
 
+# = bellmanFord ========================================================================
 # ----------------------------------------------------------------
 # Input
 #   1. 辺のリスト: タプル(始点, 終点, 重み)
@@ -105,3 +102,131 @@ def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> 
                     costs[t] = costs[f] + c
     return costs
 # ======================================================================================
+
+
+# = LCS ================================================================================
+# 長さだけ欲しい
+# ----------------------------------------------------------------
+# Input
+#   1. 文字列1
+#   2. 文字列2
+# Output
+#   最長共通部分列の長さ
+# Order
+#   O(len(string_length))
+#   string_length : 小さい方の文字列の長さ
+# Note
+#   L[i] =: 文字列aのj文字目までと文字列bのbkまでから長さがi+1の共通部分列が作れるときjが取る最小値
+# ----------------------------------------------------------------
+def getLengthOfLcs(a: str, b: str):
+    L = []
+    for bk in b:
+        bgn_idx = 0  # 検索開始位置
+        for i, cur_idx in enumerate(L):
+            # ※1
+            chr_idx = a.find(bk, bgn_idx) + 1
+            if not chr_idx:
+                break
+            L[i] = min(cur_idx, chr_idx)
+            bgn_idx = cur_idx
+        else:
+            # ※2
+            chr_idx = a.find(bk, bgn_idx) + 1
+            if chr_idx:
+                L.append(chr_idx)
+    return len(L)
+# ======================================================================================
+# 文字列を欲しい
+# ----------------------------------------------------------------
+# Input
+#   1. 文字列1
+#   2. 文字列2
+# Output
+#   最長共通部分列の長さ
+# Order
+#   O(len(b))
+# Note
+#   dp[s][t] =: 文字列str1のs文字目までと文字列str2のt文字目までのLCS。(0 <= s < len(str1), 0 <= t < len(str2))
+#   例)
+#   axyb      (str1)
+#   abyxb     (str2)
+#   生成するdp
+#   [1, 1, 1, 1, 1]
+#   [1, 1, 1, 2, 2]
+#   [1, 1, 2, 2, 2]
+#   [1, 2, 2, 2, 3]
+# ----------------------------------------------------------------
+
+def getLcs(str1: str, str2: str):
+    ls1, ls2 = len(str1), len(str2)
+    dp = []
+    for _ in range(ls1):
+        dp.append([0] * (ls2))
+    
+    # str1の0文字目の初期化
+    isSameFound = False
+    for t in range(ls2):
+        if isSameFound or str2[t] == str1[0]:
+            dp[0][t] = 1
+            isSameFound = True
+
+    # str2の0文字目の初期化
+    isSameFound = False
+    for s in range(ls1):
+        if isSameFound or str1[s] == str2[0]:
+            dp[s][0] = 1
+            isSameFound = True
+
+    for s in range(1, ls1):
+        for t in range(1, ls2):
+            dp[s][t] = dp[s - 1][t - 1] + 1 if str1[s] == str2[t] else max(dp[s][t - 1], dp[s - 1][t])
+    
+    # for a in range(ls1):
+    #     print(dp[a])
+    s, t = ls1 - 1, ls2 - 1
+    lcs = ""
+    while s >= 0 and t >= 0:
+        if str1[s] == str2[t]:
+            lcs += str1[s]
+            s -= 1
+            t -= 1
+        else:
+            if s == 0:
+                t -= 1
+            elif t == 0:
+                s -= 1
+            elif dp[s-1][t] > dp[s][t-1]:
+                s -= 1
+            else:
+                t -= 1
+    return lcs[::-1]
+# ======================================================================================
+
+# ======================================================================================
+# 約数列挙
+# ----------------------------------------------------------------
+# Input
+#   1. 約数を求めたい数
+# Output
+#   約数リスト(昇順)
+# Order
+#   O(√n)
+# ----------------------------------------------------------------
+def getDivisors(n: int):
+    # validation check
+    # if not isinstance(n, int):
+    #     raise("[ERROR] parameter must be integer")
+    # if n < 0:
+    #     raise("[ERROR] parameter must be not less than 0 (n >= 0)")
+
+    lowerDivisors, upperDivisors = [], []
+    i = 1
+    while i * i <= n:
+        if n % i == 0:
+            lowerDivisors.append(i)
+            if i != n // i:
+                upperDivisors.append(n//i)
+        i += 1
+    return lowerDivisors + upperDivisors[::-1]
+# ======================================================================================
+
