@@ -28,6 +28,31 @@ def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
     return dist
 
 
+# ----
+# 入力受け取り
+
+
+# ----
+# モジュール
+import string
+# https://docs.python.org/ja/3/library/string.html
+print(string.ascii_lowercase)
+# >> abcdefghijklmnopqrstuvwxyz
+
+# ----
+
+
+# = 最大公約数 / 最小公倍数 ===============================================================
+factor1 = factor2 = 1
+# 最大公約数
+import math
+print(math.gcd(factor1, factor2))
+# 最小公倍数
+print(factor1 * factor2 // math.gcd(factor1, factor2))
+
+# ======================================================================================
+
+
 # = dijkstra ===========================================================================
 # ----------------------------------------------------------------
 # Input

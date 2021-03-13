@@ -1,25 +1,8 @@
 #!/usr/bin/env python3
 import sys
-import queue
+
 
 def solve(K: int):
-    q = queue.Queue()
-    ll = []
-    ll.append([0,1])
-    for i in range(1, 9):
-        ll.append([i - 1, i, i + 1])
-    ll.append([8, 9])
-    for i in range(1, 10):
-        q.put(i)
-    while K > 0:
-        next = q.get()
-        K -= 1
-        if K == 0:
-            print(next)
-            return
-        s = str(next)
-        for i in ll[int(s[-1])]:
-            q.put(int(str(next) + str(i)))
     return
 
 

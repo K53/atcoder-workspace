@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 import sys
+import itertools
 
 def main():
     N, M, K = map(int, input().split())
     A = list(map(int, input().split()))
     B = list(map(int, input().split()))
-    Sa, Sb = [0], [0]
-    sum = 0
-    for a in A:
-        sum += a
-        Sa.append(sum)
-    sum = 0
-    for b in B:
-        sum += b
-        Sb.append(sum)
+    Sa = [0] + sorted(list(itertools.accumulate(A)))
+    Sb = [0] + sorted(list(itertools.accumulate(B)))
 
     # True ---- ok | ng ---- False
     def is_ok(mid: int, sa: int):

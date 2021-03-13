@@ -3,6 +3,22 @@ import sys
 
 
 def solve(N: int, M: int, p: "List[int]", S: "List[str]"):
+    cnt = [[0, 0] for _ in range(N)]
+    nac = 0
+    nwa = 0
+    for i in range(M):
+        # already AC
+        if cnt[p[i] - 1][0] == 1:
+            continue
+        if S[i] == "AC":
+            cnt[p[i] - 1][0] += 1
+        else:
+            cnt[p[i] - 1][1] += 1
+    for ac, wa in cnt:
+        if ac == 1:
+            nac += 1
+            nwa += wa
+    print(nac, nwa)
     return
 
 
