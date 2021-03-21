@@ -1,13 +1,59 @@
 #!/usr/bin/env python3
 import sys
+from copy import deepcopy
 
 def solve(H: int, W: int, A: int, B: int):
     field = []
     for _ in range(H):
-        field.append([0] * W)
+        field.append([False] * W)
     
-    for h in range(H - 1):
-        
+    def getNext(x, y):
+        nx, ny = x + 1, y
+        if nx == W:
+            nx, ny = 0, y + 1
+            if ny == H:
+                nx, ny = -1, -1
+        return (nx, ny)
+
+    def dfs(f: "list[list]", x, y, a: int, b: int):
+        ans = 0
+        nx, ny = getNext(x, y)
+        print(x, y, nx, ny, a, b)
+        for i in range(H):
+            print(f[i])
+        if nx == ny == -1:
+            # print(a, b)
+            return ans + 1
+        # 既に置かれている
+        if f[y][x]:
+            ans += dfs(deepcopy(f), nx, ny, a, b)
+        # 置かれていない
+        else:
+            # 半畳を置く
+            if b > 0:
+                nf = deepcopy(f)
+                nf[y][x] = True
+                ans += dfs(nf, nx, ny, a, b - 1)
+            # 1畳を置く
+            if a > 0:
+                # 横置き
+                if x != W - 1 and not f[y][x + 1]:
+                    nf = deepcopy(f)
+                    nf[y][x], nf[y][x + 1] = True, True
+                    ans += dfs(nf, nx, ny, a - 1, b)
+                # 縦置き
+                if y != H - 1:
+                    nf = deepcopy(f)
+                    # if a == 2 and b == 0 and x == 0 and y == 1:
+                        # print(nf)
+                    nf[y][x], nf[y + 1][x] = True, True
+                    # if a == 2 and b == 0 and x == 0 and y == 1:
+                        # print(nf)
+                    ans += dfs(nf, nx, ny, a - 1, b)
+        print(ans)
+        return ans
+    
+    print(dfs(field, 0, 0, A, B))
     return
 
 
