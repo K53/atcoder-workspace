@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 import sys
-
+import collections 
 
 def solve(N: int, s: "List[str]"):
+    q = collections.defaultdict(int)
+    for t in s:
+        nt = ""
+        for tt in sorted(t):
+            nt += tt
+        q[nt] += 1
+    ans = 0
+    for i in q.values():
+        if i < 2:
+            continue
+        ans += i * (i - 1) // 2
+    print(ans)
+            
     return
 
 
