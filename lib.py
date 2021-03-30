@@ -42,6 +42,16 @@ print(string.ascii_lowercase)
 # ----
 
 
+# --
+# 2^N 通りのビット全探索。
+for n in range(2 ** N):
+    for i in range(N):
+        if (n >> i) & 1:
+            # i桁目のビットが立っている場合の処理
+            pass
+# --
+
+
 # = 最大公約数 / 最小公倍数 ===============================================================
 factor1 = factor2 = 1
 # 最大公約数
@@ -286,4 +296,20 @@ def cmb(n, r):
             result *= int(numerator[k])
  
     return result
+# ======================================================================================
+
+# = 直交座標/極座標 変換 ==================================================================
+import math
+# 直交座標 → 極座標
+def toPolarCoordinates(taeget_x, taeget_y, origin_x = 0, origin_y = 0) -> ("distance", "radian"):
+    _x, _y = taeget_x - origin_x, taeget_y - origin_y
+    r = math.sqrt(_x ** 2 + _y ** 2)
+    rad = math.atan2(_y, _x)
+    return (r, rad)
+
+# 極座標 → 直交座標
+def toCartesianCoordinates(r, rad, origin_x = 0, origin_y = 0) -> ("x", "y"):
+    x = r * math.cos(rad) + origin_x
+    y = r * math.sin(rad) + origin_y
+    return (x, y)
 # ======================================================================================

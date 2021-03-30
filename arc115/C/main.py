@@ -3,8 +3,6 @@ import sys
 
 
 def solve(N: int):
-    sum = (N - 1) * N // 2
-    print(sum)
     return
 
 

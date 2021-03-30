@@ -2,9 +2,15 @@
 import sys
 
 
-def solve(N: int):
-    sum = (N - 1) * N // 2
-    print(sum)
+def solve(T: int, case: "List[int]"):
+    for c in case:
+        if c % 2 == 0 and (c // 2) % 2 == 1:
+            print("Same")
+        else:
+            if c % 2 == 0:
+                print("Even")
+            else:
+                print("Odd")
     return
 
 
@@ -15,8 +21,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    N = int(next(tokens))  # type: int
-    solve(N)
+    T = int(next(tokens))  # type: int
+    case = [int(next(tokens)) for _ in range(T)]  # type: "List[int]"
+    solve(T, case)
 
 if __name__ == '__main__':
     main()

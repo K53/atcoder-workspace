@@ -2,9 +2,7 @@
 import sys
 
 
-def solve(N: int):
-    sum = (N - 1) * N // 2
-    print(sum)
+def solve(A: int, P: int):
     return
 
 
@@ -15,8 +13,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    N = int(next(tokens))  # type: int
-    solve(N)
+    A = int(next(tokens))  # type: int
+    P = int(next(tokens))  # type: int
+    solve(A, P)
 
 if __name__ == '__main__':
     main()

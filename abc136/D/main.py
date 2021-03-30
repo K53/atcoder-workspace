@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 import sys
+from itertools import groupby
 
+def runLengthEncode(S: str) -> "List[tuple(str, int)]":
+    grouped = groupby(S)
+    res = []
+    for k, v in grouped:
+        res.append((k, int(len(list(v)))))
+    return res
 
 def solve(S: str):
+    ss = runLengthEncode(S)
+    res = [0] * len(S)
+    l, r = -1, 0
+    for direction, num in ss:
+        if direction == "R":
+            l += num
+            r += num
+            res[l] += num // 2 + num % 2
+            res[r] += num // 2
+        else:
+            res[l] += num // 2
+            res[r] += num // 2 + num % 2
+            l += num
+            r += num
+    print(*res, sep=" ")
     return
 
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import sys
 
+YES = "Yes"  # type: str
+NO = "No"  # type: str
 
-def solve(N: int):
-    sum = (N - 1) * N // 2
-    print(sum)
+
+def solve(N: int, C: "List[List[int]]"):
     return
 
 
@@ -16,7 +17,8 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    solve(N)
+    C = [[int(next(tokens)) for _ in range(N)] for _ in range(N)]  # type: "List[List[int]]"
+    solve(N, C)
 
 if __name__ == '__main__':
     main()
