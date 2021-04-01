@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, K: int, p: "List[int]"):
+    l = 0
+    r = l + K - 1
+    s = []
+    s.append(sum(p[l:r + 1]))
+    for i in range(N - K):
+        l += 1
+        r += 1
+        s.append(s[i] - p[l - 1] + p[r])
+    print((max(s) + K) / 2)
     return
 
 

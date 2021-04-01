@@ -28,9 +28,22 @@ def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
     return dist
 
 
-# ----
-# 入力受け取り
 
+# = 入力受け取り =========================================================================
+# ---------
+# マス目
+# ---------
+H, W = map(int, input().split())
+unOverwritableList = []
+overwritableList = []
+for _ in range(H):
+    unOverwritableList.append(input())
+    overwritableList.append(list(input()))
+print(unOverwritableList)   # ['.....', '.###.', '.###.', '.###.', '.....']
+print(overwritableList)     # [['.', '.', '.', '.', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '.', '.', '.', '.']]
+unOverwritableList[0][0] = "a"   # 置き換え不可
+overwritableList[0][0] = "a"   # 置き換え可能
+# ======================================================================================
 
 # ----
 # モジュール

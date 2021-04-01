@@ -3,6 +3,16 @@ import sys
 
 
 def solve(N: int, A: "List[int]", Q: int, B: "List[int]", C: "List[int]"):
+    num = [0] * (10 ** 5 + 1)
+    sum = 0
+    for a in A:
+        num[a] += 1
+        sum += a
+    for i in range(Q):
+        sum += num[B[i]] * (C[i] - B[i])
+        num[C[i]] += num[B[i]]
+        num[B[i]] = 0
+        print(sum)
     return
 
 

@@ -3,6 +3,15 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    num = [0] * (N + 1)
+    for a in A:
+        num[a] += 1
+    all = 0
+    for n in num:
+        all += n * (n - 1) // 2
+    for a in A:
+        print(all - (num[a] - 1))
+
     return
 
 

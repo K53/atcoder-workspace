@@ -1,10 +1,30 @@
 #!/usr/bin/env python3
 import sys
+import queue
 
 YES = "Yes"  # type: str
-
+NO = "No"
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
+    nodes = [[] for _ in range(N + 1)]
+    direction = [0, 0] + [-1] * (N - 1)
+    q = queue.Queue()
+    q.put(1)
+    for i in range(M):
+        nodes[A[i]].append(B[i])
+        nodes[B[i]].append(A[i])
+    while not q.empty():
+        n = q.get()
+        for i in nodes[n]:
+            if direction[i] == -1:
+                direction[i] = n
+                q.put(i)
+    if -1 in direction[2:]:
+        print(NO)
+    else:
+        print(YES)
+        print(*direction[2:], sep="\n")
+    
     return
 
 

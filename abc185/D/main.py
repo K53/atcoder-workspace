@@ -7,23 +7,21 @@ def main():
         print(1)
         return
     A = list(map(int, input().split()))
-    A.extend([0, N + 1])
     A.sort()
-    diff = []
-    for i in range(len(A) - 1):
-        diff.append(A[i + 1] - A[i] - 1)
-    diff.sort()
-    m = 0
+    A = [0] + A + [N + 1]
+    nums = []
+    for i in range(M + 1):
+        if A[i + 1] - A[i] - 1 != 0:
+            nums.append(A[i + 1] - A[i] - 1)
+    nums.sort()
+    if len(nums) == 0:
+        print(0)
+        return
+    k = nums[0]
     ans = 0
-    for d in diff:
-        if d == 0:
-            continue
-        if m == 0:
-            m = d
-        ans += math.ceil(d / m)
+    for n in nums:
+        ans += math.ceil(n / k)
     print(ans)
-        
-    
 
 if __name__ == '__main__':
     main()
