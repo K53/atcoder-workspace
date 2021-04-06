@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 import sys
+import math
 
-
-def solve(H: int):
-    num = 1
-    ans = 0
-    for _ in range(10 ** 12):
-        ans += num
-        if H == 1:
-            break
-        H //= 2
-        num *= 2
-    print(ans)
+def solve(A: int, B: int, N: int):
+    x = B - 1 if B - 1 < N else N
+    print(math.floor(A * x / B) - A * math.floor(x / B))
     return
 
 
@@ -22,8 +15,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    H = int(next(tokens))  # type: int
-    solve(H)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    N = int(next(tokens))  # type: int
+    solve(A, B, N)
 
 if __name__ == '__main__':
     main()

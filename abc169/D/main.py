@@ -1,8 +1,32 @@
 #!/usr/bin/env python3
 import sys
 
+def primeFactrization(n: int) -> dict:
+    primeFactors = dict()
+    for i in range(2, n):
+        if i * i > n:
+            break
+        ex = 0
+        for _ in range(n):
+            if n % i != 0:
+                break
+            ex += 1
+            n //= i
+        if ex != 0:
+            primeFactors[i] = ex
+    if n != 1:
+        primeFactors[n] = 1
+    return primeFactors
 
 def solve(N: int):
+    ans = 0
+    for v in (primeFactrization(N)).values():
+        n = 1
+        while v - n >= 0:
+            v -= n
+            n += 1
+            ans += 1
+    print(ans)
     return
 
 

@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, S: str):
+    rgb = [0] * 3
+    for s in S:
+        if s == "R":
+            rgb[0] += 1
+        elif s == "G":
+            rgb[1] += 1
+        else:
+            rgb[2] += 1
+    total = rgb[0] * rgb[1] * rgb[2]
+    sub = 0
+    for i in range(N - 2):
+        for j in range(i + 1, N - 1):
+            if S[i] != S[j] and j * 2 - i < N and S[j * 2 - i] != S[i] and S[j * 2 - i] != S[j]:
+                sub += 1
+    print(total - sub)
     return
 
 

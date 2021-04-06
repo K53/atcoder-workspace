@@ -1,8 +1,36 @@
 #!/usr/bin/env python3
 import sys
 
+# a   b   c   d   e
+# ^ - ^ - ^ - ^ - ^ -
+#   3   8   7   5   5
+
+# a + b             = 6
+#     b + c         = 16
+#         c + d     = 14
+#             d + e = 10
+# a +             e = 10
+
+# total = 28
 
 def solve(N: int, A: "List[int]"):
+    sums = []
+    total = 0
+    ans = []
+    for a in A:
+        sums.append(a * 2)
+        total += a * 2
+    total //= 2
+    n = total
+    for i in range(1, N, 2):
+        n -= sums[i]
+    ans.append(n)
+    for sum in sums:
+        n = sum - n
+        ans.append(n)
+    print(*ans[:-1], sep=" ")
+
+
     return
 
 

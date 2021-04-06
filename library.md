@@ -1,81 +1,9 @@
-import queue
-def bfs(edges: "List[to]", start_node: int) -> list:
-    q = queue.Queue()
-    dist = [INF] * len(edges)
-    q.put(start_node)
-    dist[start_node] = 0
-    while not q.empty():
-        now = q.get()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.put(next)
-            dist[next] = dist[now] + 1
-    return dist
 
-def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
-    q = queue.Queue()
-    dist = [INF] * len(edges)
-    for start_node in start_nodes:
-        q.put(start_node)
-        dist[start_node] = 0
-    while not q.empty():
-        now = q.get()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.put(next)
-            dist[next] = dist[now] + 1
-    return dist
+## 動的計画法
 
+### dijkstra
 
-
-# = 入力受け取り =========================================================================
-# ---------
-# マス目
-# ---------
-H, W = map(int, input().split())
-unOverwritableList = []
-overwritableList = []
-for _ in range(H):
-    unOverwritableList.append(input())
-    overwritableList.append(list(input()))
-print(unOverwritableList)   # ['.....', '.###.', '.###.', '.###.', '.....']
-print(overwritableList)     # [['.', '.', '.', '.', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '.', '.', '.', '.']]
-unOverwritableList[0][0] = "a"   # 置き換え不可
-overwritableList[0][0] = "a"   # 置き換え可能
-# ======================================================================================
-
-# ----
-# モジュール
-import string
-# https://docs.python.org/ja/3/library/string.html
-print(string.ascii_lowercase)
-# >> abcdefghijklmnopqrstuvwxyz
-
-# ----
-
-
-# --
-# 2^N 通りのビット全探索。
-for n in range(2 ** N):
-    for i in range(N):
-        if (n >> i) & 1:
-            # i桁目のビットが立っている場合の処理
-            pass
-# --
-
-
-# = 最大公約数 / 最小公倍数 ===============================================================
-factor1 = factor2 = 1
-# 最大公約数
-import math
-print(math.gcd(factor1, factor2))
-# 最小公倍数
-print(factor1 * factor2 // math.gcd(factor1, factor2))
-# ======================================================================================
-
-
+```python
 # = dijkstra ===========================================================================
 # ----------------------------------------------------------------
 # Input
@@ -112,12 +40,12 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
                 dist[next] = dist[now] + cost
                 heapq.heappush(hq, (dist[next], next))
     return dist
-
-# Usage
-
-# ======================================================================================
+```
 
 
+### bellmanFord
+
+```python
 # = bellmanFord ========================================================================
 # ----------------------------------------------------------------
 # Input
@@ -150,8 +78,12 @@ def bellmanFord(edges: "List[(from, to, to)]", vertex: int, start_node: int) -> 
                     costs[t] = costs[f] + c
     return costs
 # ======================================================================================
+```
 
 
+### LCS
+
+```python
 # = LCS ================================================================================
 # 長さだけ欲しい
 # ----------------------------------------------------------------
@@ -249,7 +181,13 @@ def getLcs(str1: str, str2: str):
                 t -= 1
     return lcs[::-1]
 # ======================================================================================
+```
 
+## 数学
+
+### 素数判定
+
+```python
 # = 素数判定 ============================================================================
 def isPrime(n: int) -> bool:
     if n == 0 or n == 1:
@@ -260,8 +198,11 @@ def isPrime(n: int) -> bool:
         if n % i == 0:
             return False
 # ======================================================================================
+```
 
-# = 約数列挙 ============================================================================
+### 約数列挙
+
+```python
 # ----------------------------------------------------------------
 # Input
 #   1. 約数を求めたい数
@@ -271,12 +212,6 @@ def isPrime(n: int) -> bool:
 #   O(√n)
 # ----------------------------------------------------------------
 def getDivisors(n: int):
-    # validation check
-    # if not isinstance(n, int):
-    #     raise("[ERROR] parameter must be integer")
-    # if n < 0:
-    #     raise("[ERROR] parameter must be not less than 0 (n >= 0)")
-
     lowerDivisors, upperDivisors = [], []
     i = 1
     while i * i <= n:
@@ -286,9 +221,38 @@ def getDivisors(n: int):
                 upperDivisors.append(n//i)
         i += 1
     return lowerDivisors + upperDivisors[::-1]
-# ======================================================================================
+```
 
-# 素因数分解
+### 約数の個数
+
+```python
+def getNumOfDividors(n: int) -> int:
+    numOfDividors = 1
+    i = 2
+    while i * i <= n:
+        ex = 0
+        while n % i == 0:
+            ex += 1
+            n //= i
+        if ex != 0:
+            numOfDividors *= ex + 1
+        i += 1
+    if n != 1:
+        numOfDividors *= 2
+    return numOfDividors
+```
+
+### 素因数分解
+
+```python
+# ----------------------------------------------------------------
+# Input
+#   1. 素因数を求めたい数
+# Output
+#   素因数(辞書)
+# Order
+#   O(√n)
+# ----------------------------------------------------------------
 def primeFactrization(n: int) -> dict:
     primeFactors = dict()
     i = 2
@@ -303,8 +267,61 @@ def primeFactrization(n: int) -> dict:
     if n != 1:
         primeFactors[n] = 1
     return primeFactors
+```
 
-# = 組み合わせ ===========================================================================
+```python
+# ----------------------------------------------------------------
+# Input
+#   1. 素因数を求めたい数
+# Output
+#   素因数(昇順リスト)
+# Order
+#   O(√n)
+# ----------------------------------------------------------------
+def primeFactrization(n: int) -> list:
+    primeFactors = list()
+    i = 2
+    while i * i <= n:
+        while n % i == 0:
+            primeFactors.append(i)
+            n //= i
+        i += 1
+    if n != 1:
+        primeFactors.append(n)
+    return primeFactors
+```
+
+
+```python:while->for高速化
+def primeFactrization(n: int) -> dict:
+    primeFactors = dict()
+    for i in range(2, n):
+        if i * i > n:
+            break
+        ex = 0
+        for _ in range(n):
+            if n % i != 0:
+                break
+            ex += 1
+            n //= i
+        if ex != 0:
+            primeFactors[i] = ex
+    if n != 1:
+        primeFactors[n] = 1
+    return primeFactors
+```
+
+### 組み合わせ
+
+```python
+# ----------------------------------------------------------------
+# Input
+#   1,2: nCr
+# Output
+#   組み合わせの数
+# Order
+#   ??
+# ----------------------------------------------------------------
 def cmb(n, r):
     if n - r < r: r = n - r
     if r == 0: return 1
@@ -312,21 +329,11 @@ def cmb(n, r):
  
     numerator = [n - r + k + 1 for k in range(r)]
     denominator = [k + 1 for k in range(r)]
-    # print(numerator)
-    # print("----------")
-    # print(denominator)
-    # print("")
     for p in range(2,r + 1):                    # p番目について、
         pivot = denominator[p - 1]              # pivotで約分を試みる。
-        # print("--- p  : " + str(p))
-        # print("--- piv: " + str(pivot))
         if pivot > 1:                           # ただし、pivotが1、すなわちすでに割り尽くされているならp番目は飛ばす。
             offset = (n - r) % p
-            # print("--- off: " + str(offset))
-            for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分かのうなので実施する。
-                # print("------ for " + str(k) + " in range(" + str(p-1) + "," + str(r) + "," + str(p) + ")")
-                # print("------ numerator[k - offset]: " + str(numerator[k - offset]))
-                # print("------ denominator[k]       : " + str(denominator[k]))
+            for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分可能なので実施する。
                 numerator[k - offset] //= pivot
                 denominator[k] //= pivot
  
@@ -334,11 +341,12 @@ def cmb(n, r):
     for k in range(r):
         if numerator[k] > 1:
             result *= int(numerator[k])
- 
     return result
-# ======================================================================================
+```
 
-# = 直交座標/極座標 変換 ==================================================================
+### 直交座標ー極座標 変換
+
+```python
 import math
 # 直交座標 → 極座標
 def toPolarCoordinates(taeget_x, taeget_y, origin_x = 0, origin_y = 0) -> ("distance", "radian"):
@@ -352,4 +360,4 @@ def toCartesianCoordinates(r, rad, origin_x = 0, origin_y = 0) -> ("x", "y"):
     x = r * math.cos(rad) + origin_x
     y = r * math.sin(rad) + origin_y
     return (x, y)
-# ======================================================================================
+```

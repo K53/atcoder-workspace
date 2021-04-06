@@ -2,16 +2,7 @@
 import sys
 
 
-def solve(H: int):
-    num = 1
-    ans = 0
-    for _ in range(10 ** 12):
-        ans += num
-        if H == 1:
-            break
-        H //= 2
-        num *= 2
-    print(ans)
+def solve(K: int, A: int, B: int):
     return
 
 
@@ -22,8 +13,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    H = int(next(tokens))  # type: int
-    solve(H)
+    K = int(next(tokens))  # type: int
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    solve(K, A, B)
 
 if __name__ == '__main__':
     main()

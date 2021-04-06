@@ -3,20 +3,19 @@ import sys
 
 def main():
     N, W = map(int, input().split())
-    l = []
+    use = [0] * (2 * 10 ** 5 + 1)
     for _ in range(N):
         s, t, p = map(int, input().split())
-        l.append((s, p))    # 使用開始時に加算
-        l.append((t, -p))   # 使用終了時に減算
-    l.sort()
-    using = 0
-    for time, delta in l:
-        using += delta
-        if using > W:
+        use[s] += p
+        use[t] -= p
+    t = 0
+    for i in range(2 * 10 ** 5 + 1):
+        t += use[i]
+        if t > W:
             print("No")
             return
     print("Yes")
-    return    
+    return 
 
 if __name__ == '__main__':
     main()

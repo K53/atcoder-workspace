@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
 import sys
 
+def getNumOfDividors(n: int) -> int:
+    numOfDividors = 1
+    i = 2
+    while i * i <= n:
+        ex = 0
+        while n % i == 0:
+            ex += 1
+            n //= i
+        if ex != 0:
+            numOfDividors *= ex + 1
+        i += 1
+    if n != 1:
+        numOfDividors *= 2
+    return numOfDividors
 
 def solve(N: int):
+    ans = 0
+    for k in range(1, N + 1):
+        ans += k * getNumOfDividors(k)
+    print(ans)
     return
 
 

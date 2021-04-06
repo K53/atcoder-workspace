@@ -3,21 +3,6 @@ import sys
 
 
 def solve(X: int):
-    for a in range(10 ** 4):
-        t = a ** 5
-        if t < 10 ** 18:
-            for b in range(10 ** 4):
-                s = b ** 5
-                if s < 10 ** 18:
-                    if t + s == X:
-                        print(a, -b)
-                        return
-                    if t - s == X:
-                        print(a, b)
-                        return
-                    if s - t == X:
-                        print(-a, -b)
-                        return
     return
 
 

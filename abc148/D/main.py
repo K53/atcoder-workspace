@@ -3,6 +3,17 @@ import sys
 
 
 def solve(N: int, a: "List[int]"):
+    ans = 0
+    now = 1
+    if not 1 in a:
+        print(-1)
+        return
+    for i in range(N):
+        if a[i] == now:
+            now += 1
+        else:
+            ans += 1
+    print(ans)
     return
 
 

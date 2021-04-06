@@ -2,16 +2,7 @@
 import sys
 
 
-def solve(H: int):
-    num = 1
-    ans = 0
-    for _ in range(10 ** 12):
-        ans += num
-        if H == 1:
-            break
-        H //= 2
-        num *= 2
-    print(ans)
+def solve(N: int, a: "List[int]", u: "List[int]", v: "List[int]"):
     return
 
 
@@ -22,8 +13,14 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    H = int(next(tokens))  # type: int
-    solve(H)
+    N = int(next(tokens))  # type: int
+    a = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    u = [int()] * (N - 1)  # type: "List[int]"
+    v = [int()] * (N - 1)  # type: "List[int]"
+    for i in range(N - 1):
+        u[i] = int(next(tokens))
+        v[i] = int(next(tokens))
+    solve(N, a, u, v)
 
 if __name__ == '__main__':
     main()

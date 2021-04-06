@@ -2,15 +2,19 @@
 import sys
 
 def solve(X: int, Y: int, A: int, B: int):
-    ex = 0
-    while X * A < B:
-        X *= A
-        if X >= Y:
-            print(ex)
-            return
-        ex += 1
-    ex += (Y - 1 - X) // B
-    print(ex)
+    ans = 0
+    while True:
+        xa = X * A
+        xb = X + B
+        if xa < xb and xa < Y:
+            ans += 1
+            X = xa
+        elif xa >= xb and xb < Y:
+            ans += (Y - 1 - X) // B
+            break
+        else:
+            break
+    print(ans)
     return
 
 
