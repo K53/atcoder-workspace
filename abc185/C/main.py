@@ -8,21 +8,11 @@ def cmb(n, r):
 
     numerator = [n - r + k + 1 for k in range(r)]
     denominator = [k + 1 for k in range(r)]
-    # print(numerator)
-    # print("----------")
-    # print(denominator)
-    # print("")
     for p in range(2,r + 1):                    # p番目について、
         pivot = denominator[p - 1]              # pivotで約分を試みる。
-        # print("--- p  : " + str(p))
-        # print("--- piv: " + str(pivot))
         if pivot > 1:                           # ただし、pivotが1、すなわちすでに割り尽くされているならp番目は飛ばす。
             offset = (n - r) % p
-            # print("--- off: " + str(offset))
             for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分かのうなので実施する。
-                # print("------ for " + str(k) + " in range(" + str(p-1) + "," + str(r) + "," + str(p) + ")")
-                # print("------ numerator[k - offset]: " + str(numerator[k - offset]))
-                # print("------ denominator[k]       : " + str(denominator[k]))
                 numerator[k - offset] //= pivot
                 denominator[k] //= pivot
 

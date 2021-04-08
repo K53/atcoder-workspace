@@ -2,10 +2,29 @@
 import sys
 
 
-def solve(N: int, M: int, S: "List[str]"):
-                    
+def solve(N: int, S: "List[str]"):
+    d = {
+        "M": 0,
+        "A": 0,
+        "R": 0,
+        "C": 0,
+        "H": 0
+    }
+    for name in S:
+        if name[0] in "MARCH":
+            d[name[0]] += 1
+    l = [i for i in d.values()]
+    ans = 0
+    for i in range(3):
+        for j in range(i + 1, 4):
+            for k in range(j + 1, 5):
+                # print(l[i], l[j], l[k])
+                ans += l[i] * l[j] * l[k]
+    print(ans)
 
 
+
+        
     return
 
 
@@ -17,9 +36,8 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    M = int(next(tokens))  # type: int
     S = [next(tokens) for _ in range(N)]  # type: "List[str]"
-    solve(N, M, S)
+    solve(N, S)
 
 if __name__ == '__main__':
     main()

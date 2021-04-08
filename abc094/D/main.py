@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 import sys
 
-MOD = 1000000007  # type: int
-
-
-def solve(N: int, K: int):
-    
+def solve(n: int, a: "List[int]"):
+    a.sort()
+    last = a[-1]
+    center = max(last // 2, last - last // 2)
+    c = a[0]
+    for i in a:
+        if i <= center:
+            c = i
+        else:
+            if last - i > c:
+                c = i
+            break
+    print(last, c)
     return
 
 
@@ -16,9 +24,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    N = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(N, K)
+    n = int(next(tokens))  # type: int
+    a = [int(next(tokens)) for _ in range(n)]  # type: "List[int]"
+    solve(n, a)
 
 if __name__ == '__main__':
     main()

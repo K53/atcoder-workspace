@@ -3,9 +3,19 @@ import sys
 
 MOD = 1000000007  # type: int
 
+def fac(n: int):
+    ans = 1
+    for i in range(1, n + 1):
+        ans *= i
+        if ans >= MOD:
+            ans %= MOD
+    return ans
 
-def solve(N: int, K: int):
-    
+def solve(N: int, M: int):
+    if abs(N - M) > 1:
+        print(0)
+        return
+    print(fac(N) * fac(M) * (2 if N == M else 1) % MOD)
     return
 
 
@@ -17,8 +27,8 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(N, K)
+    M = int(next(tokens))  # type: int
+    solve(N, M)
 
 if __name__ == '__main__':
     main()

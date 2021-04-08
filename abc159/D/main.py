@@ -3,15 +3,15 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    num = [0] * (N + 1)
-    for a in A:
-        num[a] += 1
-    all = 0
-    for n in num:
-        all += n * (n - 1) // 2
-    for a in A:
-        print(all - (num[a] - 1))
-
+    kind = [0] * (2 * 10 ** 5 + 1)
+    for aa in A:
+        kind[aa] += 1
+    total = 0
+    for k in kind:
+        if k > 1:
+            total += k * (k - 1) // 2
+    for k in A:
+        print(total - (kind[k] - 1))
     return
 
 

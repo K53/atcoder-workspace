@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 import sys
 
-MOD = 1000000007  # type: int
 
-
-def solve(N: int, K: int):
-    
+def solve(N: int):
     return
 
 
@@ -17,8 +14,7 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(N, K)
+    solve(N)
 
 if __name__ == '__main__':
     main()
