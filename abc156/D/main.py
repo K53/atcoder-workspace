@@ -3,8 +3,57 @@ import sys
 
 MOD = 1000000007  # type: int
 
+# 3 3 1
+# 4 6 4 1
+# 5 10 10 5 1
+# 6 15 20 15 6 1
+# 7 21 35 35 21 7 1
+
+# 7 = 7 * 2^0 + 0
+# 15 = 7 * 2^1 + (0 + 1)
+# 31 = 15 * 2 + 1 = 7 * 2^2 + (0 + 1 + 2)
+# 63 = 31 * 2 + 1 = 15 * 4 + 3 = 7 * 2^3 + (0 + 1 + 2 + 4)
+# 127 = 63 * 2 + 1 = 7 * 2^4 + (0 + 1 + 2 + 4 + 8)
+
+# 7 * 2^n + (2^n - 1)
+
+# 8 * 2^(n - 3) - 1
+
+def cmb(n, r):
+    if n - r < r: r = n - r
+    if r == 0: return 1
+    if r == 1: return n
+ 
+    numerator = [n - r + k + 1 for k in range(r)]
+    denominator = [k + 1 for k in range(r)]
+    for p in range(2,r + 1):                    # p番目について、
+        pivot = denominator[p - 1]              # pivotで約分を試みる。
+        if pivot > 1:                           # ただし、pivotが1、すなわちすでに割り尽くされているならp番目は飛ばす。
+            offset = (n - r) % p
+            for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分かのうなので実施する。
+                numerator[k - offset] //= pivot
+                denominator[k] //= pivot
+    result = 1
+    for k in range(r):
+        if numerator[k] > 1:
+            result = result * int(numerator[k]) % MOD
+    return result
+
+def modpow(n: int, a: int, mod: int = MOD) -> int:
+    res = 1
+    while a > 0:
+        if a & 1:
+            res = res * n % mod
+        n = n * n % mod
+        a >>= 1
+    return res
 
 def solve(n: int, a: int, b: int):
+    if n == 2:
+        print(0)
+        return
+    all = (modpow(2, n) - 1)
+    print((all - cmb(n, a) - cmb(n, b)) % MOD)
     return
 
 
