@@ -1,4 +1,83 @@
 
+## 入力受け取り
+
+```python
+# ---------
+# マス目
+# ---------
+H, W = map(int, input().split())
+unOverwritableList = []
+overwritableList = []
+for _ in range(H):
+    unOverwritableList.append(input())
+    overwritableList.append(list(input()))
+print(unOverwritableList)   # ['.....', '.###.', '.###.', '.###.', '.....']
+print(overwritableList)     # [['.', '.', '.', '.', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '#', '#', '#', '.'], ['.', '.', '.', '.', '.']]
+unOverwritableList[0][0] = "a"   # 置き換え不可
+overwritableList[0][0] = "a"   # 置き換え可能
+```
+
+## モジュール
+
+```python
+import string
+# https://docs.python.org/ja/3/library/string.html
+print(string.ascii_lowercase)
+# >> abcdefghijklmnopqrstuvwxyz
+```
+
+## 探索
+
+### ビット全探索
+
+```python
+# 2^N 通りのビット全探索。
+for n in range(2 ** N):
+    for i in range(N):
+        if (n >> i) & 1:
+            # i桁目のビットが立っている場合の処理
+            pass
+```
+
+### BFS
+
+```python
+# = bfs(隣接) ===========================================================================
+# ----------------------------------------------------------------
+# Input
+#   1. 全てのマスが隣接したフィールドの二次元配列
+#   2. 1の高さ
+#   3. 1の幅
+#   4. スタート地点のy座標
+#   5. スタート地点のx座標
+# Output
+#   スタートから各ノードへの最小コスト
+# Order
+#   
+# Note
+#   開始点が壁の場合には除く必要あり。
+# ----------------------------------------------------------------
+import queue
+INF = 10 ** 9
+def bfs(field: "List[Lsit[]]", H: int, W: int, y: int, x: int) -> list:
+    q = queue.Queue()
+    dist = []
+    for _ in range(H):
+        dist.append([-INF] * W)
+    q.put((x, y))
+    dist[y][x] = 0
+    while not q.empty():
+        now_x, now_y= q.get()
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            next_x, next_y = now_x + dx, now_y + dy
+            if next_y < 0 or next_y >= H or next_x < 0 or next_x >= W or field[next_y][next_x] == "#" or dist[next_y][next_x] != -INF:
+                continue
+            q.put((next_x, next_y))
+            dist[next_y][next_x] = dist[now_y][now_x] + 1
+    return dist
+# ======================================================================================
+```
+
 ## 動的計画法
 
 ### dijkstra
@@ -185,6 +264,19 @@ def getLcs(str1: str, str2: str):
 
 ## 数学
 
+### 最大公約数/最小公倍数
+
+```python
+# = 最大公約数 / 最小公倍数 ===============================================================
+factor1 = factor2 = 1
+# 最大公約数
+import math
+print(math.gcd(factor1, factor2))
+# 最小公倍数
+print(factor1 * factor2 // math.gcd(factor1, factor2))
+# ======================================================================================
+```
+
 ### 素数判定
 
 ```python
@@ -344,6 +436,21 @@ def cmb(n, r):
     return result
 ```
 
+### modpow
+
+```python
+# n^a % MOD の算出
+def modpow(n: int, a: int, mod: int = MOD) -> int:
+    res = 1
+    while a > 0:
+        if a & 1:
+            res = res * n % mod
+        n = n * n % mod
+        a >>= 1
+    return res
+# ======================================================================================
+```
+
 ### 直交座標ー極座標 変換
 
 ```python
@@ -360,4 +467,24 @@ def toCartesianCoordinates(r, rad, origin_x = 0, origin_y = 0) -> ("x", "y"):
     x = r * math.cos(rad) + origin_x
     y = r * math.sin(rad) + origin_y
     return (x, y)
+```
+
+```python
+def solve(N: int, K: int, a: "List[int]"):
+    # [l, r) 右側は開区間。そのindexを含まない。
+    r = 0
+    l = 0
+    ans = 0
+    sum = 0
+    for _ in range(N):
+        while r < N and """rをインクリメントするために満たす条件""":
+            # なんらかの処理
+            # eg) sum += a[r]
+            r += 1
+        if """lをインクリメントするために満たす条件""":
+            # なんらかの処理
+            # ans += N - r + 1
+            # sum -= a[l]
+            l += 1
+    print(ans)
 ```

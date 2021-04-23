@@ -3,8 +3,35 @@ import sys
 
 MOD = 1000000007  # type: int
 
+def cmb(n, r):
+    if n - r < r: r = n - r
+    if r == 0: return 1
+    if r == 1: return n
+ 
+    numerator = [n - r + k + 1 for k in range(r)]
+    denominator = [k + 1 for k in range(r)]
+    for p in range(2,r + 1):                    # p番目について、
+        pivot = denominator[p - 1]              # pivotで約分を試みる。
+        if pivot > 1:                           # ただし、pivotが1、すなわちすでに割り尽くされているならp番目は飛ばす。
+            offset = (n - r) % p
+            for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分かのうなので実施する。
+                numerator[k - offset] //= pivot
+                denominator[k] //= pivot
+    result = 1
+    for k in range(r):
+        if numerator[k] > 1:
+            result *= int(numerator[k])
+    return result
 
 def solve(N: int, K: int):
+    for i in range(0, K):
+        blue = K - (i + 1)
+        red = N - K - i
+        space_blue = i
+        space_red = i + 1
+        blue_cmb = cmb(blue + space_blue, blue)
+        red_cmb = cmb(red + space_red, red)
+        print(blue_cmb * red_cmb % MOD)
     return
 
 

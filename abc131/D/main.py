@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-import heapq
 
 YES = "Yes"  # type: str
 NO = "No"  # type: str
@@ -8,14 +7,13 @@ NO = "No"  # type: str
 def main():
     N = int(input())
     BA = []
-    heapq.heapify(BA)
     for _ in range(N):
         a, b = map(int, input().split())
-        heapq.heappush(BA, (b, a))
+        BA.append((b, a))
+    BA.sort()
 
     now = 0
-    for _ in range(N):
-        end, task = heapq.heappop(BA)
+    for end, task in BA:
         if now + task > end:
             print(NO)
             return
