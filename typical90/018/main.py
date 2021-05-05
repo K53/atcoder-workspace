@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 import sys
 
-test
-test5
-test5
-test5
-
 def solve(T: int, L: int, X: int, Y: int, Q: int, E: "List[int]"):
     return
 
