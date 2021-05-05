@@ -3,6 +3,18 @@ import sys
 
 
 def solve(N: int, C: "List[int]", P: "List[int]", Q: int, L: "List[int]", R: "List[int]"):
+    sum1 = [0]
+    sum2 = [0]
+    for i in range(N):
+        if C[i] == 1:
+            sum1.append(sum1[i] + P[i])
+            sum2.append(sum2[i])
+        else:
+            sum1.append(sum1[i])
+            sum2.append(sum2[i] + P[i])
+    for i in range(Q):
+        print(sum1[R[i]] - sum1[L[i] - 1], sum2[R[i]] - sum2[L[i] - 1])
+
     return
 
 

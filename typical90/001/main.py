@@ -1,8 +1,40 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, L: int, K: int, A: "List[int]"):
+    subs = []
+    nA = [0] + A + [L]
+    for i in range(N + 1):
+        subs.append(nA[i + 1] - nA[i])
+
+    def isDividable(l: int) -> bool:
+        sum = 0
+        count = 0
+        for sub in subs:
+            sum += sub
+            if sum > l:
+                sum = 0
+                count += 1
+        return count >= K + 1
+
+
+    # False -- ng | ok -- True
+    def is_ok(l):
+        if l < 0: return False
+        if l >= L: return True
+        return isDividable(l)
+
+    def binSearch(ng, ok):
+        while abs(ok - ng) > 1:
+            mid = (ok + ng) // 2
+            if is_ok(mid):
+                ng = mid
+            else:
+                ok = mid
+        # print(ok, ng)
+        return ok
+
+    print(binSearch(0, L))
     return
 
 
