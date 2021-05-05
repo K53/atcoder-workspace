@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 import sys
-
+import heapq
 
 def solve(N: int, M: int, A: "List[int]"):
+    l = [-aa for aa in A]
+    heapq.heapify(l)
+    for _ in range(M):
+        if len(l) == 0:
+            break
+        next = -(heapq.heappop(l))
+        discounted = next // 2
+        if discounted == 0:
+            continue
+        heapq.heappush(l, -discounted)
+    print(-sum(l))
     return
 
 

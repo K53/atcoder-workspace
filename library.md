@@ -26,7 +26,70 @@ print(string.ascii_lowercase)
 # >> abcdefghijklmnopqrstuvwxyz
 ```
 
+## 二次元配列
+
+```python
+arr = [[0] * W for _ in range(H)]
+# def generate2Darray(height: int, width: int, init: int) -> "List[List[int]]":
+#     res = []
+#     for _ in range(height):
+#        res.append([init] * width)
+#     return res
+```
+
+## ランレングス圧縮
+
+```python
+from itertools import groupby
+
+# RUN LENGTH ENCODING str -> list(tuple())
+# example) "aabbbbaaca" -> [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] 
+def runLengthEncode(S: str) -> "List[tuple(str, int)]":
+    grouped = groupby(S)
+    res = []
+    for k, v in grouped:
+        res.append((k, int(len(list(v)))))
+    return res
+
+# RUN LENGTH DECODING list(tuple()) -> str
+# example) [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] -> "aabbbbaaca"
+def runLengthDecode(L: "list[tuple]") -> str:
+    res = ""
+    for c, n in L:
+        res += c * int(n)
+    return res
+
+# RUN LENGTH ENCODING str -> str
+# example) "aabbbbaaca" -> "a2b4a2c1a1" 
+def runLengthEncodeToString(S: str) -> str:
+    grouped = groupby(S)
+    res = ""
+    for k, v in grouped:
+        res += k + str(len(list(v)))
+    return res
+```
+
+
 ## 探索
+
+### 二分探索
+
+```python
+# True ------ ok | ng ---- False
+def is_ok(k: int):
+    return k * (k + 1) // 2 <= n + 1    # 条件式
+
+def binSearch(ok: int, ng: int):
+    # print(ok, ng)              # はじめの2値の状態
+    while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+        mid = (ok + ng) // 2
+        if is_ok(mid):
+            ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+        else:
+            ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+        # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+    return ok        
+```
 
 ### ビット全探索
 
@@ -201,7 +264,7 @@ def getLengthOfLcs(a: str, b: str):
 #   1. 文字列1
 #   2. 文字列2
 # Output
-#   最長共通部分列の長さ
+#   最長共通部分列
 # Order
 #   O(len(b))
 # Note
@@ -440,6 +503,8 @@ def cmb(n, r):
 
 ```python
 # n^a % MOD の算出
+# 二分累乗法
+MOD = 10 ** 9 + 7
 def modpow(n: int, a: int, mod: int = MOD) -> int:
     res = 1
     while a > 0:
@@ -448,7 +513,46 @@ def modpow(n: int, a: int, mod: int = MOD) -> int:
         n = n * n % mod
         a >>= 1
     return res
-# ======================================================================================
+```
+
+### modinv
+
+```python
+# ----------------------------------------------------------------
+# Input
+#   1,2: nCr % mod
+# Output
+#   組み合わせの数
+# Order
+#   ??
+# Note:
+#   MAX定数にnCkのn+1の値を入れる。種々のリスト作成される。
+#   初めにcmbInit()を呼び、階乗、階乗の逆元のリストを算出する。
+# ----------------------------------------------------------------
+MAX = 666667      # 7.3 * 10^5程度が限度。それ以上はTLE(>2s)
+MOD = 1000000007  # type: int
+
+fac, finv, inv = [1, 1], [1, 1], [0, 1]
+# fac : 階乗(1,2,6,...)
+# inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
+# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
+def cmbInit():
+    for i in range(2, MAX):
+        fac.append(fac[i - 1] * i % MOD)
+        inv.append(MOD - inv[MOD % i] * (MOD // i) % MOD)
+        finv.append(finv[i - 1] * inv[i] % MOD)
+
+# 二項係数計算
+def cmbMod(n: int,k: int):
+    if n < k: return 0
+    if n < 0 or k < 0: return 0
+    return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD
+
+# Usage
+def solve():
+    cmbInit()
+    print(cmb(100, 50))
+    return
 ```
 
 ### 直交座標ー極座標 変換
@@ -488,3 +592,53 @@ def solve(N: int, K: int, a: "List[int]"):
             l += 1
     print(ans)
 ```
+
+
+
+```python
+# 未検証
+import queue
+def bfs(edges: "List[to]", start_node: int) -> list:
+    q = queue.Queue()
+    dist = [INF] * len(edges)
+    q.put(start_node)
+    dist[start_node] = 0
+    while not q.empty():
+        now = q.get()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.put(next)
+            dist[next] = dist[now] + 1
+    return dist
+
+def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
+    q = queue.Queue()
+    dist = [INF] * len(edges)
+    for start_node in start_nodes:
+        q.put(start_node)
+        dist[start_node] = 0
+    while not q.empty():
+        now = q.get()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.put(next)
+            dist[next] = dist[now] + 1
+    return dist
+
+def dfs(edges: "List[to]", start_node: int) -> list:
+    s = []
+    dist = [INF] * len(edges)
+    dist[start_node] = 0
+    s.append(start_node)
+    while not len(s) == 0:
+        now = s.pop()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            s.append(next)
+            dist[next] = dist[now] + 1
+    return dist
+```
+

@@ -1,8 +1,25 @@
 #!/usr/bin/env python3
 import sys
+import math
 
+def primeFactrization(n: int) -> dict:
+    primeFactors = dict()
+    i = 2
+    while i * i <= n:
+        ex = 0
+        while n % i == 0:
+            ex += 1
+            n //= i
+        if ex != 0:
+            primeFactors[i] = ex
+        i += 1
+    if n != 1:
+        primeFactors[n] = 1
+    return primeFactors
 
 def solve(A: int, B: int):
+    d = primeFactrization(math.gcd(A, B))
+    print(len(d) + 1)
     return
 
 
