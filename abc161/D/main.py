@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 import sys
-
+import queue
 
 def solve(K: int):
+    q = queue.Queue()
+    for i in range(1, 10):
+        q.put(i)
+    loop = 0
+    next = 0
+    while loop < K:
+        next = q.get()
+        loop += 1
+        if str(next)[-1] == "0":
+            q.put(next * 10)
+            q.put(next * 10 + 1)
+        elif str(next)[-1] == "9":
+            q.put(next * 10 + 8)
+            q.put(next * 10 + 9)
+        else:
+            l = int(str(next)[-1])
+            q.put(next * 10 + l - 1)
+            q.put(next * 10 + l)
+            q.put(next * 10 + l + 1)
+    print(next)
     return
 
 

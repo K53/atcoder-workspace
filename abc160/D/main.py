@@ -1,8 +1,38 @@
 #!/usr/bin/env python3
 import sys
+import queue
+INF = 10 ** 16
 
+def bfs(edges: "List[to]", start_node: int) -> list:
+    q = queue.Queue()
+    dist = [INF] * len(edges)
+    q.put(start_node)
+    dist[start_node] = 0
+    while not q.empty():
+        now = q.get()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.put(next)
+            dist[next] = dist[now] + 1
+    return dist
 
 def solve(N: int, X: int, Y: int):
+    N = Y = 2 * 10 ** 3
+    X = 1
+    edges = [[] for _ in range(N)]
+    for i in range(N - 1):
+        edges[i].append(i + 1)
+        edges[i + 1].append(i)
+    edges[X - 1].append(Y - 1)
+    edges[Y - 1].append(X - 1)
+
+    ans = [0] * N
+    for i in range(N):
+        for j in bfs(edges, i):
+            ans[j] += 1
+    # for a in ans[1:]:
+    #     print(a // 2)
     return
 
 

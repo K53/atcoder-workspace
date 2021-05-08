@@ -5,7 +5,12 @@ MOD = 1000000007  # type: int
 
 
 def solve(N: int, K: int):
-    
+    sum = 0
+    for i in range(K, N + 2):
+        min = (i - 1) * i // 2
+        max = (N + N - i + 1) * i // 2
+        sum += max - min + 1
+    print(sum % MOD)
     return
 
 

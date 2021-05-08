@@ -3,21 +3,14 @@ import sys
 
 
 def solve(X: int):
-    for a in range(10 ** 4):
-        t = a ** 5
-        if t < 10 ** 18:
-            for b in range(10 ** 4):
-                s = b ** 5
-                if s < 10 ** 18:
-                    if t + s == X:
-                        print(a, -b)
-                        return
-                    if t - s == X:
-                        print(a, b)
-                        return
-                    if s - t == X:
-                        print(-a, -b)
-                        return
+    for a in range(150):
+        a5 = a ** 5
+        for b in range(150):
+            b5 = b ** 5
+            for da, db in [(1, 1), (-1, 1), (1, -1)]:
+                if a5 * da - b5 * db == X:
+                    print(a * da, b * db)
+                    return
     return
 
 

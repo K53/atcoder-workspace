@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import sys
-import math
 
 def solve(A: int, B: int, N: int):
     x = B - 1 if B - 1 < N else N
-    print(math.floor(A * x / B) - A * math.floor(x / B))
+    print(A * x // B)
     return
 
 

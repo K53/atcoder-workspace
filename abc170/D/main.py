@@ -3,6 +3,18 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    maxA = max(A)
+    nums = [0] * (maxA + 1)
+    for aa in A:
+        nums[aa] += 1
+    for nn in range(maxA + 1):
+        if nums[nn] == 0:
+            continue 
+        for i in range(2, maxA + 1):
+            if nn * i > maxA:
+                break
+            nums[nn * i] = 0
+    print(nums.count(1))
     return
 
 
