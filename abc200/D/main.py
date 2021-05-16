@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
 import sys
 
-INF = 10 ** 16
 MOD = 200  # type: int
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-
-
 def solve(N: int, A: "List[int]"):
-    l = [i % 200 for i in A]
-    nums = [0] * 200
-    for i in l:
-        nums[i] += 1
-    for i in range(200):
-        if nums[i] == 0:
-            continue
-        for a in range(1, i):
-            b = i - a
-            
-
-
-    
+    mods = [0] * 200
+    ansB = []
+    ansC = []
+    N = min(8, N)
+    A = A[:N]
+    for b in range(2 ** N):
+        sum = 0
+        for i in range(N):
+            if b >> i & 1:
+                sum += A[i] % MOD
+        if mods[sum % 200] == 0:
+            mods[sum % 200] = b
+        else:
+            print(YES)
+            for i in range(N):
+                if mods[sum % 200] >> i & 1:
+                    ansB.append(i + 1)
+                if b >> i & 1:
+                    ansC.append(i + 1)
+            print(len(ansB), *ansB, sep=" ")
+            print(len(ansC), *ansC, sep=" ")
+            return
+    print(NO)
 
     return
 

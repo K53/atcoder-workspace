@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, C: int, a: "List[int]", b: "List[int]", c: "List[int]"):
+    l = []
+    for aa, bb, cc in zip(a, b, c):
+        l.append((aa, cc))
+        l.append((bb + 1, -cc))
+    l.sort()
+    ans = 0
+    cost = 0
+    for i in range(2 * N):
+        cost += l[i][1]
+        if i != 2 * N - 1 and l[i][0] != l[i + 1][0]:
+            ans += min(cost, C) * (l[i + 1][0] - l[i][0])
+    print(ans)
     return
 
 

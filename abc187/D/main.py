@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 import sys
 
-# 数ケース通らない
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
     diff = 0
-    l = []
-    for i in range(N):
-        l .append((2 * A[i] + B[i]))
-        diff += A[i]
-    l.sort(reverse=True)
+    sums = []
+    for aa, bb in zip(A, B):
+        diff += aa
+        sums.append(2 * aa + bb)
+    sums.sort(reverse=True)
     count = 0
-    for a in l:
+    for s in sums:
         count += 1
-        diff -= a
+        diff -= s
         if diff < 0:
             print(count)
             return
