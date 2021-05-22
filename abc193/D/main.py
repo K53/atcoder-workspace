@@ -6,28 +6,46 @@ def getScore(l):
     score = 0
     for i in set(l):
         score += i * 10 ** l.count(i)
+    print("gs:", score)
     return score
 
-def solve(K: int, S: str, T: str):
-    nums = [0] + [K] * 9
-    s = (list(map(int, list(S[:-1]))))
-    t = (list(map(int, list(T[:-1]))))
-    cards = [0] + [K] * 9
-    for n in s + t:
-        cards[n] -= 1
-    
+def score(S):
+    cnt = [0] * 10
+    for c in S:
+        cnt[int(c)] += 1
     ans = 0
     for i in range(1, 10):
-        if cards[i] == 0:
-            continue
-        for j in range(1, 10):
-            if cards[j] == 0 or (i == j and cards[i] == 1):
-                continue
-            ss = copy.copy(s) + [i]
-            tt = copy.copy(t) + [j]
-            if getScore(ss) > getScore(tt):
-                ans += cards[i] * cards[j] if i != j else cards[i] * (cards[i] - 1)
-    print(ans / (K * 9 - 8) / (K * 9 - 9))
+        ans += i * 10 ** cnt[i]
+        print(ans, i * 10 ** cnt[i])
+    print("s:", ans)
+    return ans
+
+def solve(K: int, S: str, T: str):
+    print(getScore([1,2,3,4,5]))
+    print(score([1,2,3,4,5]))
+    # nums = [0] + [K] * 9
+    # s = (list(map(int, list(S[:-1]))))
+    # t = (list(map(int, list(T[:-1]))))
+    # cards = [0] + [K] * 9
+    # for n in s + t:
+    #     cards[n] -= 1
+    
+    # ans = 0
+    # a2 = 0
+    # for i in range(1, 10):
+    #     if cards[i] == 0:
+    #         continue
+    #     for j in range(1, 10):
+    #         if cards[j] == 0 or (i == j and cards[i] == 1):
+    #             continue
+    #         ss = copy.copy(s) + [i]
+    #         tt = copy.copy(t) + [j]
+    #         if getScore(ss) > getScore(tt):
+    #             ans += (cards[i] * cards[j]) if i != j else (cards[i] * (cards[i] - 1))
+    #         if score(ss) > score(tt):
+    #             a2 += (cards[i] * cards[j]) if i != j else (cards[i] * (cards[i] - 1))
+    # print(ans / ((K * 9 - 8) * (K * 9 - 9)))
+    # print(a2 / ((K * 9 - 8) * (K * 9 - 9)))
 
 
 

@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, K: int, a: "List[int]"):
+    dp = [2] + [0] * K
+    for i in range(1, K + 1):
+        for aa in a:
+            if i - aa < 0 or dp[i - aa] == 1:
+                dp[i] = 2
+            if dp[i - aa] == 2:
+                dp[i] = 1
+                break
+    print("First" if dp[-1] == 1 else "Second")
     return
 
 

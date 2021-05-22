@@ -1,8 +1,41 @@
 #!/usr/bin/env python3
 import sys
-
+INF = 10 ** 18
 
 def solve(N: int, a: "List[int]", b: "List[int]"):
+    import queue
+    def bfs(edges: "List[to]", start_node: int) -> list:
+        q = queue.Queue()
+        color = [INF] * len(edges)
+        q.put(start_node)
+        color[start_node] = 0
+        while not q.empty():
+            now = q.get()
+            c = 1
+            for next in edges[now]:
+                if color[next] != INF:
+                    continue
+                q.put(next)
+                if color[now] == c:
+                    c += 1
+                color[next] = c
+                c += 1
+        return color
+
+    
+    edges = [[] for _ in range(N)]
+    for aa, bb in zip(a, b):
+        edges[aa - 1].append(bb - 1)
+        edges[bb - 1].append(aa - 1)
+    d = bfs(edges, 0)
+    print(max(d))
+    ans = [-1] * N
+    for aa, bb in zip(a, b):
+        if ans[bb - 1] == -1:
+            ans[bb - 1] = d[bb - 1]
+        else:
+            ans[aa - 1] = d[aa - 1]
+    print(*ans[1:], sep="\n")
     return
 
 

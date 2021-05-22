@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, a: "List[int]"):
+    
     return
 
 

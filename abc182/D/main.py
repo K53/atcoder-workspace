@@ -4,15 +4,15 @@
 def main():
     N = int(input())
     A = list(map(int, input().split()))
-    s1 = [0]
-    s2 = [0]
-    for i in range(N):
-        s1.append(s1[i] + A[i])
-    for i in range(1, N + 1):
-        s2.append(s2[i - 1] + s1[i])
-    maxs1 = max(s1)
-    index = s1.index(maxs1)
-    print(maxs1 + max(s2[index:]))
-    
+    from itertools import accumulate
+    s1 = list(accumulate(A))
+    s2 = list(accumulate([0] + s1))
+    mostFar = list(accumulate(s1, func=max))
+    ans = 0
+    for nn in range(N):
+        ans = max(ans, s2[nn] + mostFar[nn])
+    print(ans)
+
+
 if __name__ == '__main__':
     main()

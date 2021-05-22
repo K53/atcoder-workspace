@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
 import sys
 
+INF = 10 ** 18
+
 
 def solve(N: int, a: "List[int]"):
+    dp = [[None] * (N + 1) for _ in range(N + 1)]
+    for i in range(N + 1):
+        dp[i][i] = 0
+    for len in range(1, N + 1):
+        for s in range(N + 1):
+            if s + len > N:
+                break
+            if (N - len) % 2 == 0:  # 先手
+                dp[s][s + len] = max(dp[s + 1][s + len] + a[s], dp[s][s + len - 1] + a[s + len - 1])
+            else: # 後手
+                dp[s][s + len] = min(dp[s + 1][s + len] - a[s], dp[s][s + len - 1] - a[s + len - 1])
+
+    print(dp[0][N])
     return
 
 
