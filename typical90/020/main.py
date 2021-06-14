@@ -6,6 +6,7 @@ NO = "No"  # type: str
 
 
 def solve(a: int, b: int, c: int):
+    print(YES if a < c ** b else NO)
     return
 
 

@@ -3,6 +3,12 @@ import sys
 
 
 def solve(N: int, S: "List[str]"):
+    ss = set()
+    for i in range(N):
+        a = len(ss)
+        ss.add(S[i])
+        if len(ss) - a == 1:
+            print(i + 1)
     return
 
 

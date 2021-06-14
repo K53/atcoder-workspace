@@ -3,6 +3,12 @@ import sys
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    A.sort()
+    B.sort()
+    ans = 0
+    for aa, bb in zip(A, B):
+        ans += abs(aa - bb)
+    print(ans)
     return
 
 

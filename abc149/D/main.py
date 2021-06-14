@@ -2,7 +2,60 @@
 import sys
 
 
+
+
+# dp[n][k][h] := n * k回目に手hを出す場合に取れる最大の得点
 def solve(N: int, K: int, R: int, S: int, P: int, T: str):
+    points = [P, R, S]
+    dp = [[[0] * 3 for _ in range(N // K + 1)] for _ in range(K)]
+    if N < K:
+        print(T.count("r") * P + T.count("s") * R + T.count("p") * S)
+    for i in range(K):
+        if T[i] == "r":
+            dp[i][0][0] = P
+        elif T[i] == "s":
+            dp[i][0][1] = R
+        else:
+            dp[i][0][2] = S
+
+        # for h in range(3):
+            # dp[i][0][h] = points[h] if "rsp".find(T[i]) == h else 0
+    # for i in range(K):
+    #     print(dp[i])
+
+    for i in range(K, N):
+        k = i // K
+        n = i % K
+        # print(n, k-1)
+        # print(dp[n][k - 1][0])
+        # print(dp[n][k - 1][1])
+        # print(dp[n][k - 1][2])
+        if T[i] == "r":
+            dp[n][k][0] = max(dp[n][k - 1][1], dp[n][k - 1][2]) + P
+            dp[n][k][1] = max(dp[n][k - 1][2], dp[n][k - 1][0])
+            dp[n][k][2] = max(dp[n][k - 1][0], dp[n][k - 1][1])
+        elif T[i] == "s":
+            dp[n][k][0] = max(dp[n][k - 1][1], dp[n][k - 1][2])
+            dp[n][k][1] = max(dp[n][k - 1][2], dp[n][k - 1][0]) + R
+            dp[n][k][2] = max(dp[n][k - 1][0], dp[n][k - 1][1])
+        else:
+            dp[n][k][0] = max(dp[n][k - 1][1], dp[n][k - 1][2])
+            dp[n][k][1] = max(dp[n][k - 1][2], dp[n][k - 1][0])
+            dp[n][k][2] = max(dp[n][k - 1][0], dp[n][k - 1][1]) + S
+            # dp[k][n][h] = dp[k - 1][n][h] + points[h] if "rsp".find(T[i]) == h else 0
+        # print("----")
+        # for i in range(K):
+        #     print(dp[i])
+
+    ans = 0
+    for k in range(K):
+        s = sum(dp[k][-1])
+        ans += max(dp[k][-2]) if s == 0 else max(dp[k][-1])
+    print(ans)
+
+    # for k in range(K):
+    #     print(dp[k])
+
     return
 
 

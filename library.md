@@ -595,12 +595,34 @@ def solve(N: int, K: int, a: "List[int]"):
     print(ans)
 ```
 
+リスト内の一致する要素を全て取り出す。
+```python
+def findSome(l: "List", val: any):
+    return [i for i, x in enumerate(l) if x == val]
+```
 
 
 ```python
-# 未検証
+def bfs(edges: "List[to]", start_node: int) -> list:
+    q = set()
+    dist = [INF] * len(edges)
+    q.add(start_node)
+    dist[start_node] = 0
+    while len(q) != 0:
+        now = q.pop()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.add(next)
+            dist[next] = dist[now] + 1
+    return dist
+
+
+
+# 未検証 deprecated
 import queue
 def bfs(edges: "List[to]", start_node: int) -> list:
+    # deprecated
     q = queue.Queue()
     dist = [INF] * len(edges)
     q.put(start_node)
@@ -644,3 +666,78 @@ def dfs(edges: "List[to]", start_node: int) -> list:
     return dist
 ```
 
+
+### Union-Find木
+
+```python
+from collections import defaultdict
+
+class UnionFind():
+    def __init__(self, n):
+        self.n = n
+        self.parents = [-1] * n
+
+    def find(self, x):
+        if self.parents[x] < 0:
+            return x
+        else:
+            self.parents[x] = self.find(self.parents[x])
+            return self.parents[x]
+
+    def union(self, x, y):
+        x = self.find(x)
+        y = self.find(y)
+
+        if x == y:
+            return
+
+        if self.parents[x] > self.parents[y]:
+            x, y = y, x
+
+        self.parents[x] += self.parents[y]
+        self.parents[y] = x
+
+    def size(self, x):
+        return -self.parents[self.find(x)]
+
+    def same(self, x, y):
+        return self.find(x) == self.find(y)
+
+    def members(self, x):
+        root = self.find(x)
+        return [i for i in range(self.n) if self.find(i) == root]
+
+    def roots(self):
+        return [i for i, x in enumerate(self.parents) if x < 0]
+
+    def group_count(self):
+        return len(self.roots())
+
+    def all_group_members(self):
+        group_members = defaultdict(list)
+        for member in range(self.n):
+            group_members[self.find(member)].append(member)
+        return group_members
+
+    def __str__(self):
+        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
+```
+
+### 尺取り法
+
+```python
+# リストa (要素数N)
+
+r = 0
+l = 0
+ans = 0
+sum = 0
+for _ in range(N):
+    while r < N and "満たすべき条件":
+        sum += a[r]
+        r += 1
+    if "満たしてはいけない条件":
+        ans += N - r + 1
+        sum -= a[l]
+        l += 1
+```

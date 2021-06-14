@@ -3,6 +3,20 @@ import sys
 
 
 def solve(N: int, A: int, B: int, C: int):
+    ans = 9999
+    for aa in range(9999):
+        for bb in range(9999):
+            if aa + bb > 9999:
+                break
+            rest = N - A * aa - B * bb
+            if rest < 0:
+                break
+            cc = rest // C
+            q = rest % C
+            all = aa + bb + cc
+            if all <= 9999 and q == 0:
+                ans = min(ans, all)
+    print(ans)
     return
 
 

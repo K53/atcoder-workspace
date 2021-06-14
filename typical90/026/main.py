@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 import sys
 
+def bfs(edges: "List[to]", start_node: int) -> list:
+    q = set()
+    dist = [-1] * len(edges)
+    q.add(start_node)
+    dist[start_node] = 1
+    while len(q) != 0:
+        now = q.pop()
+        for next in edges[now]:
+            if dist[next] != -1:
+                continue
+            q.add(next)
+            dist[next] = 0 if dist[now] == 1 else 1
+    return dist
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    tree = [[] for _ in range(N)]
+    for i in range(N - 1):
+        tree[A[i] - 1].append(B[i] - 1)
+        tree[B[i] - 1].append(A[i] - 1)
+    
+    d = bfs(tree, A[0])
+    a = 1 if sum(d) >= (N // 2) else 0
+    ans = [i + 1 for i, x in enumerate(d) if x == a]
+    print(*ans[:(N // 2)], sep=" ")
     return
 
 

@@ -3,6 +3,8 @@ import sys
 
 
 def solve(N: int, K: int, a: "List[int]"):
+
+
     return
 
 

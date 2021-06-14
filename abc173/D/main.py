@@ -3,6 +3,15 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    A.sort(reverse=True)
+    ans = A[0]
+    p = (N - 2) // 2
+    q = (N - 2) % 2
+    for i in range(p):
+        ans += A[i + 1] * 2
+    if q == 1:
+        ans += A[p + 1]
+    print(ans)
     return
 
 

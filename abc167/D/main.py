@@ -5,21 +5,19 @@ import math
 def main():
     N, K = map(int, input().split())
     A = list(map(lambda i: int(i) - 1, input().split()))
-    dv = []
-    dv.append(A)
-    for i in range(math.ceil(math.log2(K))):
-        l = []
+    d = [[None] * N for _ in range(100)]    # log2(10^18)あれば足りる
+    d[0] = A
+    # print(d[0])
+    for i in range(1, 100):
         for j in range(N):
-            l.append(dv[i][dv[i][j]])
-        dv.append(l)
-    
+            d[i][j] = d[i - 1][d[i - 1][j]]
+        # print(d[i])
     now = 0
-    for i in range(math.ceil(math.log2(K))):
+    for i in range(100):
         if K >> i & 1:
-            now = dv[i][now]
+            now = d[i][now]
     print(now + 1)
 
-        
 
 if __name__ == '__main__':
     main()

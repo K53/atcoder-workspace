@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 import sys
-
+import math
 
 def solve(A: int, B: int):
+    g = math.gcd(A, B)
+    l = A * B // g
+    print(l if l <= 10 ** 18 else "Large")
     return
 
 

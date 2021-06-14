@@ -3,6 +3,31 @@ import sys
 
 
 def solve(N: int, M: int, L: "List[int]", R: "List[int]"):
+    # N = 1000
+    # M = 10 ** 5
+    # L = [i for i in range(M)]
+    # R = [i for i in range(M)]
+    start = [0] * N
+    end = [0] * N
+    for mm in range(M):
+        start[L[mm]] += 1
+        end[R[mm]] += 1
+
+    cross = 0
+    for mm in range(M):
+        print(sum(start[:L[mm]]) + sum(start[(R[mm] + 1):]))
+        print(sum(end[(L[mm] + 1):]) + sum(end[:R[mm]]))
+        print("###")
+        cross += min(sum(start[:L[mm]]) + sum(start[(R[mm] + 1):]), sum(end[(L[mm] + 1):]) + sum(end[:R[mm]]))
+    print(cross // 2)
+    
+    # all = sum(l)
+    # ans = 0
+    # for mm in range(M):
+    #     ans += (sum(l[:(L[mm] - 1)]) + sum(l[(R[mm] - 1 + 1):])) * sum(l[(L[mm] - 1 + 1):(R[mm] - 1)])
+    # print(ans)
+    # print(l[:min(10,N)])
+        
     return
 
 
@@ -18,8 +43,8 @@ def main():
     L = [int()] * (M)  # type: "List[int]"
     R = [int()] * (M)  # type: "List[int]"
     for i in range(M):
-        L[i] = int(next(tokens))
-        R[i] = int(next(tokens))
+        L[i] = int(next(tokens)) - 1
+        R[i] = int(next(tokens)) - 1
     solve(N, M, L, R)
 
 if __name__ == '__main__':
