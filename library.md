@@ -728,15 +728,17 @@ class UnionFind():
 ```python
 # リストa (要素数N)
 
-r = 0
+# a[l:r]を考える。rはこの範囲に含まれない。
+# 例) a[0:3] → a[0]〜a[2]までの範囲
 l = 0
+r = 0
 ans = 0
 sum = 0
 for _ in range(N):
-    while r < N and "満たすべき条件":
+    while r < N and "右端を進め、範囲を広げる条件":
         sum += a[r]
         r += 1
-    if "満たしてはいけない条件":
+    if "左端を進め、範囲を狭める条件":
         ans += N - r + 1
         sum -= a[l]
         l += 1
