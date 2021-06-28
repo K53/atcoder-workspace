@@ -1,3 +1,18 @@
+## 隣接リスト作成
+
+```python
+N = 0 # 頂点数
+M = 0 # 辺の数
+a,b = [], [] # 連結した頂点。a-b
+nodes = [[] for _ in range(N)]
+for i in range(M):
+    nodes[a[i] - 1].append(b[i] - 1)
+    nodes[b[i] - 1].append(a[i] - 1)
+
+print(nodes)
+
+```
+
 
 ## 入力受け取り
 
@@ -17,7 +32,7 @@ unOverwritableList[0][0] = "a"   # 置き換え不可
 overwritableList[0][0] = "a"   # 置き換え可能
 ```
 
-## モジュール
+## 外部モジュール
 
 ```python
 import string

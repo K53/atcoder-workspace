@@ -10,7 +10,6 @@ def solve(N: int, P: int, Q: int, A: "List[int]"):
                 for a4 in range(a3 + 1, N - 1):
                     for a5 in range(a4 + 1, N):
                         if ((A[a1] % P ) * (A[a2] % P) * (A[a3] % P) * (A[a4] % P) * (A[a5] % P)) % P == Q:
-                            # print(A[a1] % P + A[a2] % P + A[a3] % P + A[a4] % P + A[a5] % P)
                             count += 1
     print(count)
     return

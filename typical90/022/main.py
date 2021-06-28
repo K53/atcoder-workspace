@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 import sys
-
+import math
 
 def solve(A: int, B: int, C: int):
+    g = math.gcd(math.gcd(A, B), C)
+    aa = A // g
+    bb = B // g
+    cc = C // g
+    print(aa + bb + cc - 3)
     return
 
 
