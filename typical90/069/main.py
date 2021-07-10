@@ -2,9 +2,24 @@
 import sys
 
 MOD = 1000000007  # type: int
-
+def modpow(n: int, a: int, mod: int = MOD) -> int:
+    res = 1
+    while a > 0:
+        if a & 1:
+            res = res * n % mod
+        n = n * n % mod
+        a >>= 1
+    return res
 
 def solve(N: int, K: int):
+    if N == 1:
+        print(K % MOD)
+        return
+    if N == 2:
+        print((K * (K - 1)) % MOD)
+        return
+
+    print((K * (K - 1) * modpow(K - 2, N - 2)) % MOD)
     return
 
 

@@ -1,8 +1,31 @@
 #!/usr/bin/env python3
 import sys
-
+from itertools import permutations
 
 def solve(N: int, A: "List[List[int]]", M: int, X: "List[int]", Y: "List[int]"):
+    # 隣接リストつくる
+    nodes = [[] for _ in range(N)]
+    for i in range(M):
+        nodes[X[i] - 1].append(Y[i] - 1)
+        nodes[Y[i] - 1].append(X[i] - 1)
+    # print(nodes)
+
+
+    ans = 100000007
+    # 全探索
+    for p in permutations([i for i in range(N)]):
+        time = 0
+        for i in range(N - 1):
+            if p[i + 1] in nodes[p[i]]:
+                break
+            time +=A[p[i]][i]
+        else:
+            time += A[p[-1]][-1]
+            # print(p, time)
+            ans = min(ans, time)
+            
+    print(ans if ans != 100000007 else -1) 
+
     return
 
 

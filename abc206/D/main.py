@@ -1,7 +1,55 @@
 #!/usr/bin/env python3
-from math import perm
 import sys
-INF = 10 ** 16
+
+from collections import defaultdict
+
+class UnionFind():
+    def __init__(self, n):
+        self.n = n
+        self.parents = [-1] * n
+
+    def find(self, x):
+        if self.parents[x] < 0:
+            return x
+        else:
+            self.parents[x] = self.find(self.parents[x])
+            return self.parents[x]
+
+    def union(self, x, y):
+        x = self.find(x)
+        y = self.find(y)
+        if x == y:
+            return
+        if self.parents[x] > self.parents[y]:
+            x, y = y, x
+
+        self.parents[x] += self.parents[y]
+        self.parents[y] = x
+
+    def size(self, x):
+        return -self.parents[self.find(x)]
+
+    def same(self, x, y):
+        return self.find(x) == self.find(y)
+
+    def members(self, x):
+        root = self.find(x)
+        return [i for i in range(self.n) if self.find(i) == root]
+
+    def roots(self):
+        return [i for i, x in enumerate(self.parents) if x < 0]
+
+    def group_count(self):
+        return len(self.roots())
+
+    def all_group_members(self):
+        group_members = defaultdict(list)
+        for member in range(self.n):
+            group_members[self.find(member)].append(member)
+        return group_members
+
+    def __str__(self):
+        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
 
 def solve(N: int, A: "List[int]"):
     if N == 1:
@@ -10,35 +58,18 @@ def solve(N: int, A: "List[int]"):
     l = A[:(N // 2)]
     r = A[-(N // 2):]
     r = r[::-1]
-    nums = [-1] * (2 * 10 ** 5 + 1)
+    if l == r:
+        print(0)
+        return
+    
     ans = 0
+    uf = UnionFind(2 * 10 ** 5 + 1)
     for i in range(N // 2):
-        if nums[l[i]] == -1:
-            if nums[r[i]] == -1:
-                if l[i] != r[i] if nums[r[i]] == -1 else nums[r[i]]:
-                    nums[l[i]] = r[i] if nums[r[i]] == -1 else nums[r[i]]
-                    ans += 1
-                    print("a2")
-            else:
-                if l[i] != nums[r[i]] if nums[nums[r[i]]] == -1 else nums[nums[r[i]]]:
-                    nums[l[i]] = nums[r[i]] if nums[nums[r[i]]] == -1 else nums[nums[r[i]]]
-                    ans += 1
-                    print(l[i])
-                    print(nums[r[i]])
-                    print(nums[nums[r[i]]])
-                    print(l[i] != nums[r[i]] if nums[nums[r[i]]] == -1 else nums[nums[r[i]]])
-        else:
-            if nums[r[i]] == -1:
-                if nums[l[i]] != r[i] if nums[r[i]] == -1 else nums[r[i]]:
-                    nums[l[i]] = r[i] if nums[r[i]] == -1 else nums[r[i]]
-                    ans += 1
-                    print("aa")
-            else:
-                if nums[l[i]] != nums[r[i]] if nums[nums[r[i]]] == -1 else nums[nums[r[i]]]:
-                    nums[l[i]] = nums[r[i]] if nums[nums[r[i]]] == -1 else nums[nums[r[i]]]
-                    ans += 1
-                    print("a")
-        print(nums[:10])
+        if l[i] != r[i]:
+            uf.union(l[i], r[i])
+    
+    for v in uf.all_group_members().values():
+        ans += len(v) - 1
     print(ans)
     return
 

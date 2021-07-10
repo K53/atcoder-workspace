@@ -758,3 +758,20 @@ for _ in range(N):
         sum -= a[l]
         l += 1
 ```
+
+### N進数変換
+
+```python
+# from N進数 to 10進数
+int(baseNvalue ,n) # 2,8,16のみ
+
+# from 10進数 to N進数
+def base10int(base10value, toBase):
+    ans = []
+    p = base10value
+    while p >= toBase:
+        p, q = divmod(p, toBase)
+        ans.append(str(q))
+    ans.append(str(p))
+    return "".join(ans[::-1])
+```

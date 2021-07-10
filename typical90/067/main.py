@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-def base10int(value, base):
-    if (int(value / base)):
-        return base10int(int(value / base), base) + str(value % base)
-    return str(value % base)
+def base10int(base10value, toBase):
+    ans = []
+    p = base10value
+    while p >= toBase:
+        p, q = divmod(p, toBase)
+        ans.append(str(q))
+    ans.append(str(p))
+    return "".join(ans[::-1])
 
 def solve(N: int, K: int):
-    N = 1
-    K = 1
     ans = str(N)
     for _ in range(K):
         before = base10int(int(ans, 8), 9)
