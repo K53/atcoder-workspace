@@ -3,6 +3,20 @@ import sys
 
 
 def solve(N: int, K: int):
+    def getNumOfPrime(limit: int):
+        numOfPrime = [0] * (limit + 1)
+        numOfPrime[0] = 0
+        numOfPrime[1] = 0
+        for p in range(2, limit + 1):
+            if not numOfPrime[p]:
+                for i in range(p, limit + 1, p):
+                    numOfPrime[i] += 1
+        return numOfPrime
+    ans = 0
+    for i in getNumOfPrime(N):
+        if i >= K:
+            ans += 1
+    print(ans)
     return
 
 

@@ -4,30 +4,25 @@ import sys
 NO = "Impossible"  # type: str
 
 def solve(N: int, S: int, A: "List[int]", B: "List[int]"):
-    dp = [[0] * (S + 1) for _ in range(N + 1)] # dp[n][s] := n日目のコストをsにできる。
+    dp = [[0] * (S + 1) for _ in range(N + 1)]
     dp[0][0] = 1
-    for i in range(N):
-        for j in range(S + 1):
-            if (j - A[i] >= 0 and dp[i][j - A[i]]) or (j - B[i] >= 0 and dp[i][j - B[i]]):
-                dp[i + 1][j] = 1
-    if not dp[N][S]:
+    for day in range(1, N + 1):
+        for cost in range(S + 1):
+            if (cost - A[day - 1] >= 0 and dp[day - 1][cost - A[day - 1]]) or (cost - B[day - 1] >= 0 and dp[day - 1][cost - B[day - 1]]):
+                dp[day][cost] = 1
+    if not dp[-1][-1]:
         print(NO)
         return
-    ss = S
     ans = []
-    for i in reversed(range(1, N + 1)):
-        if ss - A[i - 1] >= 0 and dp[i - 1][ss - A[i - 1]]:
-            # print(ss - A[i - 1])
+    cost = S
+    for day in range(1, N + 1):
+        if  cost - A[N - day] >= 0 and dp[N - day][cost - A[N - day]]:
+            cost -= A[N - day]
             ans.append("A")
-            ss -= A[i - 1]
         else:
-            # print(ss - B[i - 1])
+            cost -= B[N - day]
             ans.append("B")
-            ss -= B[i - 1]
     print(*ans[::-1], sep="")
-
-    # for i in range(N + 1):
-    #     print(dp[i])
     return
 
 

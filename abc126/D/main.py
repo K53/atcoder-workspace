@@ -3,6 +3,31 @@ import sys
 
 
 def solve(N: int, u: "List[int]", v: "List[int]", w: "List[int]"):
+    from collections import deque
+    def bfs(edges: "(List[to], cost)", start_node: int) -> list:
+        INF = 10 ** 16
+        q = deque()
+        dist = [INF] * len(edges)
+        q.append(start_node)
+        dist[start_node] = 0
+        while q:
+            now = q.popleft()
+            for next in edges[now]:
+                if dist[next[0]] != INF:
+                    continue
+                q.append(next[0])
+                dist[next[0]] = dist[now] + next[1]
+        return dist
+    tree = [[] for _ in range(N)]
+    for i in range(N - 1):
+        tree[u[i] - 1].append((v[i] - 1, w[i]))
+        tree[v[i] - 1].append((u[i] - 1, w[i]))
+    d = bfs(tree, 0)
+    for i in d:
+        if i % 2 == 0:
+            print(0)
+        else:
+            print(1)
     return
 
 

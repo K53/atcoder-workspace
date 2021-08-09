@@ -3,6 +3,32 @@ import sys
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    INF = 10 ** 9
+    def bfs(edges: "List[to]", start_node: int) -> list:
+        q = set()
+        dist = [INF] * len(edges)
+        q.add(start_node)
+        dist[start_node] = 0
+        while len(q) != 0:
+            now = q.pop()
+            for next in edges[now]:
+                if dist[next] != INF:
+                    continue
+                q.add(next)
+                dist[next] = dist[now] + 1
+        return dist
+
+    nodes = [[] for _ in range(N)]
+    for i in range(N - 1):
+        nodes[A[i] - 1].append(B[i] - 1)
+        nodes[B[i] - 1].append(A[i] - 1)
+    m = 0
+    d = 0
+    for i, val in enumerate(bfs(nodes, 0)):
+        if d < val:
+            d = val
+            m = i
+    print(max(bfs(nodes, m)) + 1)
     return
 
 

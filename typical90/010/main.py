@@ -3,6 +3,17 @@ import sys
 
 
 def solve(N: int, C: "List[int]", P: "List[int]", Q: int, L: "List[int]", R: "List[int]"):
+    c1 = [0] * (N + 1)
+    c2 = [0] * (N + 1)
+    for i in range(N):
+        if C[i] == 1:
+            c1[i + 1] = c1[i] + P[i]
+            c2[i + 1] = c2[i]
+        else:
+            c1[i + 1] = c1[i]
+            c2[i + 1] = c2[i] + P[i]
+    for i in range(Q):
+        print(c1[R[i]] - c1[L[i] - 1], c2[R[i]] - c2[L[i] - 1])
     return
 
 

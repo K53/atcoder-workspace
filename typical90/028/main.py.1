@@ -3,6 +3,27 @@ import sys
 
 
 def solve(N: int, lx: "List[int]", ly: "List[int]", rx: "List[int]", ry: "List[int]"):
+    field = [[0] * 1001 for _ in range(1001)]
+    for i in range(N):
+        field[ly[i]][lx[i]] += 1
+        field[ry[i]][rx[i]] += 1
+        field[ry[i]][lx[i]] -= 1
+        field[ly[i]][rx[i]] -= 1
+    # for h in range(20):
+    #     print(field[h][:20])
+
+    for h in range(0, 1001):
+        for w in range(1, 1001):
+            field[h][w] += field[h][w - 1]
+    for w in range(0, 1001):
+        for h in range(1, 1001):
+            field[h][w] += field[h - 1][w]
+    # print("3333")
+    nums = [0] * (N + 1)
+    for w in range(1001):
+        for h in range(1001):
+            nums[field[h][w]] += 1
+    print(*nums[1:], sep="\n")
     return
 
 

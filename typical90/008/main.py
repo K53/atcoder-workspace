@@ -5,6 +5,24 @@ MOD = 1000000007  # type: int
 
 
 def solve(N: int, S: str):
+    T = "atcoder"
+    dp = [[0 for _ in range(N + 1)] for i in range(len(T) + 1)]
+    # 横の初期化
+    for i in range(N + 1):
+        dp[0][i] = 1
+    # 縦の初期化
+    # すでに0で初期化済み
+
+    for i in range(1, len(T) + 1):
+        for j in range(1, N + 1):
+            if S[j - 1] == T[i - 1]:
+                dp[i][j] = (dp[i - 1][j - 1] + dp[i][j - 1]) % MOD
+            else:
+                dp[i][j] = dp[i][j - 1] % MOD
+    # for i in range(len(T) + 1):
+    #     print(dp[i])
+
+    print(dp[-1][-1] % MOD)
     return
 
 

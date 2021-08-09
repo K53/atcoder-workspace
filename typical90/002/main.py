@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int):
+    if N % 2 == 1:
+        print()
+        return
+    for b in range(2 ** N):
+        s = []
+        count = 0
+        for i in range(N):
+            if b >> i & 1:
+                s.append(")")
+                count += 1
+            else:
+                s.append("(")
+                count -= 1
+            if count < 0:
+                break
+        if count == 0:
+            print("".join(s[::-1]))
     return
 
 

@@ -2,10 +2,35 @@
 import sys
 
 def solve(N: int, X: int, Y: int):
+    from collections import deque
+    def bfs(edges: "List[to]", start_node: int) -> list:
+        INF = 10 ** 16
+        q = deque()
+        dist = [INF] * len(edges)
+        q.append(start_node)
+        dist[start_node] = 0
+        while q:
+            now = q.popleft()
+            for next in edges[now]:
+                if dist[next] != INF:
+                    continue
+                q.append(next)
+                dist[next] = dist[now] + 1
+        return dist
+    field = [[] for _ in range(N)]
+    for i in range(N - 1):
+        field[i].append(i + 1)
+        field[i + 1].append(i)
+    field[X - 1].append(Y - 1)
+    field[Y - 1].append(X - 1)
     ans = [0] * N
-    for a in range(1, N):
-        for b in range(a + 1, N + 1):
-            ans[min(abs(a - b), min(abs(X - a) + 1 + abs(Y - b), abs(X - b) + 1 + abs(Y - a)))] += 1
+    for i in range(N):
+        d = bfs(field, i)
+        # print(i, d)
+        for j in range(i + 1, N):
+            if i == j:
+                continue
+            ans[d[j]] += 1
     print(*ans[1:], sep="\n")
     return
 

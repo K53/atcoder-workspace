@@ -3,7 +3,19 @@ import sys
 
 
 def solve(N: int, M: int, L: "List[int]", R: "List[int]"):
-    print(max(0, min(R) - max(L) + 1))
+    cards = [0] * (N + 1 + 1)
+    for ll, rr in zip(L, R):
+        cards[ll] += 1
+        cards[rr + 1] -= 1
+    
+    for i in range(1, N + 1 + 1):
+        cards[i] += cards[i - 1]
+
+    ans = 0
+    for i in range(N + 1):
+        if cards[i] == M:
+            ans += 1
+    print(ans)
     return
 
 

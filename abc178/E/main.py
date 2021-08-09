@@ -3,6 +3,15 @@ import sys
 
 
 def solve(N: int, x: "List[int]", y: "List[int]"):
+    INF = 10 ** 18
+    xmax = ymax = -INF
+    xmin = ymin = INF
+    for xx, yy in zip(x, y):
+        xmax = max(xmax, xx - yy)
+        xmin = min(xmin, xx - yy)
+        ymax = max(ymax, xx + yy)
+        ymin = min(ymin, xx + yy)
+    print(max(abs(xmax - xmin), abs(ymax - ymin)))
     return
 
 

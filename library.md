@@ -10,9 +10,7 @@ for i in range(M):
     nodes[b[i] - 1].append(a[i] - 1)
 
 print(nodes)
-
 ```
-
 
 ## 入力受け取り
 
@@ -39,17 +37,6 @@ import string
 # https://docs.python.org/ja/3/library/string.html
 print(string.ascii_lowercase)
 # >> abcdefghijklmnopqrstuvwxyz
-```
-
-## 二次元配列
-
-```python
-arr = [[0] * W for _ in range(H)]
-# def generate2Darray(height: int, width: int, init: int) -> "List[List[int]]":
-#     res = []
-#     for _ in range(height):
-#        res.append([init] * width)
-#     return res
 ```
 
 ## ランレングス圧縮
@@ -84,6 +71,12 @@ def runLengthEncodeToString(S: str) -> str:
     return res
 ```
 
+### 座標圧縮
+
+```python
+L = []
+d = {val : i + 1 for i, val in enumerate(sorted(list(set(L))))}
+```
 
 ## 探索
 
@@ -98,7 +91,10 @@ def binSearch(ok: int, ng: int):
     # print(ok, ng)              # はじめの2値の状態
     while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
         mid = (ok + ng) // 2
-        if is_ok(mid):
+        # print("target > ", mid)
+        result = is_ok(mid)
+        # print(result)
+        if result:
             ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
         else:
             ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
@@ -117,10 +113,99 @@ for n in range(2 ** N):
             pass
 ```
 
+### DFS
+
+```python
+# = dfs(グラフ) =======================================================================
+# ----------------------------------------------------------------
+# Input
+#   1. 隣接リスト
+#   2. 開始ノード
+# Output
+#   スタートから各ノードへの最小コスト
+# Order
+# 
+# ----------------------------------------------------------------
+sys.setrecursionlimit(10 ** 9)
+def dfs(now: int):
+    res = 0
+    nums = [3, 5, 7]
+    # --- 探索終了条件 ----------------------------
+    if now > N:
+        return res
+    # --- カウントアップ条件 -----------------------
+    S = str(now)
+    check = True
+    for i in nums:
+        if not str(i) in S:
+            check = False
+    if check:
+        res += 1
+    # --- 次の探索(分岐) --------------------------
+    for num in nums:
+        next = now * 10 + num
+        res += dfs(next)
+    return res
+
+# = オイラーツアー =======================================================================
+# https://atcoder.jp/contests/abc213/submissions/24899201
+# https://hcpc-hokudai.github.io/archive/graph_tree_001.pdf
+
+# 頂点
+eularTourNodes = []
+sys.setrecursionlimit(10 ** 9)
+def getEularTourNodes(now: int, pre: int = -1):
+    eularTourNodes.append(now)
+    for next in nodes[now]:
+        if next == pre:
+            continue
+        getEularTourNodes(next, now)
+        eularTourNodes.append(now)
+    return
+getEularTourNodes(0)
+
+# 辺
+eularTourEdges = []
+sys.setrecursionlimit(10 ** 9)
+def getEularTourEdges(now: int, pre: int = -1):
+    eularTourEdges.append(now)
+    for next in nodes[now]:
+        if next == pre:
+            continue
+        getEularTourEdges(next, now)
+    eularTourEdges.append(-now)
+    return
+```
+
 ### BFS
 
 ```python
-# = bfs(隣接) ===========================================================================
+# = bfs(グラフ) =======================================================================
+# ----------------------------------------------------------------
+# Input
+#   1. 隣接リスト
+#   2. 開始ノード
+# Output
+#   スタートから各ノードへの最小コスト
+# Order
+# 
+# ----------------------------------------------------------------
+from collections import deque
+def bfs(edges: "List[to]", start_node: int) -> list:
+    INF = 10 ** 16
+    q = deque()
+    dist = [INF] * len(edges)
+    q.append(start_node)
+    dist[start_node] = 0
+    while q:
+        now = q.popleft()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.append(next)
+            dist[next] = dist[now] + 1
+    return dist
+# = bfs(グリッド) =======================================================================
 # ----------------------------------------------------------------
 # Input
 #   1. 全てのマスが隣接したフィールドの二次元配列
@@ -135,30 +220,29 @@ for n in range(2 ** N):
 # Note
 #   開始点が壁の場合には除く必要あり。
 # ----------------------------------------------------------------
-import queue
-INF = 10 ** 9
-def bfs(field: "List[Lsit[]]", H: int, W: int, y: int, x: int) -> list:
-    q = queue.Queue()
-    dist = []
-    for _ in range(H):
-        dist.append([-INF] * W)
-    q.put((x, y))
-    dist[y][x] = 0
-    while not q.empty():
-        now_x, now_y= q.get()
-        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            next_x, next_y = now_x + dx, now_y + dy
-            if next_y < 0 or next_y >= H or next_x < 0 or next_x >= W or field[next_y][next_x] == "#" or dist[next_y][next_x] != -INF:
+from collections import deque
+def bfs(edge, H, W, startX, startY) -> list:
+    INF = 10 ** 16
+    q = deque()
+    dist = [[INF] * W for _ in range(H)]
+    q.append((startY, startX))
+    dist[startY][startX] = 0
+    while q:
+        nowy, nowx = q.popleft()
+        for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
+            nexty = nowy + dy
+            nextx = nowx + dx
+            if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
                 continue
-            q.put((next_x, next_y))
-            dist[next_y][next_x] = dist[now_y][now_x] + 1
+            q.append((nexty, nextx))
+            dist[nexty][nextx] = dist[nowy][nowx] + 1
     return dist
 # ======================================================================================
 ```
 
 ## 動的計画法
 
-### dijkstra
+### dijkstra / ダイクストラ
 
 ```python
 # = dijkstra ===========================================================================
@@ -169,7 +253,7 @@ def bfs(field: "List[Lsit[]]", H: int, W: int, y: int, x: int) -> list:
 # Output
 #   スタートから各ノードへの最小コスト
 # Order
-#   O(V + E * logV)
+#   O((V + E) * logV)
 # Note
 #   *1 https://atcoder.jp/contests/abc191/tasks/abc191_e
 #       - 多始点ダイクストラの場合の注意。
@@ -368,6 +452,45 @@ def isPrime(n: int) -> bool:
         if n % i == 0:
             return False
 # ======================================================================================
+```
+
+### エラトステネスの篩
+
+ある数limitまでの素数を列挙。
+
+```python
+# ======================================================================================
+# Order
+# O(NloglogN)
+# ======================================================================================
+def getPrimeLists(limit: int):
+    primes = [] # 素数リスト
+    isPrime = [True] * (limit + 1) # 素数かどうかのフラグ
+    isPrime[0] = False
+    isPrime[1] = False
+    
+    for p in range(limit + 1):  # p : 判定対象の数
+        if not isPrime[p]:
+            continue
+        primes.append(p)
+        # pが素数のためそれ以降に出現するpの倍数を除外する。
+        # なお、ループはp始まりでも良いが、p * _ のかける側はすでに同じ処理で弾かれているはずのため無駄。
+        for i in range(p * p, limit + 1, p):
+            isPrime[i] = False
+    return primes
+
+# 発展形 : limitまでの数の素数の個数列挙
+def getNumOfPrime(limit: int):
+    numOfPrime = [0] * (limit + 1) # ある数の素因数の個数
+    numOfPrime[0] = 0
+    numOfPrime[1] = 0
+
+    for p in range(2, limit + 1): # p : 判定対象の数
+        # pが素数の場合、pの倍数の数にpが素因数となるのでインクリメント
+        if not numOfPrime[p]:
+            for i in range(p, limit + 1, p):
+                numOfPrime[i] += 1
+    return numOfPrime
 ```
 
 ### 約数列挙
@@ -572,6 +695,45 @@ def solve():
     return
 ```
 
+### ダブリング
+
+```python
+class Doubling:
+    def __init__(self, stateKind: int, maxDoublingTimes: int):
+        self.dv = []                                # dv[k][s] := 状態sを2^k回実行したらあとの状態
+        self.stateKind = stateKind                  # 状態の種類数s
+        self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
+        self.initTable()
+        self.createTable()
+    
+    # 初期化処理
+    def initTable(self):
+        self.dv.append(A) 
+    
+    def createTable(self):
+        for i in range(1, self.maxDoublingTimes):
+            l = []
+            for j in range(self.stateKind):
+                l.append(self.dv[i - 1][self.dv[i - 1][j]])
+            self.dv.append(l)
+        
+    def getState(self, doubingTimes: int, startState: int):
+        a = []
+        for i in range(self.maxDoublingTimes):
+            if doubingTimes >> i & 1:
+                a.append(i)
+        now = startState
+        for i in a:
+            now = self.dv[i][now]
+        return now
+    def getAllStates(self, targenTime: int):
+        return self.dv[targenTime]
+
+import math
+d = Doubling(N, int(math.log2(K)) + 1)
+print(d.getState(K, 0))
+```
+
 ### 直交座標ー極座標 変換
 
 ```python
@@ -618,23 +780,7 @@ def findSome(l: "List", val: any):
 
 
 ```python
-def bfs(edges: "List[to]", start_node: int) -> list:
-    q = set()
-    dist = [INF] * len(edges)
-    q.add(start_node)
-    dist[start_node] = 0
-    while len(q) != 0:
-        now = q.pop()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.add(next)
-            dist[next] = dist[now] + 1
-    return dist
-
-
-
-# 未検証 deprecated
+# 遅い deprecated
 import queue
 def bfs(edges: "List[to]", start_node: int) -> list:
     # deprecated
@@ -663,20 +809,6 @@ def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
             if dist[next] != INF:
                 continue
             q.put(next)
-            dist[next] = dist[now] + 1
-    return dist
-
-def dfs(edges: "List[to]", start_node: int) -> list:
-    s = []
-    dist = [INF] * len(edges)
-    dist[start_node] = 0
-    s.append(start_node)
-    while not len(s) == 0:
-        now = s.pop()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            s.append(next)
             dist[next] = dist[now] + 1
     return dist
 ```

@@ -4,14 +4,14 @@ import sys
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
     import heapq
-    INF = 10 ** 9       # *2
+    INF = 10 ** 10
     def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
         hq = []
         heapq.heapify(hq)
         # Set start info
         dist = [INF] * len(edges)
         heapq.heappush(hq, (0, start_node))
-        dist[start_node] = 0            # *1
+        dist[start_node] = 0
         # dijkstra
         while hq:
             min_cost, now = heapq.heappop(hq)
@@ -22,15 +22,15 @@ def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
                     dist[next] = dist[now] + cost
                     heapq.heappush(hq, (dist[next], next))
         return dist
-    
-    edges = [[] for _ in range(N)]
+    field = [[] for _ in range(N)]
     for aa, bb, cc in zip(A, B, C):
-        edges[aa - 1].append((cc, bb - 1))
-        edges[bb - 1].append((cc, aa - 1))
-    cost1 = dijkstra(edges, 0)
-    cost2 = dijkstra(edges, N - 1)
-    for k in range(N):
-        print(cost1[k] + cost2[k])
+        field[aa - 1].append((cc, bb - 1))
+        field[bb - 1].append((cc, aa - 1))
+    
+    dist1 = dijkstra(field, 0)
+    dist2 = dijkstra(field, N - 1)
+    for kk in range(N):
+        print(dist1[kk] + dist2[kk])
     return
 
 

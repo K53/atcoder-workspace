@@ -4,43 +4,23 @@ import sys
 MOD = 1000000007  # type: int
 
 def solve(S: str):
-    l = []
-    for ss in S:
-        if ss in set("chokudai"):
-            l.append(ss)
-    if set(l) != set("chokudai"):
-        print(0)
-        return
-    dp = []
     T = "chokudai"
-    # print(l)
-    for i in range(len(T)):
-        dp.append([0] * len(l))
-    if l[0] == T[0]:
-        dp[0][0] = 1
-    else:
-        dp[0][0] = 0
-    for ss in range(1, len(l)):
-        dp[0][ss] = dp[0][ss - 1] + 1 if l[ss] == T[0] else dp[0][ss - 1]
-
-    for tt in range(1, len(T)):
-        for ss in range(tt, len(l)):
-            if l[ss] == T[tt]:
-                dp[tt][ss] = dp[tt - 1][ss] + dp[tt][ss - 1]
+    M = len(S) + 1
+    N = len(T) + 1
+    dp = [[0 for _ in range(M)] for _ in range(N)]
+    for j in range(M):
+        dp[0][j] = 1
+    
+    for i in range(1, N):
+        for j in range(1, M):
+            if T[i - 1] == S[j - 1]:
+                # j文字目を取る場合と足らない場合を選べる
+                dp[i][j] = (dp[i - 1][j - 1] + dp[i][j - 1]) % MOD
             else:
-                dp[tt][ss] = dp[tt][ss - 1]
-    # for i in range(len(T)):
-    #     print(dp[i])
-    print(dp[len(T) - 1][len(l) - 1] % MOD)
-                
-                    
-    
+                # j文字目を取らない選択しかない
+                dp[i][j] = dp[i][j - 1] % MOD
+    print(dp[-1][-1])
 
-
-
-
-
-    
     return
 
 

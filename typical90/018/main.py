@@ -3,6 +3,13 @@ import sys
 
 
 def solve(T: int, L: int, X: int, Y: int, Q: int, E: "List[int]"):
+    import math
+    for ee in E:
+        rad = math.radians(360 * ee / T)
+        z = -L / 2 * math.cos(rad) + L / 2
+        y = -L / 2 * math.sin(rad)
+        l = (X ** 2 + (Y - y) ** 2) ** 0.5
+        print(math.degrees(math.atan(z / l)))
     return
 
 

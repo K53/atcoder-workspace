@@ -9,10 +9,10 @@ def solve(N: int, C: int, a: "List[int]", b: "List[int]", c: "List[int]"):
     l.sort()
     ans = 0
     cost = 0
-    for i in range(2 * N):
+    for i in range(2 * N - 1):
         cost += l[i][1]
-        if i != 2 * N - 1 and l[i][0] != l[i + 1][0]:
-            ans += min(cost, C) * (l[i + 1][0] - l[i][0])
+        days = l[i + 1][0] - l[i][0]
+        ans += min(cost, C) * days
     print(ans)
     return
 

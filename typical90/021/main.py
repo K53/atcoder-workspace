@@ -1,8 +1,38 @@
 #!/usr/bin/env python3
 import sys
+sys.setrecursionlimit(10 ** 9) #再帰回数の限界を変更
+
 
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
+    nodes = [[] for _ in range(N)]
+    for i in range(M):
+        nodes[A[i] - 1].append(B[i] - 1)
+        nodes[B[i] - 1].append(A[i] - 1)
+    
+    INF = 10 ** 9
+    order = [] * N
+    visited = [False] * N
+    number = 0
+    def dfs(dist: "List[List[to]]", now: int):
+        # 行きがけの処理
+        # pass
+        # 次の訪問先への移動
+        for next in nodes[now]:
+            if visited[now]:
+                continue
+            visited[next] = True
+            dfs(visited, next)
+        # 帰りがけの処理
+        order[now] = number
+        number += 1
+        
+    INF = 10 ** 16
+    dist = [INF] * N
+    dist[0] = 0
+    dfs(dist, 0)
+    print(dist)
+    print(nodes)
     return
 
 

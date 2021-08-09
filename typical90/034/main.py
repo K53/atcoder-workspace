@@ -1,10 +1,30 @@
 #!/usr/bin/env python3
 import sys
+from collections import defaultdict
 
 
 def solve(N: int, K: int, a: "List[int]"):
-
-
+    d = defaultdict(int)
+    l = 0
+    r = 0
+    ans = 0
+    kind = 0
+    for _ in range(N):
+        while r < N and (d[a[r]] > 0 or (d[a[r]] == 0 and kind < K)):
+            # print(l, r, list(d.values()), "#", ans, kind)
+            if d[a[r]] == 0:
+                kind += 1
+            ans = max(ans, r - l + 1)
+            d[a[r]] += 1
+            r += 1
+        # print(l, r, list(d.values()), ans, kind)
+        if kind >= K:
+            d[a[l]] -= 1
+            if d[a[l]] == 0:
+                kind -= 1
+            l += 1
+        # print(l, r, list(d.values()), ans, kind)
+    print(ans)
     return
 
 

@@ -2,7 +2,18 @@
 import sys
 
 
-def solve(N: int, Q: int, x: "List[int]", y: "List[int]", q: "List[int]"):
+def solve(N: int, Q: int, X: "List[int]", Y: "List[int]", q: "List[int]"):
+    xmax = xmin = ymax = ymin = 0
+    points = []
+    for x, y in zip(X, Y):
+        points.append((x - y, x + y))
+        xmax = max(xmax, x - y)
+        xmin = min(xmin, x - y)
+        ymax = max(ymax, x + y)
+        ymin = min(ymin, x + y)
+    for qq in q:
+        x, y = points[qq - 1]
+        print(max(abs(x - xmax), abs(x - xmin), abs(y - ymax), abs(y - ymin)))
     return
 
 

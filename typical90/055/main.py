@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 import sys
-from itertools import combinations
 
 def solve(N: int, P: int, Q: int, A: "List[int]"):
+    l = [i % P for i in A]
     count = 0
     for a1 in range(0, N - 4):
         for a2 in range(a1 + 1, N - 3):
             for a3 in range(a2 + 1, N - 2):
                 for a4 in range(a3 + 1, N - 1):
                     for a5 in range(a4 + 1, N):
-                        if ((A[a1] % P ) * (A[a2] % P) * (A[a3] % P) * (A[a4] % P) * (A[a5] % P)) % P == Q:
+                        if ((((l[a1] * l[a2]) % P) * l[a3] % P) * l[a4] % P) * l[a5] % P == Q:
                             count += 1
     print(count)
     return

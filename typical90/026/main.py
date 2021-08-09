@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 import sys
 
-def bfs(edges: "List[to]", start_node: int) -> list:
-    q = set()
-    dist = [-1] * len(edges)
-    q.add(start_node)
-    dist[start_node] = 1
-    while len(q) != 0:
-        now = q.pop()
-        for next in edges[now]:
-            if dist[next] != -1:
-                continue
-            q.add(next)
-            dist[next] = 0 if dist[now] == 1 else 1
-    return dist
+
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    from collections import deque
+    def bfs(edges: "List[to]", start_node: int) -> list:
+        INF = 10 ** 16
+        q = deque()
+        dist = [INF] * len(edges)
+        q.append(start_node)
+        dist[start_node] = 0
+        while q:
+            now = q.popleft()
+            for next in edges[now]:
+                if dist[next] != INF:
+                    continue
+                q.append(next)
+                dist[next] = 1 if dist[now] == 0 else 0
+        return dist
     tree = [[] for _ in range(N)]
     for i in range(N - 1):
         tree[A[i] - 1].append(B[i] - 1)

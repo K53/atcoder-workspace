@@ -1,8 +1,35 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, K: int, S: str):
+    from collections import deque
+    import copy
+    nearList = deque()
+    l = [-1] * 26
+    for i in reversed(range(N)):
+        l[ord(S[i]) - ord("a")] = i
+        nearList.appendleft(copy.deepcopy(l))
+    
+    # for i in range(N):
+    #     print(nearList[i])
+    
+    ans = []
+    index = 0
+    kk = 0
+    for _ in range(K):
+        for ch in range(26):
+            next = nearList[index][ch]
+            if next != -1 and N - (next + 1) >= (K - (kk + 1)):
+                ans.append(chr(ch + ord("a")))
+                index = next + 1
+                kk += 1
+                # print(">> ", index)
+                break
+        # print(ans)
+    print(*ans, sep="")
+        
+        
+
     return
 
 

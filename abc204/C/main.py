@@ -1,36 +1,26 @@
 #!/usr/bin/env python3
 import sys
+sys.setrecursionlimit(10 ** 9) #再帰回数の限界を変更
+
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
-    # N = 2000
-    # A = [i + 1 for i in range(1990)]
-    # B = [i + 2 for i in range(1990)]
-
-    from collections import deque
-    INF = 10 ** 9
-    def bfs(edges: "List[to]", start_node: int) -> list:
-        # deprecated
-        count = 0
-        q = deque()
-        dist = [INF] * len(edges)
-        q.append(start_node)
-        dist[start_node] = 0
-        while q:
-            now = q.pop()
-            for next in edges[now]:
-                if dist[next] != INF:
-                    continue
-                q.append(next)
-                dist[next] = dist[now] + 1
-                count += 1
-        return count
     field = [[] for _ in range(N)]
-    
     ans = N
     for aa, bb in zip(A, B):
         field[aa - 1].append(bb - 1)
+    
+    INF = 10 ** 9
+    def dfs(dist: "List[List[to]]", now: int):
+        for next in field[now]:
+            if dist[now] != INF:
+                continue
+            dist[next] = dist[now] + 1
+            dfs(dist, next)
+        
+    dist = [INF] * N
+    dfs(dist, 0)
     for s in range(N):
-        ans += bfs(field, s)
+        ans += dfs(field, s)
     print(ans)
     return
 

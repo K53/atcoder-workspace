@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 import sys
-
+import bisect
 
 def solve(N: int, A: "List[int]", Q: int, B: "List[int]"):
+    A.sort()
+    for bb in B:
+        i = bisect.bisect_left(A, bb)
+        if i == 0:
+            print(abs(A[i] - bb))
+        elif i == N:
+            print(abs(A[-1] - bb))
+        else:
+            print(min(abs(A[i] - bb), abs(A[i - 1] - bb)))
     return
 
 

@@ -3,6 +3,70 @@ import sys
 
 
 def solve(N: int, X: int, M: int):
+    class Doubling:
+        def __init__(self, stateKind: int, maxDoublingTimes: int):
+            self.dv = []                                # dv[k][s] := 状態sを2^k回実行したらあとの状態
+            self.stateKind = stateKind                  # 状態の種類数s
+            self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
+            self.sum = []
+            self.initTable()
+            self.createTable()
+        
+        # 初期化処理
+        def initTable(self):
+            self.dv.append([i ** 2 % M for i in range(self.stateKind)]) 
+            self.sum.append([i for i in range(self.stateKind)])
+        
+        def createTable(self):
+            for i in range(1, self.maxDoublingTimes):
+                l = []
+                s = []
+                for j in range(self.stateKind):
+                    l.append(self.dv[i - 1][self.dv[i - 1][j]])
+                    s.append(self.sum[i - 1][j] + self.sum[i - 1][self.dv[i - 1][j]])
+                self.dv.append(l)
+                self.sum.append(s)
+            
+        def getState(self, doubingTimes: int, startState: int):
+            a = []
+            for i in range(self.maxDoublingTimes):
+                if doubingTimes >> i & 1:
+                    a.append(i)
+            now = startState
+            for i in a:
+                now = self.dv[i][now]
+            return now
+        
+        def getSum(self, doubingTimes: int, startState: int):
+            res = 0
+            a = []
+            for i in range(self.maxDoublingTimes):
+                if doubingTimes >> i & 1:
+                    a.append(i)
+            now = startState
+            for i in a:
+                res += self.sum[i][now]
+                now = self.dv[i][now]
+            return res
+
+        def getAllStates(self, targenTime: int):
+            return self.dv[targenTime]
+        
+        def printDv(self):
+            for i in range(len(self.dv)):
+                print(self.dv[i][471])
+            print("###")
+            for i in range(len(self.sum)):
+                print(self.sum[i][471])
+        
+        def __str__(self):
+            return ''
+
+    import math
+    d = Doubling(M, int(math.log2(N)) + 1)
+    # d.printDv()
+    print(d.getSum(N, X))
+
     return
 
 

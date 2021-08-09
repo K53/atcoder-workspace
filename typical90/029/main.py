@@ -3,6 +3,16 @@ import sys
 
 
 def solve(W: int, N: int, L: "List[int]", R: "List[int]"):
+    d = {val : i for i, val in enumerate(sorted(list(set(L + R))))}
+    l = [0] * (N * 2)
+    for ll, rr in zip(L, R):
+        cl = d[ll]
+        cr = d[rr]
+        h = max(l[cl:(cr + 1)]) + 1
+        for i in range(cl, cr + 1):
+            l[i] = h
+        print(h)
+
     return
 
 

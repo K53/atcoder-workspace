@@ -3,20 +3,20 @@ import sys
 
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]", K: int, C: "List[int]", D: "List[int]"):
-    max = 0
+    res = 0
     for i in range(2 ** K):
-        dish = [0] * N
-        c = 0
+        nums = [False] * 101
         for b in range(K):
-            if (i >> b) & 1:    #1
-                dish[D[b] - 1] = 1
-            else:       #0
-                dish[C[b] - 1] = 1
-        for m in range(M):
-            if dish[A[m] - 1] and dish[B[m] - 1]:
-                c += 1
-        max = c if c > max else max
-    print(max)
+            if i >> b & 1:
+                nums[C[b]] = True
+            else:
+                nums[D[b]] = True
+        ans = 0
+        for aa, bb in zip(A, B):
+            if nums[aa] & nums[bb]:
+                ans += 1
+        res = max(res, ans)
+    print(res)
     return
 
 
