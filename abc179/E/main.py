@@ -9,15 +9,16 @@ def solve(N: int, X: int, M: int):
             self.stateKind = stateKind                  # 状態の種類数s
             self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
             self.sum = []
-            self.initTable()
-            self.createTable()
+            self._initTable()
+            self._createTable()
         
         # 初期化処理
-        def initTable(self):
+        def _initTable(self):
             self.dv.append([i ** 2 % M for i in range(self.stateKind)]) 
             self.sum.append([i for i in range(self.stateKind)])
         
-        def createTable(self):
+        # ダブリング実施
+        def _createTable(self):
             for i in range(1, self.maxDoublingTimes):
                 l = []
                 s = []

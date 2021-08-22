@@ -1,8 +1,50 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, M: int, x: "List[int]", y: "List[int]"):
+    import sys
+    from collections import deque
+    class Tree:
+        def __init__(self, N) -> None:
+            self.nodes = N
+            self.seen = [0] * N
+            self.G = [[] for _ in range(N)]
+            self.degree = [0] * N # 各ノードの入次数
+            return
+        
+        # 辺の追加
+        def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
+            self.G[fromNode].append(toNode)
+            if bothDirection:
+                self.G[toNode].append(fromNode)
+            self.degree[toNode] += 1
+        
+        def topologicalSort(self):
+            topologicalOrder = [node for node in range(self.nodes) if self.degree[node] == 0] # 入次数0のものがスタート
+            deq = deque(topologicalOrder)
+
+            # 片っ端から入次数0のものを取り出していく。取り出すとそのノードから遷移するノードの入次数をデクリメントする。
+            while deq:
+                node = deq.popleft()
+                for t in self.G[node]:
+                    self.degree[t] -= 1
+                    if self.degree[t] == 0:
+                        deq.append(t)
+                        topologicalOrder.append(t)
+            if [i for i in range(self.nodes) if self.degree[i]]:
+                return None
+            return topologicalOrder
+    tr = Tree(N)
+    for i in range(M):
+        tr.addEdge(x[i] - 1, y[i] - 1, False)
+    l = tr.topologicalSort()
+    dp = [0] * N
+    dp[0] = 0
+    for now in l:
+        for next in tr.G[now]:
+            dp[next] = max(dp[now] + 1, dp[next])
+    print(max(dp))
+
     return
 
 

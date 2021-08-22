@@ -3,6 +3,36 @@ import sys
 
 
 def solve(a: int, b: int, x: int, y: int):
+    G = [[] for _ in range(200)]
+    for i in range(100):
+        G[i].append((x, 100 + i))
+        G[100 + i].append((x, i))
+    for i in range(99):
+        G[i + 1].append((x, 100 + i))
+        G[100 + i].append((x, i + 1))
+        G[i + 1].append((y, i))
+        G[i].append((y, i + 1))
+    import heapq
+    INF = 10 ** 9       # *2
+    def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
+        hq = []
+        heapq.heapify(hq)
+        # Set start info
+        dist = [INF] * len(edges)
+        heapq.heappush(hq, (0, start_node))
+        dist[start_node] = 0            # *1
+        # dijkstra
+        while hq:
+            min_cost, now = heapq.heappop(hq)
+            if min_cost > dist[now]:
+                continue
+            for cost, next in edges[now]:
+                if dist[next] > dist[now] + cost:
+                    dist[next] = dist[now] + cost
+                    heapq.heappush(hq, (dist[next], next))
+        return dist
+    d = dijkstra(G, a - 1)
+    print(d[100 + b - 1])
     return
 
 

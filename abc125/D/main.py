@@ -3,6 +3,11 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    # dp[i] := i番目とi+1番目まで選んだ時の最大値
+    dp = [0] * N
+    dp[0] = A[0]
+    for i in range(N - 1):
+        dp[i] = 
     return
 
 

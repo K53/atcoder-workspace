@@ -3,6 +3,26 @@ import sys
 
 
 def solve(K: int):
+    def primeFactrization(n: int) -> dict:
+        primeFactors = dict()
+        i = 2
+        while i * i <= n:
+            ex = 0
+            while n % i == 0:
+                ex += 1
+                n //= i
+            if ex != 0:
+                primeFactors[i] = ex
+            i += 1
+        if n != 1:
+            primeFactors[n] = 1
+        return primeFactors
+    s = 0
+    for v in primeFactrization(K).values():
+        s += v
+    print(s)
+    
+    
     return
 
 

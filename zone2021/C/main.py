@@ -4,31 +4,20 @@ import itertools
 
 
 def solve(N: int, A: "List[int]", B: "List[int]", C: "List[int]", D: "List[int]", E: "List[int]"):
-
-
-
     def is_ok(minv):
-        # if minv < 0: return False
-        # if minv >= 10 ** 9: return True
         ss = set()
         for i in range(N):
+            P = [A[i], B[i], C[i], D[i], E[i]]
             score = 0
-            if A[i] >= minv:
-                score += 1
-            if B[i] >= minv:
-                score += 2
-            if C[i] >= minv:
-                score += 4
-            if D[i] >= minv:
-                score += 8
-            if E[i] >= minv:
-                score += 16
+            for i in range(5):
+                if P[i] >= minv:
+                    score += 1 << i
             ss.add(score)
         # print(ss)
         for x in ss:
             for y in ss:
                 for z in ss:
-                    if x | y | z == 31:
+                    if x | y | z == int("11111", 2):
                         return True 
         return False
 

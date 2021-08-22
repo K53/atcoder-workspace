@@ -7,57 +7,29 @@ def conv(s: str):
     res = 0
     for t in s[::-1]:
         n = ord(t)
-        if n <= 90:
-            res += (n - 65 + 1) * (52 ** d)
+        if n <= ord("Z"):
+            res += (n - ord("A") + 1) * (52 ** d)
         else:
-            res += (n - 71 + 1) * (52 ** d)
+            res += (n - ord("a") + 1 + 26) * (52 ** d)
         d += 1
     return res
 
 def solve(N: int, s: "List[str]"):
-    # print(conv("aaa"))
-    # print(conv("baa"))
-    # print(conv("caa"))
-    # print(conv("daa"))
-    # print(conv("eaa"))
-    nodes = [[] for _ in range(52 ** 3 + 1)]
+    G = [[] for _ in range(52 ** 3 + 1)]
+    dp = [-1] * (52 ** 3 + 1)
     for i in s:
-        nodes[conv(i[:3])].append(conv(i[-3:]))
-    # print(nodes[conv("aaa")])
-    # print(nodes[conv("baa")])
-    # print(nodes[conv("caa")])
-    # print(nodes[conv("daa")])
-    # print(nodes[conv("eaa")])
-    print(nodes[conv("abc")])
-    print(nodes[conv("bcd")])
-    print(nodes[conv("cda")])
-    print(nodes[conv("ada")])
-    INF = 10 ** 9
-    dist = [INF] * (52 ** 3 + 1)
-    visit = [-1] * (52 ** 3 + 1)
-    def dfs(start_node: int, m) -> list:
-        tt = dist[start_node]
-        v = visit[start_node]
-        if v == -1:
-            visit[start_node] = m
-        elif v == m:
-            dist[start_node] = -INF
-            return -INF
-        if tt == INF:
-            dist[start_node] = 0
-        else:
-            return dist[start_node]
-        ans = 0
-        for i in nodes[start_node]:
-            ans = max(ans, dfs(i, m) + 1)
-        dist[start_node] = ans
-        return 0
-
-    for i in range(52 ** 3 + 1):
-        dfs(i, i)
-    for i in s:
-        print(dist[conv(i[-3:])])
+        G[conv(i[:3])].append(conv(i[-3:]))
+    # print(G[conv("abc")])
+    # print(conv("bcd"))
+    # print(G[conv("bcd")])
+    # print(conv("cda"))
+    # print(G[conv("ada")])
+    # print(conv("ada"))
+    for node in len(G):
+        if len(G[node]) == 0:
+            dp[node] = 0
     
+
 
         
     

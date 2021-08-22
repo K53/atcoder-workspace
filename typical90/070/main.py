@@ -3,6 +3,13 @@ import sys
 
 
 def solve(N: int, X: "List[int]", Y: "List[int]"):
+    import statistics
+    mx = statistics.median_high(X)
+    my = statistics.median_high(Y)
+    ans = 0
+    for xx, yy in zip(X, Y):
+        ans += abs(xx - mx) + abs(yy - my)
+    print(ans)
     return
 
 

@@ -113,16 +113,150 @@ for n in range(2 ** N):
             pass
 ```
 
+### 累積和(DP算出)
+
+```python
+class MatrixAccumulates:
+    def __init__(self, H: int, W: int) -> None:
+        self.H, self.W = H, W
+        self.LL = [[0] * W for _ in range(H)]
+        self.S = []
+    
+    def add(self, y, x, val):
+        self.LL[y][x] += val
+        return
+
+    def setList(self, LL: "List[List[int]]"):
+        self.LL = LL
+        return
+
+    def build(self, index1: bool = False):
+        if index1:
+            self.S = [[0] * self.W for _ in range(self.H)]
+            #ヨコに累積和
+            for i in range(self.H):
+                for j in range(self.W):
+                    if i == 0:
+                        self.S[i][j] = self.LL[i][j]
+                    else:
+                        self.S[i][j] = self.S[i-1][j] + self.LL[i][j]
+            #タテに累積和
+            for i in range(self.H):
+                for j in range(self.W):
+                    if j == 0:
+                        self.S[i][j] = self.S[i][j]
+                    else:
+                        self.S[i][j] = self.S[i][j-1] + self.S[i][j]
+        else:
+            # 累積和(DPで算出)
+            # 0行目/0列目に0を挿入した二次元累積和Sを得る。
+            self.S = [[0] * (self.W + 1) for _ in range(self.H + 1)]
+            for i in range(self.H):
+                for j in range(self.W):
+                    self.S[i + 1][j + 1] = self.S[i + 1][j] + self.S[i][j + 1] - self.S[i][j] + self.LL[i][j]
+        return
+    
+    def getArea(self, excY, incY, excX, incX) -> int:
+        '''
+        exampl) excX = 1, excY = 0, incX = 3, incY = 2
+                excX  incX
+                0  1  2  3
+        excY 0  x  x  x  x
+                1  x  x  o  o
+        incY 2  x  x  o  o
+        '''
+        areaAccumulate = self.S[incY][incX] - self.S[excY][incX] - self.S[incY][excX] + self.S[excY][excX]
+        return areaAccumulate
+    
+    def printS(self) -> int:
+        for i in range(self.H):
+            print(self.S[i])
+        return
+```
+
+### 累積和(ゼータ変換)
+
+```python
+# 二次元累積和
+# 0行目/0列目に0を挿入しない累積和を得る。
+def zetaConvert(l: "List[List[int]]"):
+    H, W = len(l), len(l[0])
+    #ヨコに累積和
+    for i in range(H):
+        for j in range(W):
+            if i: l[i][j] += l[i-1][j]
+    #タテに累積和
+    for i in range(H):
+        for j in range(W):
+            if j: l[i][j] += l[i][j-1]
+    return None
+
+# 累積和
+# 0行目/0列目に0を挿入する。
+S = [[0] * (n + 1) for _ in range(n + 1)]
+for i in range(n):
+    for j in range(n):
+        S[i+1][j+1] = S[i+1][j] + S[i][j+1] - S[i][j] + A[i][j]
+```
+
 ### DFS
+
+```python
+sys.setrecursionlimit(10 ** 9)
+class DFS():
+    def __init__(self, G: "list[list[int]]", rG: "list[list[int]]"):
+        self.nodesNum = len(G)                  # 頂点数
+        self.G = G                              # グラフ
+        self.rG = rG                            # 全ての辺を逆向きにしたグラフ
+        self.seen = [False] * self.nodesNum     # 各ノードが訪問済みかどうかのフラグ
+        self.firstOrder = []                    # ノードの行きがけ順(0-index)
+        self.lastOrder = []                     # ノードの帰りがけ順(0-index)
+        self.connections = [-1] * self.nodesNum # 強連結成分分解の結果
+        self.sccNum = 0                         # 強連結成分の採番用カウンタ
+    
+    # DFS
+    def dfs(self, now: int):
+        self.firstOrder.append(now)
+        self.seen[now] = True
+        for next in self.G[now]:
+            if self.seen[next]:
+                continue
+            self.dfs(next)
+        self.lastOrder.append(now)
+    
+    # 逆向きグラフの強連結成分チェック
+    def reverseDfs(self, now: int):
+        self.seen[now] = True
+        self.connections[now] = self.sccNum
+        for next in self.rG[now]:
+            if self.seen[next]:
+                continue
+            self.reverseDfs(next)
+    
+    # 強連結成分分解SCC
+    def scc(self):
+        # 帰りがけ順のナンバリングDFS
+        for startNode in range(self.nodesNum):
+            if self.seen[startNode]:
+                continue
+            self.dfs(startNode)
+        # seenをリセット
+        self.seen = [False] * N
+        # 帰りがけ順の大きい方から順に強連結成分の判定DFS
+        for node in self.lastOrder[::-1]:
+            if self.seen[node]:
+                continue
+            self.reverseDfs(node)
+            self.sccNum += 1
+```
 
 ```python
 # = dfs(グラフ) =======================================================================
 # ----------------------------------------------------------------
 # Input
-#   1. 隣接リスト
-#   2. 開始ノード
+#   1. 現在の値
 # Output
-#   スタートから各ノードへの最小コスト
+#   O(N + M)
 # Order
 # 
 # ----------------------------------------------------------------
@@ -146,6 +280,28 @@ def dfs(now: int):
         next = now * 10 + num
         res += dfs(next)
     return res
+
+def dfs(now)
+
+# = 行きがけ/帰りがけDFS =================================================================
+sys.setrecursionlimit(10 ** 9)
+seen = [False] * N
+firstOrder = []
+lastOrder = []
+def dfs(nodes: "list[list[int]]", now: int):
+    firstOrder.append(now)
+    seen[now] = True
+    for next in nodes[now]:
+        if seen[next]:
+            continue
+        dfs(nodes, next)
+    lastOrder.append(now)
+dfs(nodes, 0)
+print("No,", "go", "back")
+for i in range(N):
+    print(i + 1, firstOrder[i] + 1, lastOrder[i] + 1)
+
+
 
 # = オイラーツアー =======================================================================
 # https://atcoder.jp/contests/abc213/submissions/24899201
@@ -175,6 +331,192 @@ def getEularTourEdges(now: int, pre: int = -1):
         getEularTourEdges(next, now)
     eularTourEdges.append(-now)
     return
+
+# = dfs(グリッド) =======================================================================
+H, W = map(int, input().split())
+field = []
+seen = []
+for _ in range(H):
+    field.append(input())
+    seen.append([False] * W)
+sys.setrecursionlimit(10 ** 9)
+def dfs(y, x):
+    seen[y][x] = True
+    # 次の探索(分岐)
+    for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        next_y = y + dy
+        next_x = x + dx
+        # 探索しない条件を切り落とし
+        if next_x < 0 or next_y < 0 or next_x >= W or next_y >= H or field[next_y][next_x] == "#" or seen[next_y][next_x]:
+            continue
+        dfs(next_y, next_x)
+    return
+```
+
+### ワーシャルフロイド(WarshallFloyd)
+
+```python
+# = ワーシャルフロイド(グラフ) =======================================================================
+INF = 10 ** 16
+class WarshallFloyd():
+    def __init__(self, N):
+        self.N = N
+        dp = [[INF] * N for _ in range(N)]
+        for i in range(N):
+            dp[i][i] = 0
+        self.dp = dp
+    
+    # 自己ループを持つグラフの扱いは注意。
+    def addEdge(self, fromNode: int, toNode: int, cost: int = 1):
+        self.dp[fromNode][toNode] = cost
+    
+    def build(self):
+        for via in range(self.N):
+            for start in range(self.N):
+                for goal in range(self.N):
+                    self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+        return self.dp
+
+# = ワーシャルフロイド(グリッド) =======================================================================
+class WarshallFloyd():
+    def __init__(self, H, W):
+        INF = 10 ** 16
+        self.H = H
+        self.W = W
+        dp = [[INF] * (H * W) for _ in range(H * W)]
+        for i in range(H * W):
+            dp[i][i] = 0
+        self.dp = dp
+    
+    def convertNode(self, y, x):
+        return y * self.W + x
+    
+    def setGraph(self, grid:"List[List[int]]"):
+        for y in range(self.H):
+            for x in range(self.W):
+                if grid[y][x] == "#":
+                    continue
+                for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
+                    nexty = y + dy
+                    nextx = x + dx
+                    if nexty < 0 or nextx < 0 or nexty >= self.H or nextx >= self.W or grid[nexty][nextx] == "#":
+                        continue
+                    self.dp[self.convertNode(y, x)][self.convertNode(nexty, nextx)] = 1
+
+    def build(self):
+        # 経由地via以下を利用してstartからgoalに辿り着く最短経路をDPする。
+        for via in range(self.H * self.W):
+            for start in range(self.H * self.W):
+                for goal in range(self.H * self.W):
+                    self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+```
+
+### SCC
+
+```python
+sys.setrecursionlimit(10 ** 9)
+class SCC():
+    def __init__(self, nodesNum: int):
+        self.nodesNum = nodesNum                            # 頂点数
+        self.G = [[] for _ in range(self.nodesNum)]         # グラフ
+        self.rG = [[] for _ in range(self.nodesNum)]        # 全ての辺を逆向きにしたグラフ
+        self.seen = [False] * self.nodesNum                 # 各ノードが訪問済みかどうかのフラグ
+        self.lastOrder = []                                 # ノードの帰りがけ順(0-indexで採番)
+        self.tplCorrespondenceTable = [-1] * self.nodesNum  # SCC後の対応表(indexがノード番号。値が0-indexで採番された順番。値が若いものから順にトポロジカルソートされている)
+        # self.topologicalSortedList = []                     # SCC後のトポロジカルソート済みリスト
+        self.sccNum = 0                                     # 強連結成分の採番用カウンタ(0-indexで採番)
+    
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int):
+        self.G[fromNode].append(toNode)
+        self.rG[toNode].append(fromNode)
+
+    # DFS
+    def _dfs(self, now: int):
+        self.seen[now] = True
+        for next in self.G[now]:
+            if self.seen[next]:
+                continue
+            self._dfs(next)
+        self.lastOrder.append(now)
+    
+    # 逆向きグラフの強連結成分チェック
+    def _reverseDfs(self, now: int):
+        self.seen[now] = True
+        self.tplCorrespondenceTable[now] = self.sccNum
+        # self.topologicalSortedList.append(now)
+        for next in self.rG[now]:
+            if self.seen[next]:
+                continue
+            self._reverseDfs(next)
+    
+    # 強連結成分分解SCC
+    def scc(self):
+        # 帰りがけ順のナンバリングDFS
+        for startNode in range(self.nodesNum):
+            if self.seen[startNode]:
+                continue
+            self._dfs(startNode)
+        # seenをリセット
+        self.seen = [False] * self.nodesNum
+        # 帰りがけ順の大きい方から順に強連結成分の判定DFS
+        for node in self.lastOrder[::-1]:
+            if self.seen[node]:
+                continue
+            self._reverseDfs(node)
+            self.sccNum += 1
+        return self.tplCorrespondenceTable
+    
+    # 2つのノードが強連結か。
+    def same(self, a: int, b: int):
+        return self.tplCorrespondenceTable[a] == self.tplCorrespondenceTable[b]
+
+# usage
+d = SCC(N) # グラフ生成
+for i in range(M):
+    d.addEdge(a[i], b[i]) # 辺の追加
+cmp = d.scc() # 強連結成分分解
+# トポロジカルソート済みのリストが欲しい場合はd.topologicalSortedListを利用する。
+```
+
+### トポロジカルソート
+
+```python
+sys.setrecursionlimit(10 ** 9)
+class Tree:
+    def __init__(self, N) -> None:
+        self.topologicalOrder = []
+        self.nodes = N
+        self.seen = [0] * N
+        self.G = [[] for _ in range(N)]
+        return
+    
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
+        self.G[fromNode].append(toNode)
+        if bothDirection:
+            self.G[toNode].append(fromNode)
+    
+    def _rec(self, now: int):
+        self.seen[now] = True
+        for next in self.G[now]:
+            if self.seen[next]:
+                continue
+            self._rec(next)
+        self.topologicalOrder.append(now) # DFSした末端から取って行き最後に反転。
+    
+    def topologicalSort(self):
+        for node in range(self.nodes): # グラフが全連結じゃない可能性を考慮して全頂点からDFS。
+            if self.seen[node]:
+                continue
+            self._rec(node)
+        self.topologicalOrder = self.topologicalOrder[::-1]
+        return self.topologicalOrder
+
+tr = Tree(N)
+for i in range(M):
+    tr.addEdge(x[i] - 1, y[i] - 1, False)
+l = tr.topologicalSort()
 ```
 
 ### BFS
@@ -188,7 +530,7 @@ def getEularTourEdges(now: int, pre: int = -1):
 # Output
 #   スタートから各ノードへの最小コスト
 # Order
-# 
+#   O(V + E)
 # ----------------------------------------------------------------
 from collections import deque
 def bfs(edges: "List[to]", start_node: int) -> list:
@@ -216,12 +558,12 @@ def bfs(edges: "List[to]", start_node: int) -> list:
 # Output
 #   スタートから各ノードへの最小コスト
 # Order
-#   
+#    O(V + E)
 # Note
 #   開始点が壁の場合には除く必要あり。
 # ----------------------------------------------------------------
 from collections import deque
-def bfs(edge, H, W, startX, startY) -> list:
+def bfs(edges, H, W, startY, startX) -> list:
     INF = 10 ** 16
     q = deque()
     dist = [[INF] * W for _ in range(H)]
@@ -237,6 +579,48 @@ def bfs(edge, H, W, startX, startY) -> list:
             q.append((nexty, nextx))
             dist[nexty][nextx] = dist[nowy][nowx] + 1
     return dist
+# ======================================================================================
+
+# ======================================================================================
+# 多始点BFS
+# 未検証
+def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
+    from collections import deque
+    INF = 10 ** 16
+    q = deque()
+    dist = [INF] * len(edges)
+    for start_node in start_nodes:
+        q.append(start_node)
+        dist[start_node] = 0
+    while q:
+        now = q.popleft()
+        for next in edges[now]:
+            if dist[next] != INF:
+                continue
+            q.append(next)
+            dist[next] = dist[now] + 1
+    return dist
+
+# ======================================================================================
+# 多始点BFS(グリッド)
+def multiStartBfs(edges, H, W, startPoints: "List[set(startY, startX)]") -> list:
+        from collections import deque
+        INF = 10 ** 16
+        q = deque()
+        dist = [[INF] * W for _ in range(H)]
+        for startY, startX in startPoints:
+            q.append((startY, startX))
+            dist[startY][startX] = 0
+        while q:
+            nowy, nowx = q.popleft()
+            for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
+                nexty = nowy + dy
+                nextx = nowx + dx
+                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
+                    continue
+                q.append((nexty, nextx))
+                dist[nexty][nextx] = dist[nowy][nowx] + 1
+        return dist
 # ======================================================================================
 ```
 
@@ -281,6 +665,101 @@ def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
                 dist[next] = dist[now] + cost
                 heapq.heappush(hq, (dist[next], next))
     return dist
+
+# ---------------------
+# グリッド (作成中)
+# ---------------------
+import heapq
+INF = 10 ** 9       # *2
+def dijkstra(G: "List[str]", H: int, W: int, startY: int, startX: int) -> list:
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    dist = [[INF] * W for _ in range(H)]
+    heapq.heappush(hq, (0, startY, startX))
+    dist[startY][startX] = 0            # *1
+    # dijkstra
+    while hq:
+        min_cost, nowY, nowX = heapq.heappop(hq)
+        if min_cost > dist[nowY][nowX]:
+            continue
+        for dy, dx in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            nextY = nowY + dy
+            nextX = nowX + dx
+            if nextY < 0 or nextX < 0 or nextY >= H or nextX >= W:
+                continue
+            cost = 1 if G[nextY][nextX] == "#" else 0
+            if dist[nextY][nextX] > dist[nowY][nowX] + cost:
+                dist[nextY][nextX] = dist[nowY][nowX] + cost
+                heapq.heappush(hq, (dist[nextY][nextX], nextY, nextX))
+    return dist
+
+# ---------------------
+# 拡張ダイクストラ
+# ---------------------
+# どの駅にいるかの他、銀貨を何枚持っているかの情報が必要。
+# 全ての辺で銀貨を最大量求められたとしても2500枚あれば足りるので、それを上限として頂点倍加。
+import heapq
+INF = 10 ** 13
+SILVER_MAX = 2500
+
+def dijkstra(edges: "List[List[(cost, to, silver)]]", C: "List[int]", D: "List[int]", start_node: int, init_silver: int):
+    hq = []
+    heapq.heapify(hq)
+    # Set start info
+    # dist[i][s] := 銀貨をs枚持った状態で頂点iに到達する時のコスト
+    dist = [[INF] * (SILVER_MAX + 1) for _ in range(len(edges))]
+    heapq.heappush(hq, (0, start_node, init_silver))
+    dist[start_node][init_silver] = 0
+
+    # dijkstra
+    while hq:
+        min_cost, node_now, silver_now = heapq.heappop(hq)
+        # いつも通り、既に最短コストのパスが発見されているならスキップ
+        if min_cost > dist[node_now][silver_now]:
+            continue
+
+        # 補充(状態変化)
+        # 2500枚を超えて銀貨に換える必要がないためフィルタ
+        if silver_now + C[node_now] <= SILVER_MAX:
+            # 交換後の銀貨の枚数
+            silver_next = silver_now + C[node_now]
+            if dist[node_now][silver_next] > min_cost + D[node_now]:    # 交換にかかる時間を加味して比較。そこで交換する方がいいか判定。
+                dist[node_now][silver_next] = min_cost + D[node_now]
+                heapq.heappush(hq, (dist[node_now][silver_next], node_now, silver_next))
+
+        # 辺の通過
+        # 駅を移動するのに銀貨を消費する。
+        for cost, next, silver in edges[node_now]: 
+            remain_silver = min(silver_now - silver, SILVER_MAX)
+            if remain_silver < 0:                                       # 手持ちの銀貨で移動不可ならスキップ
+                continue
+
+            if dist[next][remain_silver] > min_cost + cost:             # いつも通り
+                dist[next][remain_silver] = min_cost + cost
+                heapq.heappush(hq, (dist[next][remain_silver], next, remain_silver))
+    return dist
+
+def main():
+    N, M, S = map(int, input().split())
+    init_silver = min(S, SILVER_MAX)
+
+    edges = [[] for _ in range(N)]
+    for _ in range(M):
+        u, v, a, b = map(int, input().split())
+        edges[u - 1].append((b, v - 1, a))
+        edges[v - 1].append((b, u - 1, a))
+    C, D = [], []
+    for i in range(N):
+        c, d = map(int, input().split())
+        C.append(c)
+        D.append(d)
+
+    dist = dijkstra(edges, C, D, 0, init_silver)
+    print(*[min(d) for d in dist[1:]], sep="\n")
+
+if __name__ == '__main__':
+    main()
 ```
 
 
@@ -700,22 +1179,28 @@ def solve():
 ```python
 class Doubling:
     def __init__(self, stateKind: int, maxDoublingTimes: int):
-        self.dv = []                                # dv[k][s] := 状態sを2^k回実行したらあとの状態
+        self.dv = []                                # 数列(状態)のダブリングテーブル。dv[k][s] := 状態sを2^k回実行したらあとの状態
+        self.sum = []                               # 和のダブリングテーブル
         self.stateKind = stateKind                  # 状態の種類数s
         self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
-        self.initTable()
-        self.createTable()
+        self._initTable()
+        self._createTable()
     
     # 初期化処理
-    def initTable(self):
-        self.dv.append(A) 
+    def _initTable(self):
+        self.dv.append([i ** 2 % M for i in range(self.stateKind)]) 
+        self.sum.append([i for i in range(self.stateKind)])
     
-    def createTable(self):
+    # ダブリング実施
+    def _createTable(self):
         for i in range(1, self.maxDoublingTimes):
             l = []
+            s = []
             for j in range(self.stateKind):
                 l.append(self.dv[i - 1][self.dv[i - 1][j]])
+                s.append(self.sum[i - 1][j] + self.sum[i - 1][self.dv[i - 1][j]])
             self.dv.append(l)
+            self.sum.append(s)
         
     def getState(self, doubingTimes: int, startState: int):
         a = []
@@ -726,6 +1211,19 @@ class Doubling:
         for i in a:
             now = self.dv[i][now]
         return now
+    
+    def getSum(self, doubingTimes: int, startState: int):
+        res = 0
+        a = []
+        for i in range(self.maxDoublingTimes):
+            if doubingTimes >> i & 1:
+                a.append(i)
+        now = startState
+        for i in a:
+            res += self.sum[i][now]
+            now = self.dv[i][now]
+        return res
+
     def getAllStates(self, targenTime: int):
         return self.dv[targenTime]
 
@@ -781,36 +1279,36 @@ def findSome(l: "List", val: any):
 
 ```python
 # 遅い deprecated
-import queue
-def bfs(edges: "List[to]", start_node: int) -> list:
-    # deprecated
-    q = queue.Queue()
-    dist = [INF] * len(edges)
-    q.put(start_node)
-    dist[start_node] = 0
-    while not q.empty():
-        now = q.get()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.put(next)
-            dist[next] = dist[now] + 1
-    return dist
+# import queue
+# def bfs(edges: "List[to]", start_node: int) -> list:
+#     # deprecated
+#     q = queue.Queue()
+#     dist = [INF] * len(edges)
+#     q.put(start_node)
+#     dist[start_node] = 0
+#     while not q.empty():
+#         now = q.get()
+#         for next in edges[now]:
+#             if dist[next] != INF:
+#                 continue
+#             q.put(next)
+#             dist[next] = dist[now] + 1
+#     return dist
 
-def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
-    q = queue.Queue()
-    dist = [INF] * len(edges)
-    for start_node in start_nodes:
-        q.put(start_node)
-        dist[start_node] = 0
-    while not q.empty():
-        now = q.get()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.put(next)
-            dist[next] = dist[now] + 1
-    return dist
+# def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
+#     q = queue.Queue()
+#     dist = [INF] * len(edges)
+#     for start_node in start_nodes:
+#         q.put(start_node)
+#         dist[start_node] = 0
+#     while not q.empty():
+#         now = q.get()
+#         for next in edges[now]:
+#             if dist[next] != INF:
+#                 continue
+#             q.put(next)
+#             dist[next] = dist[now] + 1
+#     return dist
 ```
 
 
@@ -906,4 +1404,15 @@ def base10int(base10value, toBase):
         ans.append(str(q))
     ans.append(str(p))
     return "".join(ans[::-1])
+```
+
+
+```python
+
+def max2D(LL: "List[List[int]]", init: int = 0):
+    res = init
+    for i in range(len(LL)):
+        print(LL[i])
+        res = max(res, max(LL[i]))
+    return res
 ```

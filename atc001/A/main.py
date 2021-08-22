@@ -12,27 +12,30 @@ def main():
     seen = []
     for _ in range(H):
         field.append(input())
-        seen.append([0] * W)
-    def dfs(x, y):
-        # 終了条件
-        if x < 0 or y < 0 or x >= W or y >= H or field[y][x] == "#" or seen[y][x] == 1:
-            return False
-        if field[y][x] == "g":
-            return True
-        # カウントアップ条件
-        seen[y][x] = 1
+        seen.append([False] * W)
+    def dfs(y, x):
+        seen[y][x] = True
         # 次の探索(分岐)
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            if dfs(x + dx, y + dy):
-                return True
-        return False
+            next_y = y + dy
+            next_x = x + dx
+            # 探索しない条件を切り落とし
+            if next_x < 0 or next_y < 0 or next_x >= W or next_y >= H or field[next_y][next_x] == "#" or seen[next_y][next_x]:
+                continue
+            dfs(next_y, next_x)
+        return
 
     for hh in range(H):
         for ww in range(W):
             if field[hh][ww] == "s":
-                print(YES if dfs(ww, hh) else NO)
-                # print(seen)
-                return
+                sh = hh
+                sw = ww
+            if field[hh][ww] == "g": 
+                gh = hh
+                gw = ww
+
+    dfs(sh, sw) 
+    print(YES if seen[gh][gw] else NO)
 
 if __name__ == '__main__':
     main()

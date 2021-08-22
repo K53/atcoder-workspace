@@ -2,78 +2,33 @@
 import sys
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
-    import copy
-    import heapq
-    INF = 10 ** 16       # *2
-    def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
-        hq = []
-        heapq.heapify(hq)
-        # Set start info
-        dist = [INF] * len(edges)
-        heapq.heappush(hq, (0, start_node))
-        dist[start_node] = 0            # *1
-        # dijkstra
-        while hq:
-            min_cost, now = heapq.heappop(hq)
-            if min_cost > dist[now]:
-                continue
-            for cost, next in edges[now]:
-                if dist[next] > dist[now] + cost:
-                    dist[next] = dist[now] + cost
-                    heapq.heappush(hq, (dist[next], next))
-        return dist
-    all = [[] for _ in range(N)]
-    for i in range(M):
-        all[A[i] - 1].append((C[i], B[i] - 1))
-    # print(all)
-
+    INF = 10 ** 16
     ans = 0
-    if M == 0:
-        print(0)
-        return
-    l = []
-    for aa, bb, cc in zip(A, B, C):
-        l.append((max(aa - 1, bb - 1), aa - 1, bb - 1, cc))
-    l.sort()
-    nodes = [[] for _ in range(N)]
-    nowL = 0
-    for k in range(N):
-        for now in range(nowL, M):
-            if l[now][0] <= k:
-                _, aa, bb, cc = l[now]
-                nodes[aa].append((cc, bb))
-            else:
-                nowL = now
-                break
-        nodes[k].extend(all[k])
-        for s in range(N):
-            if s > k:
-                cnodes = copy.deepcopy(nodes)
-                cnodes[s].extend(all[s])
-            # for i in l:
-            #     d, aa, bb, cc = l[i]
-            #     if d <= k or aa in [s, ]:
-            #         cnodes[aa].append((cc, bb))
-            # for t in range(N):
-                # if s == t:
-                #     continue
-                dist = dijkstra(cnodes, s)
-                # print(s, cnodes, dist)
-            else:
-                dist = dijkstra(nodes, s)
-                # print(s, nodes, dist)
-            for w in dist:
-                if w != INF:
-                    ans += w
-        # print(ans)
-            # else:
-            #     for cc, i in all[s]:
-            #         if i == t:
-            #             ans += cc
-            #             print(cc)
-
-
-
+    class WarshallFloyd():
+        def __init__(self, N):
+            self.N = N
+            dp = [[INF] * N for _ in range(N)]
+            for i in range(N):
+                dp[i][i] = 0
+            self.dp = dp
+        
+        def addEdge(self, fromNode: int, toNode: int, cost: int = 1):
+            self.dp[fromNode][toNode] = cost
+        
+        def build(self):
+            nonlocal ans
+            for via in range(self.N):
+                for start in range(self.N):
+                    for goal in range(self.N):
+                        self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+                for start in range(self.N):
+                    for goal in range(self.N):
+                        if self.dp[start][goal] != INF:
+                            ans += self.dp[start][goal]
+    wf = WarshallFloyd(N)
+    for i in range(M):
+        wf.addEdge(A[i] - 1, B[i] - 1, C[i])
+    wf.build()
     print(ans)
     return
 

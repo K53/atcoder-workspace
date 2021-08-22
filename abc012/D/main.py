@@ -1,47 +1,38 @@
 #!/usr/bin/env python3
-import heapq
-INF = 10 ** 9
-# ----------------------------------------------------------------
-# Input
-#   1. タプル(重み, 行先)の二次元配列(隣接リスト) : 初期化時、有向無向に注意
-#   2. 探索開始ノード(番号)
-# Output
-#   スタートから各ノードへの最小コスト
-# Env
-#   import heapq
-#   INF = 10 ** 9
-# ----------------------------------------------------------------
-def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, next in edges[now]:
-            if dist[next] > dist[now] + cost:
-                dist[next] = dist[now] + cost
-                heapq.heappush(hq, (dist[next], next))
-    return dist
+import sys
 
 def main():
-    N, M = map(int, input().split())
-    edges = [[] for _ in range(N)]
+    INF = 10 ** 16
+    class WarshallFloyd():
+        def __init__(self, N):
+            self.N = N
+            dp = [[INF] * N for _ in range(N)]
+            for i in range(N):
+                dp[i][i] = 0
+            self.dp = dp
+        
+        def addEdge(self, fromNode: int, toNode: int, cost: int = 1):
+            self.dp[fromNode][toNode] = cost
+        
+        def build(self):
+            for via in range(self.N):
+                for start in range(self.N):
+                    for goal in range(self.N):
+                        self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+            return self.dp
+
+    N, M = map(int, sys.stdin.readline().split())
+    wf = WarshallFloyd(N)
     for _ in range(M):
-        a, b, c = map(int, input().split())
-        edges[a - 1].append((c, b - 1))
-        edges[b - 1].append((c, a - 1))
+        a, b, t = map(int, sys.stdin.readline().split())
+        wf.addEdge(a - 1, b - 1, t)
+        wf.addEdge(b - 1, a - 1, t)
+    d = wf.build()
     ans = INF
     for start in range(N):
-        dist = dijkstra(edges, start)
-        # print(dist)
-        ans = min(max(dist), ans)
+        ans = min(ans, max(d[start]))
     print(ans)
 
+        
 if __name__ == '__main__':
     main()

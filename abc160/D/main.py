@@ -17,21 +17,20 @@ def solve(N: int, X: int, Y: int):
                 q.append(next)
                 dist[next] = dist[now] + 1
         return dist
-    field = [[] for _ in range(N)]
+    G = [[] for _ in range(N)]
     for i in range(N - 1):
-        field[i].append(i + 1)
-        field[i + 1].append(i)
-    field[X - 1].append(Y - 1)
-    field[Y - 1].append(X - 1)
+        G[i].append(i + 1)
+        G[i + 1].append(i)
+    G[X - 1].append(Y - 1)
+    G[Y - 1].append(X - 1)
     ans = [0] * N
     for i in range(N):
-        d = bfs(field, i)
-        # print(i, d)
-        for j in range(i + 1, N):
-            if i == j:
-                continue
-            ans[d[j]] += 1
-    print(*ans[1:], sep="\n")
+        d = bfs(G, i)
+        for dd in d:
+            ans[dd] += 1
+    for i in range(1, N):
+        print(ans[i] // 2)
+
     return
 
 

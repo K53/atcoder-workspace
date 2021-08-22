@@ -3,6 +3,20 @@ import sys
 
 
 def solve(N: int, S: str):
+    from itertools import groupby
+    def runLengthEncode(S: str) -> "List[tuple(str, int)]":
+        grouped = groupby(S)
+        res = []
+        for k, v in grouped:
+            res.append((k, int(len(list(v)))))
+        return res
+    ans = 0
+    ll = N
+    l = runLengthEncode(S)
+    for i in range(len(l) - 1):
+        ll -= l[i][1]
+        ans += ll * l[i][1]
+    print(ans)
     return
 
 

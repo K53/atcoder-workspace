@@ -1,42 +1,102 @@
 #!/usr/bin/env python3
 import sys
-import numpy as np
-
-
-def median_filter(src, ksize):
-    # 畳み込み演算をしない領域の幅
-    # width of skip
-    d = int((ksize-1)/2)
-    h, w = src.shape[0], src.shape[1]
-
-    # ndarray of destination
-    # 出力画像用の配列（要素は入力画像と同じ）
-    dst = src.copy()
-
-    for y in range(d, h - d):
-        for x in range(d, w - d):
-            # 近傍にある画素値の中央値を出力画像の画素値に設定
-            dst[y][x] = np.median(src[y-d:y+d+1, x-d:x+d+1])
-
-    return dst
 
 def solve(N: int, K: int, A: "List[List[int]]"):
-    # ll = (K ** 2) // 2
-    # ans = 10 ** 10
-    # for h in range(N - K + 1):
-    #     for w in range(N - K + 1):
-    #         l = []
-    #         for i in range(K):
-    #             for j in range(K):
-    #                 l.append(A[h+i][w+j])
-    #         l.sort(reverse=True)
-    #         # print(l)
-    #         # print(l[ll])
-    #         ans = min(ans, l[ll])
+    class MatrixAccumulates:
+        def __init__(self, H: int, W: int) -> None:
+            self.H, self.W = H, W
+            self.LL = [[0] * W for _ in range(H)]
+            self.S = []
+        
+        def add(self, y, x, val):
+            self.LL[y][x] += val
+            return
 
-    print(median_filter(A, K)) 
+        def setList(self, LL: "List[List[int]]"):
+            for i in range(self.H):
+                for j in range(self.W):
+                    self.LL = LL[i][j]
+            return
 
+        def build(self, index1: bool = False):
+            if index1:
+                self.S = [[0] * self.W for _ in range(self.H)]
+                #ヨコに累積和
+                for i in range(self.H):
+                    for j in range(self.W):
+                        if i == 0:
+                            self.S[i][j] = self.LL[i][j]
+                        else:
+                            self.S[i][j] = self.S[i-1][j] + self.LL[i][j]
+                #タテに累積和
+                for i in range(self.H):
+                    for j in range(self.W):
+                        if j == 0:
+                            self.S[i][j] = self.S[i][j]
+                        else:
+                            self.S[i][j] = self.S[i][j-1] + self.S[i][j]
+            else:
+                # 累積和(DPで算出)
+                # 0行目/0列目に0を挿入した二次元累積和Sを得る。
+                self.S = [[0] * (self.W + 1) for _ in range(self.H + 1)]
+                for i in range(self.H):
+                    for j in range(self.W):
+                        self.S[i + 1][j + 1] = self.S[i + 1][j] + self.S[i][j + 1] - self.S[i][j] + self.LL[i][j]
+            return
+        
+        def getArea(self, excY, incY, excX, incX) -> int:
+            '''
+            exampl) excX = 1, excY = 0, incX = 3, incY = 2
+                    excX  incX
+                    0  1  2  3
+            excY 0  x  x  x  x
+                 1  x  x  o  o
+            incY 2  x  x  o  o
+            '''
+            areaAccumulate = self.S[incY][incX] - self.S[excY][incX] - self.S[incY][excX] + self.S[excY][excX]
+            # print(self.S[incY][incX], self.S[excY][incX], self.S[incY][excX], self.S[excY][excX])
+            return areaAccumulate
+        
+        def printS(self) -> int:
+            for i in range(self.H):
+                print(self.S[i])
+            return
 
+    # True ------ ok | ng ---- False
+    # 全ての区画の中央値をk以上にできるか？1つでもできない区画があるとkは最小値として選択できなくなるのでFalse
+    def is_ok(k: int):
+        ma = MatrixAccumulates(N, N)
+        for i in range(N):
+            for j in range(N):
+                if A[i][j] >= k:
+                    ma.add(i, j, 1)
+        ma.build()
+        # for i in range(N):
+        #     print(ma.LL[i])
+        # for i in range(N + 1):
+        #     print(ma.S[i])
+        for ex in range(N - K + 1):
+            for ey in range(N - K + 1):
+                tot = ma.getArea(ey, ey + K, ex, ex + K)
+                if tot < (K ** 2 // 2 + 1):
+                    return False
+        return True
+
+    def binSearch(ok: int, ng: int):
+        # print(ok, ng)              # はじめの2値の状態
+        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+            mid = (ok + ng) // 2
+            # print("target > ", mid)
+            result = is_ok(mid)
+            # print(result)
+            if result:
+                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+            else:
+                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+        return ok
+    a = binSearch(-1, 10 ** 9 + 1)
+    print(a)
     return
 
 

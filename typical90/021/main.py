@@ -2,37 +2,74 @@
 import sys
 sys.setrecursionlimit(10 ** 9) #再帰回数の限界を変更
 
-
-
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
-    nodes = [[] for _ in range(N)]
-    for i in range(M):
-        nodes[A[i] - 1].append(B[i] - 1)
-        nodes[B[i] - 1].append(A[i] - 1)
-    
-    INF = 10 ** 9
-    order = [] * N
-    visited = [False] * N
-    number = 0
-    def dfs(dist: "List[List[to]]", now: int):
-        # 行きがけの処理
-        # pass
-        # 次の訪問先への移動
-        for next in nodes[now]:
-            if visited[now]:
-                continue
-            visited[next] = True
-            dfs(visited, next)
-        # 帰りがけの処理
-        order[now] = number
-        number += 1
+    class SCC():
+        def __init__(self, nodesNum: int):
+            self.nodesNum = nodesNum                    # 頂点数
+            self.G = [[] for _ in range(self.nodesNum)] # グラフ
+            self.rG = [[] for _ in range(self.nodesNum)]# 全ての辺を逆向きにしたグラフ
+            self.seen = [False] * self.nodesNum         # 各ノードが訪問済みかどうかのフラグ
+            self.firstOrder = []                        # ノードの行きがけ順(0-indexで採番)
+            self.lastOrder = []                         # ノードの帰りがけ順(0-indexで採番)
+            self.tplConnections = [-1] * self.nodesNum  # 強連結成分分解の結果(0-indexで採番。数値が若いものから順にトポロジカルソートされている)
+            self.sccNum = 0                             # 強連結成分の採番用カウンタ(0-indexで採番)
         
-    INF = 10 ** 16
-    dist = [INF] * N
-    dist[0] = 0
-    dfs(dist, 0)
-    print(dist)
-    print(nodes)
+        # 辺の追加
+        def addEdge(self, fromNode: int, toNode: int):
+            self.G[fromNode].append(toNode)
+            self.rG[toNode].append(fromNode)
+
+        # DFS
+        def _dfs(self, now: int):
+            self.firstOrder.append(now)
+            self.seen[now] = True
+            for next in self.G[now]:
+                if self.seen[next]:
+                    continue
+                self._dfs(next)
+            self.lastOrder.append(now)
+        
+        # 逆向きグラフの強連結成分チェック
+        def _reverseDfs(self, now: int):
+            self.seen[now] = True
+            self.tplConnections[now] = self.sccNum
+            for next in self.rG[now]:
+                if self.seen[next]:
+                    continue
+                self._reverseDfs(next)
+        
+        # 強連結成分分解SCC
+        def scc(self):
+            # 帰りがけ順のナンバリングDFS
+            for startNode in range(self.nodesNum):
+                if self.seen[startNode]:
+                    continue
+                self._dfs(startNode)
+            # seenをリセット
+            self.seen = [False] * self.nodesNum
+            # 帰りがけ順の大きい方から順に強連結成分の判定DFS
+            for node in self.lastOrder[::-1]:
+                if self.seen[node]:
+                    continue
+                self._reverseDfs(node)
+                self.sccNum += 1
+            return self.tplConnections
+        
+        # 2つのノードが強連結か。
+        def same(self, a: int, b: int):
+            return self.tplConnections[a] == self.tplConnections[b]
+
+    # usage
+    d = SCC(N) # グラフ生成
+    for i in range(M):
+        d.addEdge(A[i] - 1, B[i] - 1) # 辺の追加
+    nums = [0] * N
+    ans = 0
+    for i in d.scc(): # 強連結成分分解
+        nums[i] += 1
+    for i in nums:
+        ans += (i * (i - 1)) // 2
+    print(ans)
     return
 
 

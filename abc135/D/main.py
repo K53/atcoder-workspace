@@ -5,6 +5,22 @@ MOD = 1000000007  # type: int
 
 
 def solve(S: str):
+    dp = [[0] * 13 for _ in range(len(S) + 1)]
+    dp[0][0] = 1
+    for dig in range(len(S)):
+        for q in range(13):
+            ss = S[dig] 
+            if ss == "?":
+                for num in range(10):
+                    dp[dig + 1][(q * 10 + num) % 13] += dp[dig][q]
+                    dp[dig + 1][(q * 10 + num) % 13] %= MOD
+            else:
+                dp[dig + 1][(q * 10 + int(ss)) % 13] += dp[dig][q]
+                dp[dig + 1][(q * 10 + int(ss)) % 13] %= MOD
+
+    print(dp[-1][5] % MOD)
+    # for i in range(len(S) + 1):
+    #     print(dp[i])
     return
 
 

@@ -4,7 +4,19 @@ import sys
 MOD = 1000000007  # type: int
 
 
+
+
+def calc(N: int):
+    ans = 0
+    for i in range(1, 20):
+        if N >= 10 ** i - 1:
+            ans += (((10 ** i - 1) - 10 ** (i - 1) + 1) * ((10 ** i - 1) + 10 ** (i - 1))  * i // 2) % MOD
+        else:
+            ans += ((N - 10 ** (i - 1) + 1) * (N + 10 ** (i - 1))  * i // 2) % MOD
+            return ans % MOD
+
 def solve(L: int, R: int):
+    print((calc(R) - calc(L - 1)) % MOD)
     return
 
 

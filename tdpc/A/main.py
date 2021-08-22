@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 import sys
 
-# dp[{得点をvにする時}] = {何通りあるか}
+# dp[k][v] = 問kまでで得点をvにできるかどうか
 def solve(N: int, p: "List[int]"):
-    dp = [0] * (N * max(p) + 1)
-    for i in p:
-        dp[i] = 1
-    
-    for i in range(N * max(p) + 1):
-        for j in p:
-            if i - j < 0:
-                continue
-            dp[i] = max(dp[i], dp[i - j] + 1)
-    print(dp)
-    print(dp[N])
+    m = 10001
+    dp = [[False] * m for _ in range(N + 1)]
+    dp[0][0] = True
+
+    for k in range(1, N + 1):
+        for v in range(m):
+            if dp[k - 1][v]:
+                dp[k][v] = True
+                dp[k][v + p[k - 1]] = True
+    ans = 0
+    ans += dp[-1].count(True)            
+    print(ans)
     return
 
 

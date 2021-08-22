@@ -6,6 +6,30 @@ NO = "No"  # type: str
 
 
 def solve(H: int, W: int, A: "List[List[int]]", B: "List[List[int]]"):
+    for hh in range(H):
+        for ww in range(W):
+            A[hh][ww] -= B[hh][ww]
+
+    
+    ans = 0
+    for hh in range(H - 1):
+        for ww in range(W - 1):
+            if A[hh][ww] == 0:
+                continue
+            d = -A[hh][ww]
+            A[hh][ww] += d
+            A[hh][ww + 1] += d
+            A[hh + 1][ww] += d
+            A[hh + 1][ww + 1] += d
+            ans += abs(d)
+
+    for hh in range(H):
+        for ww in range(W):
+            if A[hh][ww] != 0:
+                print(NO)
+                return
+    print(YES)
+    print(ans)
     return
 
 

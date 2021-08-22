@@ -13,8 +13,6 @@ def solve(P: int):
         if P == 0:
             break
     print(ans)
-    
-
 
 
     return

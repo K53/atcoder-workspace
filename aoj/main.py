@@ -1,39 +1,67 @@
 #!/usr/bin/env python3
 import sys
 
-# https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=0563&lang=jp
-
 def main():
-    import statistics
-    W, H = map(int, sys.stdin.readline().split())
-    N = int(sys.stdin.readline())
-    xpoints = []
-    ypoints = []
-    for _ in range(N):
-        x, y = map(int, sys.stdin.readline().split())
-        xpoints.append(x)
-        ypoints.append(y)
-    xss = [statistics.median_low(xpoints), statistics.median_high(xpoints)]
-    yss = [statistics.median_low(ypoints), statistics.median_high(ypoints)]
-    maxd = 0
-    ansd = 10 ** 16
-    ansx = 0
-    ansy = 0
-    for xs in xss:
-        for ys in yss:
-            sumd = 0
-            for x, y in zip(xpoints, ypoints):
-                d = abs(x - xs) + abs(y - ys)
-                sumd += d * 2
-                maxd = max(maxd, d)
-            # ansd == sumd - maxdのケースも更新すると、x軸y軸方向に最小にならなくなるので無視
-            if ansd > sumd - maxd:
-                ansx = xs
-                ansy = ys
-                ansd = sumd - maxd
-    print(ansd)
-    print(ansx, ansy)
-    return
+    from collections import defaultdict
+    class UnionFind():
+        def __init__(self, n):
+            self.n = n
+            self.parents = [-1] * n
+
+        def find(self, x):
+            if self.parents[x] < 0:
+                return x
+            else:
+                self.parents[x] = self.find(self.parents[x])
+                return self.parents[x]
+
+        def union(self, x, y):
+            x = self.find(x)
+            y = self.find(y)
+
+            if x == y:
+                return
+
+            if self.parents[x] > self.parents[y]:
+                x, y = y, x
+
+            self.parents[x] += self.parents[y]
+            self.parents[y] = x
+
+        def size(self, x):
+            return -self.parents[self.find(x)]
+
+        def same(self, x, y):
+            return self.find(x) == self.find(y)
+
+        def members(self, x):
+            root = self.find(x)
+            return [i for i in range(self.n) if self.find(i) == root]
+
+        def roots(self):
+            return [i for i, x in enumerate(self.parents) if x < 0]
+
+        def group_count(self):
+            return len(self.roots())
+
+        def all_group_members(self):
+            group_members = defaultdict(list)
+            for member in range(self.n):
+                group_members[self.find(member)].append(member)
+            return group_members
+
+        def __str__(self):
+            return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
+
+    N, K = map(int, input().split())
+    A = list(map(lambda i: int(i) - 1, input().split()))
+    uf = UnionFind(N)
+    for i, aa in enumerate(A):
+        uf.union(i, aa)
+    
+    print(uf.size(N - 1))
+    
+
 
 if __name__ == '__main__':
     main()

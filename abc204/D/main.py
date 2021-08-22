@@ -3,51 +3,30 @@ import sys
 
 
 def solve(N: int, T: "List[int]"):
-    # N = 100
-    # T = [1000] * 100
-    # ans = 10 ** 9
-    # for i in range(2 ** N):
-    #     a = 0
-    #     b = 0
-    #     for bb in range(N):
-    #         if i >> bb & 1:
-    #             a += T[bb]
-    #         else:
-    #             b += T[bb]
-    #     # print(max(a, b))
-    #     ans = min(ans, max(a, b))
-    # print(ans)
-    dp = [[0] * (10 ** 5 + 10) for _ in range(N)]
-    dp[0][T[0]] = 1
-    for i in range(1, N):
-        dp[i][T[i]] = 1
-        for tt in range(10 ** 5 + 10):
-            if dp[i - 1][tt]:
-                dp[i][tt] = 1
-                if tt + T[i] < 10 ** 5 + 10: 
-                    dp[i][tt + T[i]] = 1
-    ss = sum(T)
-    center = ss // 2 + ss % 2
-    if dp[N - 1][center]:
-        print(center)
+    S = sum(T)
+    hS = S // 2
+    # dp[i][t] := i個選んで時間をtにすることができる。
+    dp = [[0] * (10 ** 5 + 1) for _ in range(N + 1)]
+    dp[0][0] = 1
+    
+    for i in range(1, N + 1):
+        for j in range(10 ** 5 + 1):
+            if dp[i - 1][j]:
+                # その料理を選ぶ
+                if j + T[i - 1] < 10 ** 5 + 1:
+                    dp[i][j + T[i - 1]] = 1
+                # 選ばない
+                dp[i][j] = 1
+    # for i in range(N):
+    #     print(dp[i][:25])
+
+    if dp[N][hS]:
+        print(max(hS, S - hS))
         return
-    for d in range((10 ** 5) // 2 + 1):
-        if center + d < 10 ** 5 + 10 and dp[N - 1][center + d]:
-            print(center + d)
+    for i in range(10 ** 5):
+        if dp[N][hS + i]:
+            print(max(hS + i, S - (hS + i)))
             return
-        if center - d > 0 and dp[N - 1][center - d]:
-            print(center - d)
-            return
-
-    
-    # print(dp[0][:25])
-    # print(dp[1][:25])
-    # print(dp[2][:25])
-    # print(dp[3][:25])
-    # print(dp[4][:25])
-
-        
-    
 
     return
 
