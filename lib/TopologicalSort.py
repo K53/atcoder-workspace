@@ -1,12 +1,29 @@
+"""
+* Kahnの方法
+* Tarjanの方法
+"""
 # ------------------------------------------------------------------------------
-# 1. Kahnの方法
-# キューを用いる方法。
-# 入次数が0のものから確定させて行く。
-# 循環があるかどうかも判定可能(Noneを返す)。
-# 計算量 O(E + V)
-#
-# http://www.thothchildren.com/chapter/5bcc8bc051d9305189030f9f
-# https://tjkendev.github.io/procon-library/python/graph/topological_sort.html
+#     トポロジカルソート (Kahnの方法)
+# ------------------------------------------------------------------------------
+# 解説
+# - 1. Kahnの方法
+# - キューを用いる方法。
+# - 入次数が0のものから確定させて行く。
+# - DAG判定 : 循環があるかどうかも判定可能(Noneを返す)。
+# 
+# 考察
+# - 【要検証】自己ループと多重辺がある場合に入次数が正しく挙動するのか？
+# 
+# リンク
+# - http://www.thothchildren.com/chapter/5bcc8bc051d9305189030f9f
+# - https://tjkendev.github.io/procon-library/python/graph/topological_sort.html
+# - https://drken1215.hatenablog.com/entry/2021/01/02/164800
+# 
+# 計算量
+# - O(E + V) : 各ノードについて全ての頂点を1回ずつ見るため。
+# 
+# Modify
+# - https://atcoder.jp/contests/abc216/tasks/abc216_d
 # ------------------------------------------------------------------------------
 from collections import deque
 class Tree:
@@ -56,14 +73,25 @@ class Tree:
 # usage
 tr = Tree(N)
 for i in range(M):
-    tr.addEdge(x[i] - 1, y[i] - 1, False)
+    tr.addEdge(x[i] - 1, y[i] - 1, bothDirection=False)
 l = tr.topologicalSort()
 
 # ------------------------------------------------------------------------------
-# 2. Tarjanの方法
-# DFSを用いる方法。
-# 帰りがけの順序で採番していき、最後に反転させる。
-# 計算量 O(E + V)
+#     トポロジカルソート (Tarjanの方法)
+# ------------------------------------------------------------------------------
+# 解説
+# - 2. Tarjanの方法
+# - DFSを用いる方法。
+# - 帰りがけの順序で採番していき、最後に反転させる。
+# 
+# リンク
+# -
+# 
+# 計算量
+# - O(E + V) : DFSの計算量
+# 
+# Modify
+# - 
 # ------------------------------------------------------------------------------
 import sys
 sys.setrecursionlimit(10 ** 9)
