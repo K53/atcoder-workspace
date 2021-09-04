@@ -1,8 +1,61 @@
 #!/usr/bin/env python3
 import sys
 
+class Eratosthenes():
+    """ 素数列挙
+    計算量 : O(NloglogN)
+    """
+    def __init__(self, N: int) -> None:
+        self.isPrime = [True] * (N + 1) # 数iが素数かどうかのフラグ
+        self.isPrime[0] = False
+        self.isPrime[1] = False
+        self.minfactor = [0] * (N + 1) # 数iの最小の素因数
+        self.minfactor[1] = 1
+        self.primes = []    # 数Nまでの素数のリスト
+        for p in range(2, N + 1):  # p : 判定対象の数
+            if not self.isPrime[p]:
+                continue
+            self.minfactor[p] = p
+            self.primes.append(p)
+            # pが素数のためそれ以降に出現するpの倍数を除外する。
+            # なお、ループはp始まりでも良いが、p * _ のかける側はすでに同じ処理で弾かれているはずのため無駄。
+            for i in range(p * p, N + 1, p):
+                if self.minfactor[i] == 0:
+                    self.minfactor[i] = p
+                self.isPrime[i] = False
+        return
+    
+    """ 高速素因数分解
+    計算量 : O(NlogN)
+    """
+    def factorize(self, n: int) -> list:
+        res = set()
+        while n > 1:
+            p = self.minfactor[n]
+            exp = 0
+            while self.minfactor[n] == p:
+                n //= p
+                exp += 1
+            res.add(p)
+        return res
 
 def solve(N: int, A: "List[int]"):
+    nums = [0] * (10 ** 6 + 1)
+    er = Eratosthenes(10 ** 6)
+    for aa in A:
+        for i in er.factorize(aa):
+            nums[i] += 1
+    setwiseFlag = False
+    for i in range(10 ** 6 + 1):
+        if nums[i] == N:
+            print("not coprime")
+            return
+        if nums[i] > 1:
+            setwiseFlag = True
+    if setwiseFlag:
+        print("setwise coprime")
+    else:
+        print("pairwise coprime")
     return
 
 
