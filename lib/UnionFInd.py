@@ -9,7 +9,7 @@
 # - https://note.nkmk.me/python-union-find/
 # 
 # 計算量
-# - 
+# - α(N) ・・・　Ackermann 関数の逆関数であり、ほぼ定数。
 # 
 # Modify
 # - https://yukicoder.me/problems/no/1390
