@@ -175,7 +175,7 @@ class MatrixAccumulates:
                 excX  incX
                 0  1  2  3
         excY 0  x  x  x  x
-                1  x  x  o  o
+             1  x  x  o  o
         incY 2  x  x  o  o
         '''
         areaAccumulate = self.S[incY][incX] - self.S[excY][incX] - self.S[incY][excX] + self.S[excY][excX]
@@ -493,6 +493,7 @@ cmp = d.scc() # 強連結成分分解
 ```
 
 ### トポロジカルソート
+→ 移植済み
 
 ```python
 sys.setrecursionlimit(10 ** 9)
@@ -1174,7 +1175,7 @@ def solve():
     return
 ```
 
-### ダブリング
+### ダブリング → 移植済み
 
 ```python
 class Doubling:
@@ -1312,7 +1313,7 @@ def findSome(l: "List", val: any):
 ```
 
 
-### Union-Find木
+### Union-Find木  → 移植済み
 
 ```python
 from collections import defaultdict

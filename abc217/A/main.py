@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 import sys
 
+YES = "Yes"  # type: str
+NO = "No"  # type: str
 
-def solve(K: int):
+
+def solve(S: str, T: str):
+    if S < T:
+        print("Yes")
+    else:
+        print("No")
     return
 
 
@@ -13,8 +20,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    S = next(tokens)  # type: str
+    T = next(tokens)  # type: str
+    solve(S, T)
 
 if __name__ == '__main__':
     main()

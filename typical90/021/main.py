@@ -3,25 +3,28 @@ import sys
 sys.setrecursionlimit(10 ** 9) #再帰回数の限界を変更
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
+    import sys
+    sys.setrecursionlimit(10 ** 9)
     class SCC():
-        def __init__(self, nodesNum: int):
-            self.nodesNum = nodesNum                    # 頂点数
-            self.G = [[] for _ in range(self.nodesNum)] # グラフ
-            self.rG = [[] for _ in range(self.nodesNum)]# 全ての辺を逆向きにしたグラフ
-            self.seen = [False] * self.nodesNum         # 各ノードが訪問済みかどうかのフラグ
-            self.firstOrder = []                        # ノードの行きがけ順(0-indexで採番)
-            self.lastOrder = []                         # ノードの帰りがけ順(0-indexで採番)
-            self.tplConnections = [-1] * self.nodesNum  # 強連結成分分解の結果(0-indexで採番。数値が若いものから順にトポロジカルソートされている)
-            self.sccNum = 0                             # 強連結成分の採番用カウンタ(0-indexで採番)
+        def __init__(self, N: int):
+            self.N = N                                              # 頂点数
+            self.G = [[] for _ in range(self.N)]                    # 与えられたグラフ
+            self.rG = [[] for _ in range(self.N)]                   # 全ての辺を逆向きにしたグラフ
+            self.seen = [False] * self.N                            # 各ノードが訪問済みかどうかのフラグ
+            self.lastOrder = []                                     # ノードの帰りがけ順(0-indexで採番)
+            self.associationNodeNumWithSccGroupNum = [-1] * self.N  # SCC後の対応表(indexがノード番号。値が0-indexで採番されたSCCのグループの順番。値が若いものから順にトポロジカルソートされている)
+            # self.topologicalSortedList = []                         # SCC後のトポロジカルソート済みリスト
+            self.sccNum = 0                                         # SCCの個数 兼 強連結成分の採番用カウンタ(0-indexで採番)
         
         # 辺の追加
         def addEdge(self, fromNode: int, toNode: int):
+            # グラフ構築
             self.G[fromNode].append(toNode)
+            # 逆向きグラフの構築
             self.rG[toNode].append(fromNode)
 
         # DFS
         def _dfs(self, now: int):
-            self.firstOrder.append(now)
             self.seen[now] = True
             for next in self.G[now]:
                 if self.seen[next]:
@@ -32,43 +35,47 @@ def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
         # 逆向きグラフの強連結成分チェック
         def _reverseDfs(self, now: int):
             self.seen[now] = True
-            self.tplConnections[now] = self.sccNum
+            self.associationNodeNumWithSccGroupNum[now] = self.sccNum
+            # self.topologicalSortedList.append(now)
             for next in self.rG[now]:
                 if self.seen[next]:
                     continue
                 self._reverseDfs(next)
         
         # 強連結成分分解SCC
-        def scc(self):
+        def build(self):
             # 帰りがけ順のナンバリングDFS
-            for startNode in range(self.nodesNum):
+            for startNode in range(self.N):
                 if self.seen[startNode]:
                     continue
                 self._dfs(startNode)
             # seenをリセット
-            self.seen = [False] * self.nodesNum
+            self.seen = [False] * self.N
             # 帰りがけ順の大きい方から順に強連結成分の判定DFS
             for node in self.lastOrder[::-1]:
                 if self.seen[node]:
                     continue
                 self._reverseDfs(node)
                 self.sccNum += 1
-            return self.tplConnections
+            return self.associationNodeNumWithSccGroupNum
         
         # 2つのノードが強連結か。
         def same(self, a: int, b: int):
-            return self.tplConnections[a] == self.tplConnections[b]
+            return self.associationNodeNumWithSccGroupNum[a] == self.associationNodeNumWithSccGroupNum[b]
 
-    # usage
+        # 強連結成分SCCを全取得。
+        def getAllSccGroups(self):
+            res = [[] for _ in range(self.sccNum)]
+            for nodeNum, sccGroupNum in enumerate(self.associationNodeNumWithSccGroupNum):
+                res[sccGroupNum].append(nodeNum)
+            return res
     d = SCC(N) # グラフ生成
     for i in range(M):
         d.addEdge(A[i] - 1, B[i] - 1) # 辺の追加
-    nums = [0] * N
+    d.build()
     ans = 0
-    for i in d.scc(): # 強連結成分分解
-        nums[i] += 1
-    for i in nums:
-        ans += (i * (i - 1)) // 2
+    for l in d.getAllSccGroups():
+        ans += (len(l) * (len(l) - 1)) // 2
     print(ans)
     return
 

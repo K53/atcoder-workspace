@@ -2,7 +2,11 @@
 import sys
 
 
-def solve(K: int):
+def solve(N: int, p: "List[int]"):
+    l = [0] * N
+    for i in range(N):
+        l[p[i] - 1] = i + 1
+    print(*l, sep=" ")
     return
 
 
@@ -13,8 +17,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    N = int(next(tokens))  # type: int
+    p = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, p)
 
 if __name__ == '__main__':
     main()

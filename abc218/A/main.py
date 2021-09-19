@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import sys
 
+YES = "Yes"  # type: str
+NO = "No"  # type: str
 
-def solve(K: int):
+
+def solve(N: int, S: str):
+    print(YES if S[N - 1] == "o" else NO)
     return
 
 
@@ -13,8 +17,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    N = int(next(tokens))  # type: int
+    S = next(tokens)  # type: str
+    solve(N, S)
 
 if __name__ == '__main__':
     main()

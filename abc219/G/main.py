@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(Q: int, a: "List[int]", b: "List[int]", c: "List[int]", d: "List[int]"):
+def solve(N: int, M: int, Q: int, u: "List[int]", v: "List[int]", x: "List[int]"):
     return
 
 
@@ -13,17 +13,16 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
+    N = int(next(tokens))  # type: int
+    M = int(next(tokens))  # type: int
     Q = int(next(tokens))  # type: int
-    a = [int()] * (Q)  # type: "List[int]"
-    b = [int()] * (Q)  # type: "List[int]"
-    c = [int()] * (Q)  # type: "List[int]"
-    d = [int()] * (Q)  # type: "List[int]"
-    for i in range(Q):
-        a[i] = int(next(tokens))
-        b[i] = int(next(tokens))
-        c[i] = int(next(tokens))
-        d[i] = int(next(tokens))
-    solve(Q, a, b, c, d)
+    u = [int()] * (M)  # type: "List[int]"
+    v = [int()] * (M)  # type: "List[int]"
+    for i in range(M):
+        u[i] = int(next(tokens))
+        v[i] = int(next(tokens))
+    x = [int(next(tokens)) for _ in range(Q)]  # type: "List[int]"
+    solve(N, M, Q, u, v, x)
 
 if __name__ == '__main__':
     main()

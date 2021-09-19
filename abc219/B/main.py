@@ -2,7 +2,11 @@
 import sys
 
 
-def solve(K: int):
+def solve(S: "List[str]", T: int):
+    l = []
+    for i in list(str(T)):
+        l.append(S[int(i) - 1])
+    print(*l, sep="")
     return
 
 
@@ -13,8 +17,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    S = [next(tokens) for _ in range(3)]  # type: "List[str]"
+    T = int(next(tokens))  # type: int
+    solve(S, T)
 
 if __name__ == '__main__':
     main()

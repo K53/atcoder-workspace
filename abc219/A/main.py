@@ -2,7 +2,17 @@
 import sys
 
 
-def solve(K: int):
+def solve(X: int):
+    if X >= 90:
+        print("expert")
+        return
+    if 70 <= X < 90:
+        print(90 - X)
+        return
+    if 40 <= X < 70:
+        print(70 - X)
+        return
+    print(40 - X)
     return
 
 
@@ -13,8 +23,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    X = int(next(tokens))  # type: int
+    solve(X)
 
 if __name__ == '__main__':
     main()

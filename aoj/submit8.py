@@ -2,7 +2,6 @@
 import sys
 
 class LcaDoubling:
-    # 木であれば任意の点を根と見做せる。
     def __init__(self, N, root=0):
         self.N = N
         self.root = root
@@ -42,17 +41,13 @@ class LcaDoubling:
                     q.append((next, now, dep + 1, dist + cost))
         return directAncestors
  
-    def getLca(self, nodeA: int, nodeB: int):
+    def getLca(self, nodeA, nodeB):
         depthA, depthB = self.depths[nodeA], self.depths[nodeB]
         if depthA > depthB:
             nodeA, nodeB = nodeB, nodeA
             depthA, depthB = depthB, depthA
-        
-        # 2ノードを同じ深さまで揃える。
         tu = nodeA
         tv = self.upstream(nodeB, depthB - depthA)
-
-        # 遡上させて行き2つが衝突する位置が共通祖先。
         if nodeA == tv:
             return nodeA
         for k in range(depthA.bit_length() - 1, -1, -1):
@@ -65,16 +60,10 @@ class LcaDoubling:
         assert lca == self.ancestors[0][tv]
         return lca
  
-    # 2つのノードの間の距離を返す。
-    def getDistance(self, nodeA, nodeB):
-        lca = self.getLca(nodeA, nodeB)
-        return self.distances[nodeA] + self.distances[nodeB] - 2 * self.distances[lca]
-
-    # targetNodeが2つのノード間のパス上に存在するかを返す。
-    def isOnPath(self, nodeA: int, nodeB: int, evalNode: int):
-        return self.getDistance(nodeA, nodeB) == self.getDistance(nodeA, evalNode) + self.getDistance(evalNode, nodeB) 
-
-    # ノードvからk個遡上したノードを返す。
+    def getDistance(self, u, v):
+        lca = self.getLca(u, v)
+        return self.distances[u] + self.distances[v] - 2 * self.distances[lca]
+ 
     def upstream(self, v, k):
         i = 0
         while k:
@@ -87,37 +76,17 @@ class LcaDoubling:
 def main():
     N = int(input())
     ld = LcaDoubling(N)
-    for _ in range(N - 1):
-        a, b = map(int, input().split())
-        ld.addEdge(a, b, 1)
+    for i in range(N):
+        kc = list(map(int, input().split()))
+        if kc[0] == 0:
+            continue
+        for c in kc[1:]:
+            ld.addEdge(i, c, 1)
     ld.build()
-    U = [int(input()) for _ in range(N)]
-
-    from collections import deque
-    def bfs(edges: "List[to]", start_node: int) -> list:
-        q = deque()
-        dist = [0] * len(edges)
-        q.append(start_node)
-        dist[start_node] = U[0]
-        while q:
-            now = q.popleft()
-            for _, next in edges[now]:
-                if dist[next] != 0:
-                    continue
-                q.append(next)
-                dist[next] = dist[now] + U[next]
-        return dist
-
-    d = bfs(ld.G, 0)
-    M = int(input())
-    ans = 0
-    for _ in range(M):
-        u, v, e = map(int, input().split())
-        lca = ld.getLca(u, v)
-        ans += (d[u] + d[v] - 2 * d[lca] + U[lca]) * e
-    print(ans)
-    return 
+    Q = int(input())
+    for _ in range(Q):
+        u, v = map(int, input().split())
+        print(ld.getLca(u, v))
     
-        
 if __name__ == '__main__':
     main()

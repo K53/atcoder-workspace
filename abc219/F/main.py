@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(K: int):
+def solve(S: str, K: int):
     return
 
 
@@ -13,8 +13,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
+    S = next(tokens)  # type: str
     K = int(next(tokens))  # type: int
-    solve(K)
+    solve(S, K)
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,10 @@
 import sys
 
 
-def solve(K: int):
+def solve(S: "List[str]"):
+    a = set(["ABC", "ARC", "AGC", "AHC"]) ^ set(S)
+    print(a.pop())
+
     return
 
 
@@ -13,8 +16,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    S = [next(tokens) for _ in range(3)]  # type: "List[str]"
+    solve(S)
 
 if __name__ == '__main__':
     main()

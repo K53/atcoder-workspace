@@ -2,7 +2,11 @@
 import sys
 
 
-def solve(K: int):
+def solve(P: "List[int]"):
+    ans = []
+    for i in P:
+        ans.append(chr(i - 1 + 97))
+    print(*ans, sep="")
     return
 
 
@@ -13,8 +17,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    P = [int(next(tokens)) for _ in range(26)]  # type: "List[int]"
+    solve(P)
 
 if __name__ == '__main__':
     main()

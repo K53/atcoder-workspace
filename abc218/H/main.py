@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(K: int):
+def solve(N: int, R: int, A: "List[int]"):
     return
 
 
@@ -13,8 +13,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    N = int(next(tokens))  # type: int
+    R = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(N - 1)]  # type: "List[int]"
+    solve(N, R, A)
 
 if __name__ == '__main__':
     main()
