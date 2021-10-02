@@ -3,6 +3,13 @@ import sys
 
 
 def solve(N: int, S: "List[str]", P: "List[int]"):
+    l = []
+    for i in range(N):
+        l.append((S[i], -P[i], i + 1))
+    l.sort()
+    ans = [0] * N
+    for i in range(N):
+        print(l[i][2])
     return
 
 

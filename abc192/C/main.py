@@ -1,25 +1,13 @@
 #!/usr/bin/env python3
 import sys
 
-def g1(n):
-    dec = 1
-    l = sorted(list(map(int, str(n))))
-    num = 0
-    for i in l:
-        num += i * dec
-        dec *= 10
-    return num
-
 def g2(n):
-    dec = 1
+    l = sorted(list(map(int, str(n))))
+    return int("".join(map(str, l)))
+
+def g1(n):
     l = sorted(list(map(int, str(n))), reverse=True)
-    num = 0
-    for i in l:
-        if i == 0:
-            break
-        num += i * dec
-        dec *= 10
-    return num
+    return int("".join(map(str, l)))
 
 def solve(N: int, K: int):
     n = N

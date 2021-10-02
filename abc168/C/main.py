@@ -4,10 +4,11 @@ import math
 
 def main():
     A, B, H, M = map(int, input().split())
-    h = 0.5 * (H * 60 + M)
-    m = 6 * M
-    dig = abs(h - m)
-    print(math.sqrt(A ** 2 + B ** 2 - 2 * A * B * math.cos(math.radians(dig))))
+    # 6 /min
+    # 0.5 /min
+    mm = H * 60 + M
+    digree = min(5.5 * mm, 360 - 5.5 * mm)
+    print((A ** 2 + B ** 2 - 2 * A * B * math.cos(math.radians(digree))) ** 0.5)
 
 if __name__ == '__main__':
     main()

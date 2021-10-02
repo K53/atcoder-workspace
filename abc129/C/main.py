@@ -5,15 +5,17 @@ MOD = 1000000007  # type: int
 
 
 def solve(N: int, M: int, a: "List[int]"):
-    stairs = sorted(list(set(i for i in range(N + 1)) ^ set(a)))
-    dp = [0] * (N + 1)
-    for i in stairs:
-        if i == 0 or i == 1:
-            dp[i] = 1
-        else:
-            dp[i] = (dp[i - 2] + dp[i - 1]) % MOD
-        
-    print(dp[-1])
+    dp = [1] + [0] * N
+    br = [0] * (N + 1)
+    for i in a:
+        br[i] = 1
+    for i in range(N):
+        for j in [1, 2]:
+            if i + j >= N + 1 or br[i + j]:
+                continue
+            dp[i + j] += dp[i]
+    # print(dp)
+    print(dp[N] % MOD)
     return
 
 

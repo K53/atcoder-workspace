@@ -1,51 +1,14 @@
 #!/usr/bin/env python3
 import sys
-
-
-def fact(x):
-    if x == 0:
-        return 1
-    else:
-        return x * fact(x - 1)
-
-def func(l):
-    all = 0
-    bunbo = 1
-    for k in range(len(l)):
-        all += l[k][1]
-        bunbo *= fact(l[k][1])
-    bunsi = fact(all)
-    return bunsi // bunbo
-
-    
+from itertools import permutations
 
 def solve(S: str, K: int):
-    S = "aaba"
-    d = {}
-    for i in S:
-        d[i] = (S.count(i))
-    l = []
-    for k, v in d.items():
-        l.append([k, v])
-    l.sort()
-    print(l)
-
-    print(func(l))
-    import copy
-    for i in range(len(l)):
-        print(l[i])
-        ll = copy.deepcopy(l)
-        for j in range(len(l)):
-            if l[i][0] == ll[j][0]:
-                ll[j][1] -= 1
-                break
-        print(func(ll))
-        ll[j][1] += 1
-
-        
-
-   
-
+    ll = set()
+    for i in permutations(list(S)):
+        ll.add("".join(list(i)))
+    ll =list(ll)
+    ll.sort()
+    print(ll[K - 1])
     return
 
 

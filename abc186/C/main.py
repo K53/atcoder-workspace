@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-def check7(i, base):
-    p = i // base
-    q = i % base
-    if q == 7:
-        return False
-    if p > 0:
-        return check7(p, base)
-    return True
     
 def solve(N: int):
-    count = 0
+    ans = 0
     for i in range(1, N + 1):
-        if check7(i, 10) and check7(i, 8):
-            count += 1
-    print(count)
+        if "7" in str(i) or "7" in str(oct(i)):
+            continue
+        ans += 1
+    print(ans)
+        
+
 
     return
 

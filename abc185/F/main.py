@@ -24,7 +24,7 @@ class SegmentTree:
         '''Update : A[k] = x '''
         pos = k + self._seg_length_half - 1
         # Set value at k-th
-        self.tree[pos] ^= x
+        self.tree[pos] = x
         # Build bottom-up
         while pos:
             pos = (pos - 1) // 2
@@ -63,39 +63,47 @@ class SegmentTree:
 
     def segsearch_right(self, condfunc, left = 0):
         ''' Return min_i satisfying condfunc( func( A[left], ... , A[i])) 
-        if impossible : return n
+        if impossible : return -1
         '''
-
-        print(left, self.N, condfunc(self.segquery(left, self.N)), self.segquery(left, self.N))
         # if impossible (ie. condfunc( func( A[left], ... , A[-1])) is False)
         if not condfunc(self.segquery(left, self.N)):
-            return self.N
+            return -1
         
         # possible
         func_value = self.identityElement
         rightpos = left + self._seg_length_half - 1
         while True: 
             # while rightpos is the left-child, move bottom-up
-            while rightpos&1 == 1:
+            while rightpos & 1 == 1:
                 rightpos //= 2
             # try
             up_value_trial = self.func(func_value, self.tree[rightpos])
             if not condfunc(up_value_trial):
                 # move up and right
                 func_value = up_value_trial
-                rightpos = (rightpos-1)//2 + 1
+                rightpos = (rightpos - 1) // 2 + 1
             else:
                 # move top-down
-                while rightpos < self._seg_length_half-1:
-                    down_value_trial = self.func(func_value, self.tree[rightpos*2 + 1])
+                while rightpos < self._seg_length_half - 1:
+                    down_value_trial = self.func(func_value, self.tree[rightpos * 2 + 1])
                     if condfunc(down_value_trial):
                         # move left-child
-                        rightpos = rightpos*2 + 1
+                        rightpos = rightpos * 2 + 1
                     else:
                         # move right-child
                         func_value = down_value_trial
-                        rightpos = rightpos*2 + 2
+                        rightpos = rightpos * 2 + 2
                 return rightpos - self._seg_length_half + 1
+
+    def __str__(self):
+        cnt = 0
+        res = []
+        for i in range((self.N - 1).bit_length() + 1):
+            num = 2 ** i
+            res.append(" ".join(f'{j}' for j in self.tree[cnt:cnt + num]))
+            cnt += num
+        return "\n".join(res)
+
 
 def main():
     N, Q = map(int, input().split())
@@ -104,7 +112,7 @@ def main():
     for _ in range(Q):
         C, x, y = map(int, input().split())
         if C == 1:
-            st.pointupdate(x - 1, y)
+            st.pointupdate(x - 1, st.pointgetval(x - 1) ^y)
         else:
             print(st.segquery(x - 1, y))
     return

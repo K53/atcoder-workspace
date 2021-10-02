@@ -39,45 +39,6 @@ print(string.ascii_lowercase)
 # >> abcdefghijklmnopqrstuvwxyz
 ```
 
-## ランレングス圧縮
-
-```python
-from itertools import groupby
-
-# RUN LENGTH ENCODING str -> list(tuple())
-# example) "aabbbbaaca" -> [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] 
-def runLengthEncode(S: str) -> "List[tuple(str, int)]":
-    grouped = groupby(S)
-    res = []
-    for k, v in grouped:
-        res.append((k, int(len(list(v)))))
-    return res
-
-# RUN LENGTH DECODING list(tuple()) -> str
-# example) [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] -> "aabbbbaaca"
-def runLengthDecode(L: "list[tuple]") -> str:
-    res = ""
-    for c, n in L:
-        res += c * int(n)
-    return res
-
-# RUN LENGTH ENCODING str -> str
-# example) "aabbbbaaca" -> "a2b4a2c1a1" 
-def runLengthEncodeToString(S: str) -> str:
-    grouped = groupby(S)
-    res = ""
-    for k, v in grouped:
-        res += k + str(len(list(v)))
-    return res
-```
-
-### 座標圧縮
-
-```python
-L = []
-d = {val : i + 1 for i, val in enumerate(sorted(list(set(L))))}
-```
-
 ## 探索
 
 ### 二分探索
@@ -492,47 +453,6 @@ cmp = d.scc() # 強連結成分分解
 # トポロジカルソート済みのリストが欲しい場合はd.topologicalSortedListを利用する。
 ```
 
-### トポロジカルソート
-→ 移植済み
-
-```python
-sys.setrecursionlimit(10 ** 9)
-class Tree:
-    def __init__(self, N) -> None:
-        self.topologicalOrder = []
-        self.nodes = N
-        self.seen = [0] * N
-        self.G = [[] for _ in range(N)]
-        return
-    
-    # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
-        self.G[fromNode].append(toNode)
-        if bothDirection:
-            self.G[toNode].append(fromNode)
-    
-    def _rec(self, now: int):
-        self.seen[now] = True
-        for next in self.G[now]:
-            if self.seen[next]:
-                continue
-            self._rec(next)
-        self.topologicalOrder.append(now) # DFSした末端から取って行き最後に反転。
-    
-    def topologicalSort(self):
-        for node in range(self.nodes): # グラフが全連結じゃない可能性を考慮して全頂点からDFS。
-            if self.seen[node]:
-                continue
-            self._rec(node)
-        self.topologicalOrder = self.topologicalOrder[::-1]
-        return self.topologicalOrder
-
-tr = Tree(N)
-for i in range(M):
-    tr.addEdge(x[i] - 1, y[i] - 1, False)
-l = tr.topologicalSort()
-```
-
 ### BFS
 
 ```python
@@ -660,25 +580,6 @@ def multiStartBfs(edges, H, W, startPoints: "List[set(startY, startX)]") -> list
 #   *2 https://atcoder.jp/contests/tkppc4-1/tasks/tkppc4_1_h
 #       - INFの値は毎回吟味すること。
 # ----------------------------------------------------------------
-import heapq
-INF = 10 ** 9       # *2
-def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0            # *1
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, next in edges[now]:
-            if dist[next] > dist[now] + cost:
-                dist[next] = dist[now] + cost
-                heapq.heappush(hq, (dist[next], next))
-    return dist
 
 # ---------------------
 # グリッド (作成中)
@@ -1084,7 +985,7 @@ def primeFactrization(n: int) -> dict:
     return primeFactors
 ```
 
-### 組み合わせ
+### 組み合わせ -> 移植済み
 
 ```python
 # ----------------------------------------------------------------
@@ -1171,67 +1072,10 @@ def cmbMod(n: int,k: int):
 # Usage
 def solve():
     cmbInit()
-    print(cmb(100, 50))
+    print(cmbMod(100, 50))
     return
 ```
 
-### ダブリング → 移植済み
-
-```python
-class Doubling:
-    def __init__(self, stateKind: int, maxDoublingTimes: int):
-        self.dv = []                                # 数列(状態)のダブリングテーブル。dv[k][s] := 状態sを2^k回実行したらあとの状態
-        self.sum = []                               # 和のダブリングテーブル
-        self.stateKind = stateKind                  # 状態の種類数s
-        self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
-        self._initTable()
-        self._createTable()
-    
-    # 初期化処理
-    def _initTable(self):
-        self.dv.append([i ** 2 % M for i in range(self.stateKind)]) 
-        self.sum.append([i for i in range(self.stateKind)])
-    
-    # ダブリング実施
-    def _createTable(self):
-        for i in range(1, self.maxDoublingTimes):
-            l = []
-            s = []
-            for j in range(self.stateKind):
-                l.append(self.dv[i - 1][self.dv[i - 1][j]])
-                s.append(self.sum[i - 1][j] + self.sum[i - 1][self.dv[i - 1][j]])
-            self.dv.append(l)
-            self.sum.append(s)
-        
-    def getState(self, doubingTimes: int, startState: int):
-        a = []
-        for i in range(self.maxDoublingTimes):
-            if doubingTimes >> i & 1:
-                a.append(i)
-        now = startState
-        for i in a:
-            now = self.dv[i][now]
-        return now
-    
-    def getSum(self, doubingTimes: int, startState: int):
-        res = 0
-        a = []
-        for i in range(self.maxDoublingTimes):
-            if doubingTimes >> i & 1:
-                a.append(i)
-        now = startState
-        for i in a:
-            res += self.sum[i][now]
-            now = self.dv[i][now]
-        return res
-
-    def getAllStates(self, targenTime: int):
-        return self.dv[targenTime]
-
-import math
-d = Doubling(N, int(math.log2(K)) + 1)
-print(d.getState(K, 0))
-```
 
 ### 直交座標ー極座標 変換
 
@@ -1312,63 +1156,6 @@ def findSome(l: "List", val: any):
 #     return dist
 ```
 
-
-### Union-Find木  → 移植済み
-
-```python
-from collections import defaultdict
-
-class UnionFind():
-    def __init__(self, n):
-        self.n = n
-        self.parents = [-1] * n
-
-    def find(self, x):
-        if self.parents[x] < 0:
-            return x
-        else:
-            self.parents[x] = self.find(self.parents[x])
-            return self.parents[x]
-
-    def union(self, x, y):
-        x = self.find(x)
-        y = self.find(y)
-
-        if x == y:
-            return
-
-        if self.parents[x] > self.parents[y]:
-            x, y = y, x
-
-        self.parents[x] += self.parents[y]
-        self.parents[y] = x
-
-    def size(self, x):
-        return -self.parents[self.find(x)]
-
-    def same(self, x, y):
-        return self.find(x) == self.find(y)
-
-    def members(self, x):
-        root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
-
-    def roots(self):
-        return [i for i, x in enumerate(self.parents) if x < 0]
-
-    def group_count(self):
-        return len(self.roots())
-
-    def all_group_members(self):
-        group_members = defaultdict(list)
-        for member in range(self.n):
-            group_members[self.find(member)].append(member)
-        return group_members
-
-    def __str__(self):
-        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
-```
-
 ### 尺取り法
 
 ```python
@@ -1390,22 +1177,6 @@ for _ in range(N):
         l += 1
 ```
 
-### N進数変換
-
-```python
-# from N進数 to 10進数
-int(baseNvalue ,n) # 2,8,16のみ
-
-# from 10進数 to N進数
-def base10int(base10value, toBase):
-    ans = []
-    p = base10value
-    while p >= toBase:
-        p, q = divmod(p, toBase)
-        ans.append(str(q))
-    ans.append(str(p))
-    return "".join(ans[::-1])
-```
 
 
 ```python

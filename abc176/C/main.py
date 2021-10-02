@@ -4,14 +4,15 @@ import sys
 def main():
     N = int(input())
     A = list(map(int, input().split()))
+    h = 0
     ans = 0
-    for i in range(0, N - 1):
-        if A[i] <= A[i + 1]:
+    for i in A:
+        if h <= i:
+            h = i
             continue
-        else:
-            ans += A[i] - A[i + 1]
-            A[i + 1] = A[i]
+        ans += h - i
     print(ans)
-
+    return
+    
 if __name__ == '__main__':
     main()

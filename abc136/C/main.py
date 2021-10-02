@@ -7,12 +7,14 @@ NO = "No"  # type: str
 
 def solve(N: int, H: "List[int]"):
     for i in reversed(range(1, N)):
-        if H[i - 1] <= H[i]:
+        if H[i] - H[i - 1] >= 0:
             continue
-        if H[i - 1] - H[i] > 1:
-            print(NO)
-            return
-        H[i - 1] -= 1
+        else:
+            if H[i - 1] - H[i] == 1:
+                H[i - 1] -= 1
+            if H[i - 1] - H[i] > 1:
+                print(NO)
+                return
     print(YES)
     return
 

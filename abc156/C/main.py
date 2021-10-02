@@ -8,12 +8,13 @@ def main():
     X = list(map(int, input().split()))
     ans = INF
     for p in range(1, 101):
-        s = 0
-        for x in X:
-            s += (x - p) ** 2
-        # print(s)
-        ans = min(ans, s)
+        sum = 0
+        for xx in X:
+            sum += (xx - p) ** 2
+        ans = min(ans, sum)
     print(ans)
+    return
+
 
 
 if __name__ == '__main__':

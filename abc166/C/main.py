@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
 import sys
 
-
 def main():
     N, M = map(int, input().split())
     H = list(map(int, input().split()))
-    way = [[] for _ in range(N)]
+    a, b = [], []
     for _ in range(M):
-        A, B = map(int, input().split())
-        way[A - 1].append(H[B - 1])
-        way[B - 1].append(H[A - 1])
+        aa, bb = map(int, input().split())
+        a.append(aa)
+        b.append(bb)
+    nodes = [[] for _ in range(N)]
+    for i in range(M):
+        nodes[a[i] - 1].append(b[i] - 1)
+        nodes[b[i] - 1].append(a[i] - 1)
     ans = 0
-    for i in range(N):
-        if len(way[i]) == 0:
-            ans += 1
-            continue
-        if max(way[i]) < H[i]:
+    for v in range(N):
+        for i in nodes[v]:
+            if H[v] <= H[i]:
+                break
+        else:
             ans += 1
     print(ans)
+    return
+
+
 
 
 

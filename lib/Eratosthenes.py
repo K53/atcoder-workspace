@@ -28,8 +28,10 @@
 #  - O(σ(N))
 #  - 注) σ(N) : 数Nの約数の数
 # 
-# Modify
+# verify
 # - https://yukicoder.me/problems/no/1665
+# - https://atcoder.jp/contests/abc179/tasks/abc179_c
+# - https://yukicoder.me/problems/no/713
 # ------------------------------------------------------------------------------
 class Eratosthenes():
     """ 素数列挙
@@ -69,7 +71,7 @@ class Eratosthenes():
             res.append((p, exp))
         return res
 
-    """ 高速素因数分解
+    """ 高速約数列挙
     計算量 : O(σ(N)) 
     注) σ(N) : 数Nの約数の数
     """

@@ -1,30 +1,20 @@
 #!/usr/bin/env python3
 import sys
-
+import string
 
 def solve(X: str, N: int, S: "List[str]"):
-    # X = "bacdefghijklmnopqrstuvwxzy"
-    # N = 3
-    # S = ["z", "aa", "ab"]
     d = dict()
-    for i in range(26):
-        d[X[i]] = i
-    l = []
-    for name in S:
-        num = 0
-        cut = 10
-        for ss in list(name):
-            # print(ss)
-            # print(d[ss] * (26 ** cut))
-            # print("--")
-            num += d[ss] * (26 ** cut)
-            cut -= 1
-            # print(" ")
-        l.append((num, name))
-    l.sort()
-    # print(l)
-    for i in range(N):
-        print(l[i][1])
+    for abc, xxx in zip(string.ascii_lowercase, X):
+        d[xxx] = abc
+    ans = []
+    for ss in S:
+        st = []
+        for c in ss:
+            st.append(d[c])
+        ans.append(("".join(st), ss))
+    ans.sort()
+    for _, a in ans:
+        print(a)
     return
 
 

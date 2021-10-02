@@ -10,26 +10,20 @@ def main():
         l = list(map(lambda i : int(i) - 1, input().split()))
         S.append(l[1:])
     P = list(map(int, input().split()))
-    
-    for n in range(2 ** N):
-        onSwitch = [0] * M
-        for i in range(N):
-            if (n >> i) & 1:
-                for m in range(M):
-                    if i in S[m]:
-                        onSwitch[m] += 1
-        for m in range(M):
-            if onSwitch[m] % 2 != P[m]:
+
+    ans = 0
+    for state in range(2 ** N):
+        for i in range(M):
+            cnt = 0
+            for b in S[i]:
+                if state >> b & 1:
+                    cnt += 1
+            if cnt % 2 != P[i]:
                 break
         else:
             ans += 1
     print(ans)
-
-
-
-
-
-    
+    return
 
 
 if __name__ == '__main__':

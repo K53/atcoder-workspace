@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 import sys
-import itertools
+from itertools import permutations
 import math
 
 def distance(x1, y1, x2, y2):
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** (1/2)
 
 def solve(N: int, x: "List[int]", y: "List[int]"):
-    p = [i for i in range(N)]
-    l = itertools.permutations(p)
     ans = 0
-    for case in l:
-        for i in range(N - 1):
-            # case[i] -> case[i + 1]
-            ans += distance(x[case[i]], y[case[i]], x[case[i + 1]], y[case[i + 1]])
-    print(ans / math.factorial(N))
+    t = 0
+    for order in permutations(range(N)):
+        # print(order)
+        t += 1
+        for i in range(1, N):
+            # print(order[i - 1], order[i])
+            ans += distance(x[order[i - 1]], y[order[i - 1]], x[order[i]], y[order[i]])
+    print(ans / t)
     return
 
 

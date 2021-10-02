@@ -3,16 +3,19 @@ import sys
 
 
 def solve(R: int, X: int, Y: int):
-    dis = (X ** 2 + Y ** 2) ** (1/2)
-    p = dis // R
-    q = dis % R
-    if q == 0:
-        print(int(p))
-    else:
-        if p == 0:
-            print(2)
-        else:
-            print(int(p + 1))
+    dist = (X ** 2 + Y ** 2) ** 0.5
+    p, q = map(int, str(dist).split("."))
+    rr, mm = divmod(p, R)
+    if rr == 0:
+        print(2)
+        return
+    if q != 0:
+        print(rr + 1)
+        return
+    if mm == 0:
+        print(rr)
+        return
+    print(rr + 1)
     return
 
 

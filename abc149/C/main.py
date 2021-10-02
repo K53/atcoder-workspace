@@ -1,30 +1,64 @@
 #!/usr/bin/env python3
 import sys
 
-def getPrimes(last: int, first: int = 1):
-    # validation check
-    if not isinstance(last, int) or \
-        not isinstance(first, int):
-        raise("[ERROR] parameter must be integer")
-    if last < 0 or first < 0:
-        raise("[ERROR] parameter must be not less than 0 (first >= 0 & last >= 0)")
+class Eratosthenes():
+    """ 素数列挙
+    計算量 : O(NloglogN)
+    """
+    def __init__(self, N: int) -> None:
+        self.isPrime = [True] * (N + 1) # 数iが素数かどうかのフラグ
+        self.isPrime[0] = False
+        self.isPrime[1] = False
+        self.minfactor = [0] * (N + 1) # 数iの最小の素因数
+        self.minfactor[1] = 1
+        self.primes = []    # 数Nまでの素数のリスト
+        for p in range(2, N + 1):  # p : 判定対象の数
+            if not self.isPrime[p]:
+                continue
+            self.minfactor[p] = p
+            self.primes.append(p)
+            # pが素数のためそれ以降に出現するpの倍数を除外する。
+            # なお、ループはp始まりでも良いが、p * _ のかける側はすでに同じ処理で弾かれているはずのため無駄。
+            for i in range(p * p, N + 1, p):
+                if self.minfactor[i] == 0:
+                    self.minfactor[i] = p
+                self.isPrime[i] = False
+        return
+    
+    """ 高速素因数分解
+    計算量 : O(NlogN)
+    """
+    def factorize(self, n: int) -> list:
+        res = [] # (p, exp)
+        while n > 1:
+            p = self.minfactor[n]
+            exp = 0
+            while self.minfactor[n] == p:
+                n //= p
+                exp += 1
+            res.append((p, exp))
+        return res
 
-    if last < first:
-        last, first = first, last
-    isPrime = [True] * (last + 1)    # 素数かどうか
-    # 0と1をFalseに
-    isPrime[0] = isPrime[1] = False
-    for i in range(2, int(last ** 0.5 + 1)):
-        if isPrime[i]:
-            # 篩にかける。iの倍数をすべてFalseにしていく。このとき i^2まではすでにふるい落とされているので見る必要がない
-            for j in range(i ** 2, last + 1, i):
-                isPrime[j] = False
-    return [i for i in range(first, last + 1) if isPrime[i]] 
+    """ 高速素因数分解
+    計算量 : O(σ(N)) 
+    注) σ(N) : 数Nの約数の数
+    """
+    def getDivisors(self, n: int) -> list:
+        res = [1]
+        for p in self.factorize(n):
+            for i in range(len(res)):
+                v = 1
+                for _ in range(p[1]):
+                    v *= p[0]
+                    res.append(res[i] * v)
+        return res
 
 def solve(X: int):
-    l = getPrimes(X, 10 ** 6)
-    print(l[0])
-
+    er = Eratosthenes(10 ** 6)
+    for i in er.primes:
+        if i >= X:
+            print(i)
+            return
     return
 
 

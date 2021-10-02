@@ -3,20 +3,19 @@ import sys
 
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
-    import bisect
     A.sort()
     B.sort()
-    ans = 10 ** 9
+    import bisect
+    ans = 10 ** 10
     for aa in A:
-        num = bisect.bisect_left(B, aa)
-        # print("s", num)
-        if num == 0:
-            ans = min(ans, abs(B[num] - aa))
-        elif num == M:
-            ans = min(ans, abs(B[num - 1] - aa))
+        i = bisect.bisect(B, aa)
+        if i == 0:
+            ans = min(ans, abs(B[i] - aa))
+        elif i == M:
+            ans = min(ans, abs(B[i - 1] - aa))
         else:
-            ans = min(ans, min(abs(B[num - 1] - aa), abs(B[num] - aa)))
-    print(ans)
+            ans = min(min(ans, abs(B[i - 1] - aa)), abs(B[i] - aa))
+    print(ans)    
     return
 
 

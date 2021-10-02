@@ -2,25 +2,24 @@
 import sys
 import string
 
-def getpq(n: int):
-    p = n // 26
-    q = n % 26
-    return (p, q)
+S = string.ascii_lowercase
 
+def convert(q):
+    return S[q - 1]
+    
 def main():
     N = int(input())
-    S = string.ascii_lowercase
-    p = N - 1
-    ans = ""
-    while True:
-        p, q = getpq(p)
-        ans = S[q] + ans
-        # print(p, q)
-        if p == 0:
-            break
-        p -= 1
+    ans = []
+    while N != 0:
+        N, q = divmod(N, 26)
+        ans.append(convert(q))
+        if q == 0:
+            N -= 1
+    print("".join(ans[::-1]))
+    return
+    
 
-    print(ans)
+
 
 
 if __name__ == '__main__':

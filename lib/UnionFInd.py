@@ -11,7 +11,7 @@
 # 計算量
 # - α(N) ・・・　Ackermann 関数の逆関数であり、ほぼ定数。
 # 
-# Modify
+# verify
 # - https://yukicoder.me/problems/no/1390
 # ------------------------------------------------------------------------------
 from collections import defaultdict

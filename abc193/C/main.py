@@ -1,47 +1,21 @@
 #!/usr/bin/env python3
 import sys
-import math
-
-# def aa(N: int):
-#     s = set()
-#     for a in range(2, N):
-#         if a * a > N:
-#             break
-#         for b in range(2, 34):
-#             t = a ** b
-#             if t <= N:
-#                 s.add(t)
-#     return s
 
 def solve(N: int):
-    ss = set()
-    # N = 100
     ans = 0
-    q = 0
-    for i in range(2, N):
-        if i * i > N:
+    l = set()
+    for a in range(2, N):
+        if a ** 2 > N:
             break
-        skip = False
-        for e in range(2, 34):
-            a = math.log(i, e)
-            if a.is_integer() and a > 1:
-                skip = True
+        num = a
+        for nb in range(N):
+            if num * a > N:
+                ans += nb
                 break
-        if skip:
-            continue
-        # print(i)
-        m = math.log(N, i) - 1
-        for k in range(int(m//1)):
-            ss.add(i ** (k + 2))
-        # print(m)
-        # print("#")
-        ans += int(m // 1)
-    # sa = aa(N)
-    # print(len(ss))
-    # print(len(sa))
-    # print(q)
-    # print(sa.difference(ss))
-    print(N - len(ss))
+            num *= a
+            l.add(num)
+    
+    print(N - len(l))
     return
 
 

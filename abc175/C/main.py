@@ -3,16 +3,19 @@ import sys
 
 def main():
     X, K, D =map(int, input().split())
-    if X < 0:
-        X *= -1
-    p = X // D
-    q = X % D
-    rest = K - p
-    if rest <= 0:
-        ans = X - K * D
+    X = abs(X)
+    p, q = divmod(X, D)
+    if p >= K:
+        print(X - K * D)
+        return
+    K -= p
+    if K % 2 == 0:
+        print(q)
     else:
-        ans = q if rest % 2 == 0 else abs(q - D)
-    print(ans)
+        print(D - q)
+    return
+
+
 
 
 if __name__ == '__main__':

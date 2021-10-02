@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 import sys
-import itertools
+from itertools import permutations
 
 def solve(N: int, P: "List[int]", Q: "List[int]"):
-    a, b = 0, 0
-    l = sorted(list(itertools.permutations(P)))
-    P = tuple(P)
-    Q = tuple(Q)
-    for i in range(len(l)):
-        if P == l[i]:
-            a = i
-        if Q == l[i]:
-            b = i
+    num = 0
+    a = 0
+    b = 0
+    for order in permutations([i + 1 for i in range(N)]):
+        num += 1
+        if list(order) == P:
+            a = num
+        if list(order) == Q:
+            b = num
     print(abs(a - b))
+         
+
+
+
+
     return
 
 

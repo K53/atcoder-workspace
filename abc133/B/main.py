@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 import sys
-
+from itertools import combinations
 
 def solve(N: int, D: int, X: "List[List[int]]"):
+    ans = 0
+    for k in combinations([i for i in range(N)], 2):
+        sum = 0
+        for j in range(D):
+            sum += (X[k[0]][j] - X[k[1]][j]) ** 2
+        if (sum ** 0.5).is_integer():
+            ans += 1
+    print(ans)
     return
 
 

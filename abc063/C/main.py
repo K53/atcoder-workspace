@@ -3,6 +3,17 @@ import sys
 
 
 def solve(N: int, s: "List[int]"):
+    tot = sum(s)
+    if tot % 10 != 0:
+        print(tot)
+        return
+    s.sort()
+    for ss in s:
+        if ss % 10 == 0:
+            continue
+        print(tot - ss)
+        return
+    print(0)
     return
 
 

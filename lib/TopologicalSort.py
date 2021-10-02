@@ -22,7 +22,7 @@
 # 計算量
 # - O(E + V) : 各ノードについて全ての頂点を1回ずつ見るため。
 # 
-# Modify
+# verify
 # - https://atcoder.jp/contests/abc216/tasks/abc216_d
 # ------------------------------------------------------------------------------
 from collections import deque

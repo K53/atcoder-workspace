@@ -3,6 +3,9 @@ import sys
 
 
 def solve(W: int, H: int, x: int, y: int):
+    a = 1 if x == W / 2 and y == H / 2 else 0
+    print(W * H / 2, a)
+
     return
 
 

@@ -12,40 +12,24 @@ def main():
             XYs.append((x - 1, y))
         A.append(XYs)
     # print(A)
+
     ans = 0
     for case in range(2 ** N):
-        # print(bin(case))
-        people = [-1] * N
-        count = 0
-        conflict = False
+        flg = True
         for i in range(N):
-            t = case >> i
-            if t & 1:
-                count += 1
-                if people[i] == -1:
-                    people[i] = 1
-                elif people[i] != 1:
-                    conflict = True
-                    break
-                for x, y in A[i]:
-                    if people[x] == -1:
-                        people[x] = y
-                    elif people[x] != y:
-                        conflict = True
-                        break
-            else:
-                if people[i] == -1:
-                    people[i] = 0
-                elif people[i] != 0:
-                    conflict = True
-                    break
-        if not conflict:
-            # print(bin(case))
-            # print(count)
-            # print(people)
-            # print("#")
-            ans = max(ans ,count)
+            if case >> i & 1:
+                for num in A[i]:
+                    if (case >> num[0] & 1) != num[1]:
+                        flg = False
+        if flg:
+            c = 0
+            for i in range(N):
+                if case >> i & 1:
+                    c += 1
+            ans = max(ans, c)
     print(ans)
+    return
+
 
 if __name__ == '__main__':
     main()

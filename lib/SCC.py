@@ -15,7 +15,7 @@
 # 計算量
 # - O(V + E) : 要するに2回のDFSなので。
 # 
-# Modify
+# verify
 # - https://atcoder.jp/contests/practice2/tasks/practice2_g?lang=ja
 # - https://atcoder.jp/contests/typical90/tasks/typical90_u
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_3_C&lang=jp

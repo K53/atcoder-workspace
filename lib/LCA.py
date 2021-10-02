@@ -12,7 +12,7 @@
 # 計算量
 # - O(logN)
 # 
-# Modify
+# verify
 # - getLca()
 #   - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=GRL_5_C&lang=ja
 #   - https://yukicoder.me/submissions/699828

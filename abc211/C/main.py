@@ -4,16 +4,19 @@ import sys
 MOD = 1000000007  # type: int
 
 def solve(S: str):
-    chokudai = "chokudai"
-    dp = [[0] * (len(S) + 1) for _ in range(9)]
-    for i in range (len(S) + 1):
-        dp[0][i] = 1
-    for i in range(1, 9):
-        for j in range(1, len(S) + 1):
-            if chokudai[i - 1] == S[j - 1]:
-                dp[i][j] = (dp[i - 1][j - 1] + dp[i][j - 1]) % MOD
+    T = "chokudai"
+    dp = [[0] * (len(S) + 1) for _ in range(len(T) + 1)]
+    for ss in range(len(S)):
+        for tt in range(len(T)):
+            if S[ss - 1] == T[tt - 1]:
+                dp[tt][ss] = dp[tt][ss - 1] + 1
+                dp[tt][ss] = dp[tt - 1][ss - 1]
             else:
-                dp[i][j] = dp[i][j - 1]
+                dp[tt][ss] = dp[tt][ss - 1]
+
+
+    
+
     print(dp[-1][-1])
 
 

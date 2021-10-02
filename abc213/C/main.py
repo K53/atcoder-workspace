@@ -3,12 +3,10 @@ import sys
 
 
 def solve(H: int, W: int, N: int, A: "List[int]", B: "List[int]"):
-    dx = {val : i + 1 for i, val in enumerate(sorted(list(set(B))))}
-    dy = {val : i + 1 for i, val in enumerate(sorted(list(set(A))))}
-
-    ans = [[0] * 2 for _ in range(N)]
-    for yy, xx in zip(A, B):
-        print(dy[yy], dx[xx])
+    dx = {val : i + 1 for i, val in enumerate(sorted(list(set(A))))}
+    dy = {val : i + 1 for i, val in enumerate(sorted(list(set(B))))}
+    for aa, bb in zip(A, B):
+        print(dx[aa], dy[bb])
     return
 
 

@@ -3,15 +3,12 @@ import sys
 
 
 def solve(N: int):
-    count = 0
-    for num in range(1, 10 ** 6 + 1):
-        s = str(num)
-        t = int(s + s)
-        if t > N:
+    ans = 0
+    for i in range(1, 10 ** 6 + 1):
+        if int(str(i) + str(i)) > N:
             break
-        count += 1
-
-    print(count)
+        ans += 1
+    print(ans)
     return
 
 

@@ -8,20 +8,23 @@ def main():
         CA = list(map(int, input().split()))
         C.append(CA[0])
         A.append(CA[1:])
-    ans = INF
-    for n in range(2 ** N):
-        skill = [0] * M
+    ans = 10 ** 9
+    for i in range(2 ** N):
         cost = 0
-        for i in range(N):
-            if n >> i & 1 == 1:
-                skill = [x + y for (x, y) in zip(skill, A[i])]
-                cost += C[i]
-        for j in range(M):
-            if skill[j] < X:
+        know = [0] * M
+        for b in range(N):
+            if i >> b & 1:
+                cost += C[b]
+                for aa in range(M):
+                    know[aa] += A[b][aa]
+        # print(know)
+        for aaa in know:
+            if aaa < X:
                 break
         else:
-            ans = min(ans, cost)
+            ans = min(cost, ans)
     print(-1 if ans == INF else ans)
+
 
 
 

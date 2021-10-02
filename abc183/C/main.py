@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-import itertools
+from itertools import permutations
 
 def main():
     N, K = map(int, input().split())
@@ -9,20 +9,19 @@ def main():
     for i in range(N):
         T.append(list(map(int, input().split())))
         n.append(i)
-
+    
     ans = 0
-    for way in list(itertools.permutations(n[1:])):
-        w = list(way)
-        w.append(0)
+    for root in permutations(range(1, N)):
+        cost = 0
         now = 0
-        count = 0
-        for i in range(N):
-            next = w[i]
-            count += T[now][next]
-            now = next
-        if count == K:
+        for i in list(root) + [0]:
+            cost += T[now][i]
+            now = i
+        if cost == K:
             ans += 1
     print(ans)
+    return
 
+    
 if __name__ == '__main__':
     main()

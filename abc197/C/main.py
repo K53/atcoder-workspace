@@ -3,42 +3,26 @@ import sys
 import itertools
 
 def solve(N: int, A: "List[int]"):
-    if N == 1:
+    if N == 1: 
         print(A[0])
         return
-    # print(1073741824 | 1073741823)
-    # print(1073741824 ^ 1073741823)
-    l = [i for i in range(1, N)]
-    c = 10 ** 16
-    for n in range(1, N):
-        for v in itertools.combinations(l, n):
-            # splited = []
-            # anses = []
-            res = 0
-            before = 0
-            for i in v:
-                # splited.append(A[before:i])
-                ans = 0
-                for aa in A[before:i]:
-                    ans |= aa
-                before = i
-                # anses.append(ans)
-                res ^= ans
-            # splited.append(A[before:])
-            ans = 0
-            for aa in A[before:]:
-                ans |= aa
-            # anses.append(ans)
-            # print(splited)
-            # print(anses)
-            res ^= ans
-            c = min(c, res)
-    print(c)
-        
-        
-            
-
-            
+    ans = 10 ** 16
+    for case in range(1, 2 ** (N - 1)):
+        now = 0
+        l = []
+        for b in range(N):
+            if case >> b & 1:
+                l.append(A[now:b + 1])
+                now = b + 1
+        l.append(A[now:])
+        xorsum = 0
+        for ll in l:
+            orsum = 0
+            for num in ll:
+                orsum |= num
+            xorsum ^= orsum
+        ans = min(ans, xorsum)
+    print(ans)
     return
 
 

@@ -4,9 +4,9 @@ import sys
 
 def solve(N: int, A: "List[int]"):
     l = [0] * 200
-    for aa in [i % 200 for i in A]:
-        l[aa] += 1
     ans = 0
+    for aa in A:
+        l[aa % 200] += 1
     for i in l:
         ans += i * (i - 1) // 2
     print(ans)

@@ -4,28 +4,25 @@ import sys
 
 def main():
     N, M = map(int, input().split())
-    ans = [-1] * N
+    sc = set()
     for _ in range(M):
         s, c = map(int, input().split())
-        if ans[s - 1] == -1 or ans[s - 1] == c:
-            ans[s - 1] = c
-        else:
-            print(-1)
-            return
-    for i in range(N):
-        if ans[i] == -1:
-            if N != 1 and i == 0:
-                ans[i] = 1
-            else:
-                ans[i] = 0
-    if N != 1 and ans[0] == 0:
-        print(-1)
+        sc.add((s, c))
+    l, r = 0, 0
+    if N == 1:
+        l, r = 0, 10
     else:
-        print(*ans, sep="")
+        l, r = 10 ** (N - 1), 10 ** N
+    for i in range(l, r):
+        ss = str(i)
+        for s, c in sc:
+            if s > N or int(ss[s - 1]) != c:
+                break
+        else:
+            print(i)
+            return
+    print(-1)
     return
-
-
-            
 
 
 if __name__ == '__main__':

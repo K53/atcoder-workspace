@@ -8,19 +8,16 @@ def main():
     for _ in range(H):
         l.append(input())
     
-    for h in range(H - 1):
-        for w in range(W - 1):
-            c = 0
-            if l[h][w] == "#":
-                c += 1
-            if l[h][w + 1] == "#":
-                c += 1
-            if l[h + 1][w] == "#":
-                c += 1
-            if l[h + 1][w + 1] == "#":
-                c += 1
-            if c == 1 or c == 3:
+    for i in range(H - 1):
+        for j in range(W - 1):
+            block = 0
+            for x in range(2):
+                for y in range(2):
+                    block += 1 if l[i + x][j + y] == "#" else 0
+            if block == 1 or block == 3:
                 ans += 1
-    print(ans)
+    print(ans)    
+    return
+
 if __name__ == '__main__':
     main()

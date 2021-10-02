@@ -14,8 +14,9 @@
 # 計算量
 # - O(√N)
 # 
-# Modify
+# verify
 # - https://yukicoder.me/problems/no/1452
+# - https://atcoder.jp/contests/abc180/tasks/abc180_c
 # ------------------------------------------------------------------------------
 def getDivisors(n: int):
     lowerDivisors, upperDivisors = [], []
@@ -49,7 +50,7 @@ print(getDivisors(120))
 # - O(√N)
 # 
 # Modify
-# - 
+# - https://atcoder.jp/contests/abc052/tasks/arc067_a
 # ------------------------------------------------------------------------------
 def primeFactorise(n: int) -> list:
     primeFactors = []
@@ -73,3 +74,23 @@ print(l)
 # convert to dict
 print(dict(l))
 "-> {2: 1, 3: 2, 5: 1}"
+
+
+# 約数の個数
+#
+# verify
+# - https://atcoder.jp/contests/abc052/tasks/arc067_a
+def getNumOfDividors(n: int) -> int:
+    numOfDividors = 1
+    i = 2
+    while i * i <= n:
+        ex = 0
+        while n % i == 0:
+            ex += 1
+            n //= i
+        if ex != 0:
+            numOfDividors *= ex + 1
+        i += 1
+    if n != 1:
+        numOfDividors *= 2
+    return numOfDividors

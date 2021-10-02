@@ -13,7 +13,7 @@
 # - O(ElogV) : 辺の数Eに依存。UnionFindはα(n)であるためほぼ定数となり、
 # - 辺のソートが支配的になる。
 # 
-# Modify
+# verify
 # - https://atcoder.jp/contests/typical-algorithm/tasks/typical_algorithm_f?lang=ja
 # - https://atcoder.jp/contests/abc218/tasks/abc218_e
 # ------------------------------------------------------------------------------

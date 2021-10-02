@@ -4,10 +4,9 @@ import sys
 
 def solve(N: int, B: "List[int]"):
     A = [B[0]]
-    for i in range(N - 1):
-        if A[i] > B[i]:
-            A[i] = B[i]
-        A.append(B[i])
+    for i in range(N - 2):
+        A.append(min(B[i], B[i + 1]))
+    A.append(B[-1])
     print(sum(A))
     return
 

@@ -3,13 +3,19 @@ import sys
 
 def main():
     X, N = map(int, input().split())
-    p = list(map(int, input().split())) if N != 0 else []
-    for d in range(X + 1):
-        for v in [-1, 1]:
-            a = X + d * v
-            if p.count(a) == 0:
-                print(a)
-                return
+    if N == 0:
+        print(X)
+        return
+    pp = set(map(int, input().split())) ^ set(range(0, 102))
+    m = 10 ** 9
+    ans = -1
+    for i in pp:
+        if abs(i - X) < m:
+            ans = i
+            m = abs(i - X)
+    print(ans)
+    return
+    
 
 
 
