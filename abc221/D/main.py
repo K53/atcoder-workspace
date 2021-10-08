@@ -6,27 +6,23 @@ def solve(N: int, A: "List[int]", B: "List[int]"):
     end = []
     for aa, bb in zip(A, B):
         end.append(aa + bb)# - 1)
-    # print(end)
-    d = {}
-    rd = []
+    compressed = {}
+    compressed_to_row = []
     for index, val in enumerate(sorted(list(set(A + end)))):
-        d[val] = index
-        rd.append(val)
-    # print(d)
-    # print(rd)
-    nums = [0] * (len(list(d)) + 1)
+        compressed[val] = index
+        compressed_to_row.append(val)
+    # print(compressed)
+    # print(compressed_to_row)
+    l = [0] * len(compressed_to_row)
     for aa, ee in zip(A, end):
-        nums[d[aa]] += 1
-        nums[d[ee]] -= 1 # + 1
-    ans = 0
-    l = list(accumulate(nums))
-    # print(l)
-    ans = [0] * (N + 2)
-    for i in range(len(l) - 1 - 1):
-        # print(rd[i + 1] - rd[i])
-        ans[l[i]] += (rd[i + 1] - rd[i])
-    ans[l[-2]] += 1
-    print(*ans[1:-1], sep=" ")
+        l[compressed[aa]] += 1
+        l[compressed[ee]] -= 1
+    acc = list(accumulate(l))
+    # print(acc)
+    ans = [0] * (N + 1)
+    for i in range(len(acc) - 1):
+        ans[acc[i]] += (compressed_to_row[i + 1] - compressed_to_row[i])
+    print(*ans[1:], sep=" ")
 
 
     return

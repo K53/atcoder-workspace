@@ -1,21 +1,32 @@
 #!/usr/bin/env python3
 import sys
+import math
 
 MOD = 1000000007  # type: int
+MAX = 666667      # Pythonだと7.3 * 10^5程度が限度。それ以上はTLE(>2s)
+# MAX = 10 ** 6   # Pypyで 260~280 msくらい
 
-def fac(n: int):
-    ans = 1
-    for i in range(1, n + 1):
-        ans *= i
-        if ans >= MOD:
-            ans %= MOD
-    return ans
+fac, finv, inv = [1, 1], [1, 1], [0, 1]
+# fac : 階乗(1,2,6,...)
+# inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
+# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
+def cmbInit():
+    for i in range(2, MAX):
+        fac.append(fac[i - 1] * i % MOD)
+        # inv.append(MOD - inv[MOD % i] * (MOD // i) % MOD)
+        # finv.append(finv[i - 1] * inv[i] % MOD)
 
 def solve(N: int, M: int):
+    cmbInit()
     if abs(N - M) > 1:
         print(0)
         return
-    print(fac(N) * fac(M) * (2 if N == M else 1) % MOD)
+    if N == M:
+        print(fac[N] * fac[M] * 2 % MOD)
+    else:
+        mm = min(N, M)
+        aa = max(N, M)
+        print(fac[mm] * fac[aa] % MOD)
     return
 
 

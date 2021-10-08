@@ -1,10 +1,35 @@
 #!/usr/bin/env python3
 import sys
-
+from collections import defaultdict
+import math
 MOD = 1000000007  # type: int
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    d = defaultdict(int)
+    a0 = 0
+    b0 = 0
+    for aa, bb in zip(A, B):
+        if aa == 0:
+            a0 += 1
+            continue
+        elif bb == 0:
+            b0 += 1
+            continue
+        g = math.gcd(aa, bb)
+        d[(aa / g, bb / g)] += 1
+    ans = 2 ** a0 + 2 ** b0 - 1
+    for aa, bb in zip(A, B):
+        ans += d[(-bb, aa)] + d[(bb, -aa)]
+    print(ans)
+    print(((2 ** N - 1) - ans // 2) % MOD)
+        
+
+
+    
+    
+
+    
     return
 
 

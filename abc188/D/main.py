@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 import sys
+from itertools import accumulate
 
 def solve(N: int, C: int, a: "List[int]", b: "List[int]", c: "List[int]"):
-    l = []
-    for aa, bb, cc in zip(a, b, c):
-        l.append((aa, cc))
-        l.append((bb + 1, -cc))
-    l.sort()
+    end = []
+    for bb in b:
+        end.append(bb + 1)
+    compressed = {}
+    compressed_to_row = []
+    for index, val in enumerate(sorted(list(set(a + end)))):
+        compressed[val] = index
+        compressed_to_row.append(val)
+    # print(compressed)
+    l = [0] * len(compressed_to_row)
+    for aa, ee, cc in zip(a, end, c):
+        l[compressed[aa]] += cc
+        l[compressed[ee]] -= cc
+    acc = list(accumulate(l))
+    prime = []
+    for cc in acc:
+        prime.append(min(cc, C))
+    # print(prime)
     ans = 0
-    cost = 0
-    for i in range(2 * N):
-        cost += l[i][1]
-        if i != 2 * N - 1 and l[i][0] != l[i + 1][0]:
-            ans += min(cost, C) * (l[i + 1][0] - l[i][0])
+    for i in range(len(prime) - 1):
+        ans += (compressed_to_row[i + 1] - compressed_to_row[i]) * prime[i]
     print(ans)
+
     return
 
 

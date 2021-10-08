@@ -4,11 +4,23 @@ import sys
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-
 def solve(N: int, S: "List[str]", T: "List[str]"):
-    rotated = zip(*S[::-1])
-    
-    
+    ss = set()
+    tt = set()
+    for i in range(N):
+        for j in range(N):
+            if S[i][j] == "#":
+                ss.add((i, j))
+            if T[i][j] == "#":
+                tt.add((i, j))
+    for _ in range(4):
+        minXs, minYs = min(ss)
+        minXt, minYt = min(tt)
+        if set((x - minXs, y - minYs) for x, y in ss) == set((x - minXt, y - minYt) for x, y in tt):
+            print(YES)
+            return
+        tt = set((y, -x) for x, y in tt)
+    print(NO)
     return
 
 

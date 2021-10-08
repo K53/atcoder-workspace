@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+from itertools import combinations
 
 def solve(N: int, x: "List[int]", y: "List[int]"):
     # N = 2000
@@ -7,55 +8,25 @@ def solve(N: int, x: "List[int]", y: "List[int]"):
     # y = [i % 13 + i % 98 for i in range(N)]
     dx = {val : i for i, val in enumerate(sorted(list(set(x))))}
     dy = {val : i for i, val in enumerate(sorted(list(set(y))))}
-    # print(dx, dy)
-    lx = [set() for _ in range(len(dx))]
-    ly = [set() for _ in range(len(dy))]
-    ll = []
-    ls = set()
+    # print(dx)
+    # print(dy)
+    points = [[] for _ in range(len(list(dx)))]
+    cc = []
     for xx, yy in zip(x, y):
-        ll.append((xx, yy))
-        ls.add((xx, yy))
-        lx[dx[xx]].add(dy[yy])
-        ly[dy[yy]].add(dx[xx])
-    ll.sort(key = lambda x: x[0]) 
-    # print(lx, ly)
-    # seen = set()
-    # for xx, yy in zip(x, y):
-    #     if set([dx[xx]]) & seen:
-    #         continue
-    #     seen.add(dx[xx])
-    #     for desiredy in lx[dx[xx]]:
-    #         if desiredy == dy[yy]:
-    #             continue
-    #         print(ly[dy[yy]], ly[desiredy])
-    #         print(len(ly[dy[yy]] & ly[desiredy]) - 1)
-    # for xx in range(len(dx)):
-    #     for yy in range(len(dy)):
-    #         for needy in lx[xx]:
-    #             for needx in ly[yy]:
-    #                 if needy <= yy or needx <= xx:
-    #                     continue
-    #                 if (needx, needy) in set(ll):
-    #                     print(xx, yy, needx, needy)  
-    # for xx in range(len(dx)):
-    #     for yy in range(len(dy)):
-    #         if (xx, yy) in ll:
-    #             for needy in lx[xx]:
-    #                 for needx in ly[yy]:
-    #                     if needy <= yy or needx <= xx:
-    #                         continue
-    #                     if (needx, needy) in ll:
-    #                         print(xx, yy, needx, needy)   
+        points[dx[xx]].append(dy[yy])
+        cc.append((dx[xx], dy[yy]))
+    # for i in range(len(points)):
+        # print(points[i])
     ans = 0
-    for xx, yy in ll:
-        for needy in lx[dx[xx]]:
-            for needx in ly[dy[yy]]:
-                if needy <= yy or needx <= xx:
-                    continue
-                if (needx, needy) in ls:
-                    print(xx, yy, needx, needy)    
-                    ans += 1
-    print(ans)
+    for case in combinations(cc, 2):
+        x1, y1 = case[0]
+        x2, y2 = case[1]
+        if x1 == x2 or y1 == y2:
+            continue
+        if y2 in points[x1] and y1 in points[x2]:
+            # print(x1, "->",y2, y1, "->", x2)
+            ans += 1
+    print(ans // 2)
     return
 
 

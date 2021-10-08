@@ -10,32 +10,23 @@ def solve(N: int, M: int, a: "List[int]", b: "List[int]"):
         nodes[a[i] - 1].append(b[i] - 1)
         nodes[b[i] - 1].append(a[i] - 1)
 
+    from collections import deque
     def bfs(edges: "List[to]", start_node: int) -> list:
-        q = set()
-        dist = []
-        for i in range(len(edges)):
-            dist.append([INF, 0])
-        q.add(start_node)
-        dist[start_node] = [0, 1]
-        count = 0
-        while len(q) != 0:
-            now = q.pop()
+        q = deque()
+        dist = [INF] * len(edges)
+        q.append(start_node)
+        dist[start_node] = 0
+        while q:
+            now = q.popleft()
             for next in edges[now]:
-                if next == N - 1:
-                    count += dist[now][1]
-                if dist[next][0] != INF:
-                    if dist[next][0] == dist[now][0] + 1:
-                        dist[next][1] += dist[now][1]
+                if dist[next] != INF:
                     continue
-                dist[next][1] += dist[now][1]
-                q.add(next)
-                dist[next][0] = dist[now][0] + 1
-        # for i in range(len(dist)):
-        #     print(dist)
-        return count
-    
+                q.append(next)
+                dist[next] = dist[now] + 1
+        return dist
 
-    print(bfs(nodes, 0) % MOD)
+    d = bfs(nodes, 0)
+    print(0 if d[-1] == INF else d[-1] % MOD)
 
     return
 

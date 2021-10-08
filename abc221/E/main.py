@@ -1,25 +1,44 @@
 #!/usr/bin/env python3
 import sys
-from itertools import accumulate
 
 MOD = 998244353  # type: int
 
+class BIT:
+    def __init__(self, N):
+        self.N = N
+        self.tree = [0] * (self.N + 1) # 1-indexedのため
+        
+    def add(self, pos, val):
+        '''Add : A[pos] = val '''
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.tree[i] += val
+            i += i & -i
+
+    def sum(self, pos):
+        ''' Return Sum(A[1], ... , A[pos])'''
+        res = 0
+        i = pos + 1 # convert from 0-index to 1-index
+        while i > 0:
+            res += self.tree[i]
+            res %= MOD
+            i -= i & -i    
+        return res
 
 def solve(N: int, A: "List[int]"):
-    d = []
     ans = 0
-    for i in range(N):
-        d.append((A[i], i))
-    d.sort()
-    dd = []
-    for i, v in d:
-        dd.append(v)
-    dd = list(accumulate(dd))
-    for i in range(len(dd)):
-        ans += (2 ** (dd[-1] - dd[i] - 1)) % MOD
-    print(ans)
-    
 
+    compressed = {val : index for index, val in enumerate(sorted(list(set(A))))}
+    a = [compressed[aa] for aa in A]
+    bit =  BIT(len(compressed))
+
+    inv2 = pow(2, MOD - 2, MOD)
+    for i in range(N):
+        val = a[i]
+        ans += pow(2, i, MOD) * bit.sum(val) % MOD
+        ans %= MOD
+        bit.add(val, pow(inv2, i + 1, MOD))
+    print(ans)
     return
 
 
