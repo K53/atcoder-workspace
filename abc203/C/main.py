@@ -3,32 +3,20 @@ import sys
 import bisect
 
 def solve(N: int, K: int, A: "List[int]", B: "List[int]"):
-    friends = []
-    for aa, bb in zip(A, B):
-        friends.append((aa, bb))
-    friends.sort()
-    As = []
-    s = 0
-    Bs = []
-    for aa, bb in friends:
-        As.append(aa)
-        s += bb
-        Bs.append(s)
-    # print(As)
-    # print(Bs)
-    # print(bisect.bisect_right(As, 3) - 1)
+    f = []
+    for i in range(N):
+        f.append((A[i], B[i]))
+    f.sort()
     now = 0
     coin = K
-    preS = 0
-    while coin > 0:
-        now += coin
-        bb = bisect.bisect_right(As, now)
-        if bb == 0:
-            break
-        ss = Bs[bb - 1]
-        coin = ss - preS
-        preS = ss
-    print(now)
+    for next, bb in f:
+        if coin < next - now:
+            print(now + coin)
+            return
+        coin -= next - now
+        now += next - now
+        coin += bb
+    print(now + coin)
     return
 
 

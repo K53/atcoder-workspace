@@ -6,6 +6,7 @@ NO = "No"  # type: str
 
 
 def solve(X: int):
+    print(YES if X >= 30 else NO)
     return
 
 

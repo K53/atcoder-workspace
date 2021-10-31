@@ -60,7 +60,7 @@ def binSearch(ok: int, ng: int):
         else:
             ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
         # print(ok, ng)          # 半分に切り分ける毎の2値の状態
-    return ok        
+    return ok    # 関数呼び出し時の引数のngは絶対評価されないのでngに書く値が答えになりうるならその数マイナス1を指定する。
 ```
 
 ### ビット全探索
@@ -345,6 +345,10 @@ class WarshallFloyd():
         self.dp[fromNode][toNode] = cost
     
     def build(self):
+        """
+        やっていることとしては、
+        0 〜 (via - 1)までの地点だけを利用して求めたdpテーブルを使い、viaを経由地とした時の更新処理している。
+        """
         for via in range(self.N):
             for start in range(self.N):
                 for goal in range(self.N):
@@ -384,6 +388,24 @@ class WarshallFloyd():
                 for goal in range(self.H * self.W):
                     self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
 ```
+
+### 桁DP テンプレート
+
+```python
+L = len(S)
+dp = [[[0] * D for _ in range(2)] for _ in range(L + 1)]
+dp[0][0][0] = 1
+
+for i in range(1, L + 1):
+    for smaller in range(2):
+        for j in range(D):      # jの範囲や遷移先の式は問題毎に書き換え
+            maxNum = int(N[i - 1]) if smaller == 0 else 9
+            for num in range(maxNum + 1):
+                dp[i][smaller or num < int(N[i - 1])][(j + num) % D] += dp[i - 1][smaller][j]
+                dp[i][smaller or num < int(N[i - 1])][(j + num) % D] %= MOD
+print((dp[-1][0][0] + dp[-1][1][0] + MOD - 1) % MOD)
+```
+
 
 ### SCC
 

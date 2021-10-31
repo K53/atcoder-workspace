@@ -1,58 +1,71 @@
 #!/usr/bin/env python3
 import sys
+import heapq
+class Tree:
+    def __init__(self, N) -> None:
+        self.topologicalOrder = []
+        self.N = N
+        self.seen = [0] * N
+        self.G = [[] for _ in range(N)]
+        self.degree = [0] * N # 各ノードの入次数
+        return
+    
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
+        self.G[fromNode].append(toNode)
+        self.degree[toNode] += 1
+        if bothDirection:
+            self.G[toNode].append(fromNode)
+            self.degree[fromNode] += 1
 
+    # ----------------------------------------
+    #  辞書順最小のトポロジカル順序を必要とする場合はqueueではなくheapqを使い、常に入次数0のみのが取れるようにする。
+    # ----------------------------------------
+    def topologicalSort(self):
+        hq = [node for node in range(self.N) if self.degree[node] == 0] # 入次数0のものがスタート
+        heapq.heapify(hq)
+        # 片っ端から入次数0のものを取り出していく。取り出すとそのノードから遷移するノードの入次数をデクリメントする。
+        while hq:
+            node = heapq.heappop(hq)
+            self.topologicalOrder.append(node)
+            for t in self.G[node]:
+                self.degree[t] -= 1
+                if self.degree[t] == 0:
+                    heapq.heappush(hq, t)
+        if [i for i in range(self.N) if self.degree[i]]: # 最終的な入次数が0じゃないものが残る場合循環がある。
+            return None
+        return self.topologicalOrder
+
+
+    # そのトポロジカルソートの結果が唯一のものかを返す。
+    # 一般に、トポロジカルソート順 v1,v2,…,vN において、連続する2要素 vi,vi+1 の間に辺がないとき、その2要素を入れ替えることができる。
+    # https://drken1215.hatenablog.com/entry/2021/01/02/164800
+    def hasOtherOrder(self):
+        for node in range(self.N - 1):
+            if not self.topologicalOrder[node + 1] in self.G[self.topologicalOrder[node]]:
+                return True
+        else:
+            return False
 
 def solve(N: int, A: "List[str]", B: "List[str]"):
-    from collections import deque
-    class Tree:
-        def __init__(self, N) -> None:
-            self.nodes = N
-            self.seen = [0] * N
-            self.G = [[] for _ in range(N)]
-            self.degree = [0] * N # 各ノードの入次数
-            return
-        
-        # 辺の追加
-        def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
-            self.G[fromNode].append(toNode)
-            self.degree[toNode] += 1
-            if bothDirection:
-                self.G[toNode].append(fromNode)
-                self.degree[fromNode] += 1
-            
-        
-        def topologicalSort(self):
-            topologicalOrder = [node for node in range(self.nodes) if self.degree[node] == 0] # 入次数0のものがスタート
-            deq = deque(topologicalOrder)
-
-            # 片っ端から入次数0のものを取り出していく。取り出すとそのノードから遷移するノードの入次数をデクリメントする。
-            while deq:
-                node = deq.popleft()
-                for t in self.G[node]:
-                    self.degree[t] -= 1
-                    if self.degree[t] == 0:
-                        deq.append(t)
-                        topologicalOrder.append(t)
-            if [i for i in range(self.nodes) if self.degree[i]]: # 最終的な入次数が0じゃないものが残る場合循環がある。
-                return None
-            return topologicalOrder
-
-    # tr = Tree(26)
-    # q = set("z")
-    # for aa, bb in zip(A, B):
-    #     for aaa, bbb in zip(aa, bb):
-    #         if aaa != bbb:
-    #             tr.addEdge(ord(aaa) - ord("a"), ord(bbb) - ord("a"), False)
-    #             q.add(aaa)
-    # for i in range(26):
-    #     print(tr.G[i])
-    # import string
-    # for ch in string.ascii_lowercase:
-    #     if ch in q:
-    #         continue
-    #     tr.addEdge(ord(ch) - ord("a"), ord(ch) + 1 - ord("a"), False)
-    # l = tr.topologicalSort()
-    # print(l)
+    tr = Tree(26)
+    for aa, bb in zip(A, B):
+        for i in range(min(len(aa), len(bb))):
+            if aa[i] != bb[i]:
+                tr.addEdge(ord(aa[i]) - ord("a"), ord(bb[i]) - ord("a"), bothDirection=False)
+                break
+        else:
+            if aa > bb:
+                print(-1)
+                return
+    l = tr.topologicalSort()
+    if l == None:
+        print(-1)
+        return
+    ll = []
+    for c in l:
+        ll.append(chr(c + ord("a")))
+    print(*ll, sep="")
     return
 
 

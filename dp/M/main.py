@@ -1,32 +1,24 @@
 #!/usr/bin/env python3
 import sys
+from itertools import accumulate
 
 MOD = 1000000007  # type: int
 
 
 def solve(N: int, K: int, a: "List[int]"):
-    if sum(a) < K:
-        print(0)
-        return
-    dp = [[0] * (K) for _ in range(N)]
-    sums = [[0] * (K) for _ in range(N)]
-    if K == 0:
-        print(1)
-        return
+    dp = [[0] * (K + 1) for _ in range(N + 1)]
+    sdp = [0] * (K + 1)
     dp[0][0] = 1
-    for i in range(0, N):   # i人目
-        for j in range(0, K):   # j個
-            if i == j == 0:
-                continue
-            for k in range(a[i]): # i人目に配る個数 (0 ~ ai)
-                if j - k >= 0:
-                    dp[i][j] = (dp[i][j] + dp[i - 1][j - k]) % MOD
-    for i in range(N):
-        print(dp[i])
-    print(dp[N - 1][K - 1])
-    # for i in range(K + 1):
-    #     print(dp[i])
-            
+    sdp = list(accumulate(dp[0]))
+
+    # print(sdp)
+    for i in range(1, N + 1):
+        for num in range(K + 1):
+            dp[i][num] = sdp[num] - (sdp[num - a[i - 1] - 1] if num - a[i - 1] - 1 >= 0 else 0)
+            dp[i][num] %= MOD
+        sdp = list(accumulate(dp[i]))
+        # print(i, sdp)
+    print(dp[N][K] % MOD)
     return
 
 

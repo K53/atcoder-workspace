@@ -2,26 +2,32 @@
 import sys
 
 NO = "Impossible"  # type: str
-
 def solve(N: int, S: int, A: "List[int]", B: "List[int]"):
-    dp = [[0] * (S + 1) for _ in range(N + 1)]
-    dp[0][0] = 1
-    for day in range(1, N + 1):
-        for cost in range(S + 1):
-            if (cost - A[day - 1] >= 0 and dp[day - 1][cost - A[day - 1]]) or (cost - B[day - 1] >= 0 and dp[day - 1][cost - B[day - 1]]):
-                dp[day][cost] = 1
-    if not dp[-1][-1]:
+    INF = 10 ** 12
+    dp = [[INF] * (S + 1) for _ in range(N + 1)]
+    dp[0][0] = 0
+    for i in range(N):
+        for j in range(S + 1):
+            if dp[i][j] != INF:
+                if j + A[i] < S + 1:
+                    dp[i + 1][j + A[i]] = 1
+                if j + B[i] < S + 1:
+                    dp[i + 1][j + B[i]] = 1
+    if dp[-1][-1] == INF:
         print(NO)
         return
+    
+    ss = S
     ans = []
-    cost = S
-    for day in range(1, N + 1):
-        if  cost - A[N - day] >= 0 and dp[N - day][cost - A[N - day]]:
-            cost -= A[N - day]
+    for i in reversed(range(1, N + 1)):
+        if ss - A[i - 1] >= 0 and dp[i - 1][ss - A[i - 1]] != INF:
             ans.append("A")
-        else:
-            cost -= B[N - day]
+            ss -= A[i - 1]
+            continue
+        if ss - B[i - 1] >= 0 and dp[i - 1][ss - B[i - 1]] != INF:
             ans.append("B")
+            ss -= B[i - 1]
+            continue
     print(*ans[::-1], sep="")
     return
 

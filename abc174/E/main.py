@@ -3,6 +3,28 @@ import sys
 
 
 def solve(N: int, K: int, A: "List[int]"):
+    # False ------ ng | ok ---- True
+    def is_ok(k: int):
+        num = 0
+        for aa in A:
+            p, q = divmod(aa, k)
+            num += p - 1 if q == 0 else p
+        return num <= K    # 条件式
+
+    def binSearch(ok: int, ng: int):
+        # print(ok, ng)              # はじめの2値の状態
+        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+            mid = (ok + ng) // 2
+            # print("target > ", mid)
+            result = is_ok(mid)
+            # print(result)
+            if result:
+                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+            else:
+                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+        return ok
+    print(binSearch(10 ** 9 + 1, 0))
     return
 
 

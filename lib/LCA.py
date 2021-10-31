@@ -10,7 +10,8 @@
 # - https://ikatakos.com/pot/programming_algorithm/graph_theory/lowest_common_ancestor
 # 
 # 計算量
-# - O(logN)
+# - O(NlogN) : 前計算
+# - O(logN)  : クエリ
 # 
 # verify
 # - getLca()

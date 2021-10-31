@@ -94,3 +94,17 @@ def getNumOfDividors(n: int) -> int:
     if n != 1:
         numOfDividors *= 2
     return numOfDividors
+
+
+
+# N進数変換
+"-> BaseConversion.py"
+
+
+# 最小公倍数
+import functools 
+import math
+def lcm(x, y):
+    return x * y // math.gcd(x, y)
+
+print(functools.reduce(lcm, [1, 2, 4, 8, 16]))

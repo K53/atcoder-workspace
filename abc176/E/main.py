@@ -3,6 +3,23 @@ import sys
 
 
 def solve(H: int, W: int, M: int, h: "List[int]", w: "List[int]"):
+    x = [0] * W
+    y = [0] * H
+    for hh, ww in zip(h, w):
+        y[hh - 1] += 1
+        x[ww - 1] += 1
+    max_x = max(x)
+    max_y = max(y)
+    num_x = x.count(max_x)
+    num_y = y.count(max_y)
+    out = 0
+    for hh, ww in zip(h, w):
+        if y[hh - 1] == max_y and x[ww - 1] == max_x:
+            out += 1
+    if num_x * num_y > out:
+        print(max_x + max_y)
+    else:
+        print(max_x + max_y - 1)
     return
 
 

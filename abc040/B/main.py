@@ -3,6 +3,11 @@ import sys
 
 
 def solve(n: int):
+    m = 10 ** 9
+    for i in range(1, n + 1):
+        p, q = divmod(n, i)
+        m = min(m, abs(p - i) + q)
+    print(m)
     return
 
 

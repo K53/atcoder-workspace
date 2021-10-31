@@ -1,33 +1,22 @@
 #!/usr/bin/env python3
 import sys
-import bisect
+import heapq
 
 def solve(N: int, K: int, a: "List[int]", b: "List[int]"):
     a.sort()
     b.sort()
-    # [0] ~ True ------ ok | ng ---- False  ~ [a[-1] * b[-1]]
-    def is_ok(k: int):
-        count = 0
-        for aa in a:
-            # bisect_leftでは一致した時(b = k // aa)にカウントし落とす。
-            # k / a <- 小数にはしない。浮動小数点の問題で前後が正確に測れない。
-            count += bisect.bisect_right(b, k // aa)
-        return count < K
-
-    def binSearch(ok: int, ng: int):
-        # print(ok, ng)              # はじめの2値の状態
-        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
-            mid = (ok + ng) // 2
-            # print("target > ", mid)
-            result = is_ok(mid)
-            # print(result)
-            if result:
-                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
-            else:
-                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
-            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
-        return ng    
-    print(binSearch(0, a[-1] * b[-1]))
+    q = []
+    ans = []
+    selected = set()
+    heapq.heappush(q, (a[0] * b[0], 0, 0))
+    for i in range(K):
+        e, aa, bb = heapq.heappop(q)
+        ans.append(e)
+        for ia, ib in [(1, 0), (0, 1)]:
+            if aa + ia < N and bb + ib < N and not (aa + ia, bb + ib) in selected:
+                heapq.heappush(q, (a[aa + ia] * b[bb + ib], aa + ia, bb + ib))
+                selected.add((aa + ia, bb + ib))
+    print(ans[-1])
     return
 
 

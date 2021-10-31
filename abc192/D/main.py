@@ -1,31 +1,39 @@
 #!/usr/bin/env python3
 import sys
 
-def Base_n_to_10(X,n):
-    out = 0
-    for i in range(1,len(str(X))+1):
-        out += int(X[-i])*(n**(i-1))
-    return out#int out
+def baseKto10int(baseKvalue: int, fromBase: int):
+    ans = 0
+    exp = 0
+    baseKvalue = list(str(baseKvalue)) 
+    for i in baseKvalue[::-1]:
+        ans += int(i) * fromBase ** exp
+        exp += 1
+    return ans
 
 def solve(X: str, M: int):
     if len(X) == 1:
-        if int(X) <= M:
-            print(1)
-        else:
-            print(0)
+        print(1 if int(X) <= M else 0)
         return
-    x = int(X)
-    l = max(list(map(int, X))) + 1
-    r = M
-    while True:
-        c = (l + r) // 2
-        if Base_n_to_10(X, c) <= M:
-            l = c
-        else:
-            r = c
-        if l == c:
-            break
-    print(l - max(list(map(int, X))))
+    maxm = max(map(int, list(X)))
+    # True ------ ok | ng ---- False
+    def is_ok(k: int):
+        return baseKto10int(baseKvalue=X, fromBase=k) <= M
+
+    def binSearch(ok: int, ng: int):
+        # print(ok, ng)              # はじめの2値の状態
+        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+            mid = (ok + ng) // 2
+            # print("target > ", mid)
+            result = is_ok(mid)
+            # print(result)
+            if result:
+                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+            else:
+                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+        return ok     
+    ans = binSearch(maxm, M + 1)
+    print(ans - maxm)
     return
 
 

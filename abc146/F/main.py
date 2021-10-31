@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, M: int, S: str):
     return
 

@@ -3,25 +3,13 @@ import sys
 from collections import defaultdict
 
 def solve(N: int, A: "List[int]"):
-    ans = 0
+    ans = N * (N - 1) // 2
     d = defaultdict(int)
-    for i in A:
-        d[i] += 1
-    for aa in range(N):
-        all = N - 1 - aa
-        ans += all - (d[A[aa]] - 1)
-        d[A[aa]] -= 1
-        # print(d)
+    for aa in A:
+        d[aa] += 1
+    for i, val in d.items():
+        ans -= val * (val - 1) // 2
     print(ans)
-    
-    
-    # ans = 0
-    # for i in range(N - 1):
-    #     for j in range(i, N):
-    #         if A[i] == A[j]:
-    #             ans += 1
-    # print(ans)
-                
     return
 
 

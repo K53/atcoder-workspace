@@ -5,29 +5,27 @@ MOD = 1000000007  # type: int
 INF = 10 ** 16
 
 def solve(N: int, M: int, a: "List[int]", b: "List[int]"):
-    nodes = [[] for _ in range(N)]
+    G = [[] for _ in range(N)]
+    dist = [[0, INF] for _ in range(N)]
+    dist[0] = [1, 0]
     for i in range(M):
-        nodes[a[i] - 1].append(b[i] - 1)
-        nodes[b[i] - 1].append(a[i] - 1)
-
+        G[a[i] - 1].append(b[i] - 1)
+        G[b[i] - 1].append(a[i] - 1)
+    
     from collections import deque
-    def bfs(edges: "List[to]", start_node: int) -> list:
-        q = deque()
-        dist = [INF] * len(edges)
-        q.append(start_node)
-        dist[start_node] = 0
-        while q:
-            now = q.popleft()
-            for next in edges[now]:
-                if dist[next] != INF:
-                    continue
+    q = deque()
+    q.append(0)
+    while q:
+        now = q.popleft()
+        for next in G[now]:
+            if dist[next][1] < dist[now][1] + 1:
+                continue
+            if dist[next][1] == INF:
                 q.append(next)
-                dist[next] = dist[now] + 1
-        return dist
-
-    d = bfs(nodes, 0)
-    print(0 if d[-1] == INF else d[-1] % MOD)
-
+            dist[next][1] = dist[now][1] + 1
+            dist[next][0] += dist[now][0]
+            dist[next][0] %= MOD
+    print(dist[-1][0] % MOD)
     return
 
 

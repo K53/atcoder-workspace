@@ -3,6 +3,14 @@ import sys
 
 
 def solve(N: int, X: int, L: "List[int]"):
+    aa = [0]
+    for i in range(N):
+        aa.append(aa[-1] + L[i])
+    ans = 0
+    for i in aa:
+        if i <= X:
+            ans += 1 
+    print(ans)
     return
 
 

@@ -6,6 +6,11 @@ NO = "NO"  # type: str
 
 
 def solve(N: int, p: "List[int]"):
+    c = 0
+    for i in range(N):
+        if p[i] != i + 1:
+            c += 1
+    print(YES if c <= 2 else NO)
     return
 
 

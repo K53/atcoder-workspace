@@ -6,6 +6,11 @@ NO = "No"  # type: str
 
 
 def solve(N: int):
+    aa = set()
+    for i in range(1, 10):
+        for j in range(1, 10):
+            aa.add(i * j)
+    print(YES if N in aa else NO)
     return
 
 

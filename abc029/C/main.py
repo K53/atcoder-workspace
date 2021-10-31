@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int):
+    l = []
+    for i in range(3 ** N):
+        ll = []
+        p = i
+        for b in range(N):
+            p, q = divmod(p, 3)
+            if q == 0: # b桁目が0の場合の処理
+                ll.append("a")
+            elif q == 1: # b桁目が1の場合の処理
+                ll.append("b")
+            else:
+                ll.append("c")
+        l.append("".join(ll))
+    l.sort()
+    print(*l, sep="\n")
     return
 
 

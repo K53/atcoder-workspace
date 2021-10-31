@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
 import sys
-import itertools
 
 def solve(S: str):
-    must = []
-    cand = []
+    must = set()
+    ng = set()
     for i in range(10):
         if S[i] == "o":
-            must.append(i)
-        elif S[i] == "?":
-            cand.append(i)
-    if len(must) > 4:
-        print(0)
-        return
-    cand.extend(must)
-    lest = 4 - len(must)
-    ans = set()
-    for l in itertools.combinations_with_replacement(cand, lest):
-        ans |= set(itertools.permutations(must + list(l)))
-    print(len(ans))
-    
+            must.add(str(i))
+        elif S[i] == "x":
+            ng.add(str(i))
+    ans = 0
+    for num in range(10000):
+        k = set(f"{num:0=4}")
+        if k >= must and not k & ng:
+            ans += 1
+    print(ans)
     return
 
 

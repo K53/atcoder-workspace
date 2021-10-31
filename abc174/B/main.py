@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 import sys
-
+import math
 
 def solve(N: int, D: int, X: "List[int]", Y: "List[int]"):
+    ans = 0
+    for xx, yy in zip(X, Y):
+        if xx ** 2 + yy ** 2 <= D ** 2:
+            ans += 1
+    print(ans)
     return
 
 

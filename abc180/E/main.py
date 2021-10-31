@@ -3,6 +3,27 @@ import sys
 
 
 def solve(N: int, X: "List[int]", Y: "List[int]", Z: "List[int]"):
+    def dist(i, j):
+        return abs(X[i] - X[j]) + abs(Y[i] - Y[j]) + max(0, Z[j] - Z[i])
+    
+    INF = 1 << 60
+    dp = [[INF] * (1 << N) for _ in range(N)]
+    dp[0][1 << 0] = 0 # 街0にいる状態(訪問済集合は2^0)
+    # dp[i][bit] 今は街iにいて、すでに言った街の集合bitの時。
+    for bit in range(1 << N):
+        for now in range(N):
+            if not (bit >> now & 1):
+                continue # 現在地が集合に入ってないケースはありえないので外す。
+            for next in range(N):
+                if (bit >> next & 1): # すでに訪問している場合
+                    continue
+                nextBit = bit | (1 << next)
+                dp[next][nextBit] = min(dp[next][nextBit], dp[now][bit] + dist(now, next))
+
+    res = INF
+    for i in range(N):
+        res = min(res, dp[i][-1] + dist(i, 0))
+    print(res)
     return
 
 

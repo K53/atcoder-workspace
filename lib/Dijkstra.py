@@ -22,7 +22,7 @@
 # - https://atcoder.jp/contests/abc214/tasks/abc214_c
 # ------------------------------------------------------------------------------
 import heapq
-INF = 10 ** 9 
+INF = 10 ** 16
 class Dijkstra():
     def __init__(self, N: int) -> None:
         self.N = N 

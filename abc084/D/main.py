@@ -1,37 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(Q: int, l: "List[int]", r: "List[int]"):
-    from itertools import accumulate
-    def getPrimeLists(limit: int):
-        primes = [] # 素数リスト
-        isPrime = [True] * (limit + 1) # 素数かどうかのフラグ
-        isPrime[0] = False
-        isPrime[1] = False
-        
-        for p in range(limit + 1):  # p : 判定対象の数
-            if not isPrime[p]:
-                continue
-            primes.append(p)
-            # pが素数のためそれ以降に出現するpの倍数を除外する。
-            # なお、ループはp始まりでも良いが、p * _ のかける側はすでに同じ処理で弾かれているはずのため無駄。
-            for i in range(p * p, limit + 1, p):
-                isPrime[i] = False
-        return isPrime
-    P = getPrimeLists(10 ** 5 + 1)
-    # print(P[:10])
-    isLike2017 = []
-    for i in range(10 ** 5 + 1):
-        if i % 2 == 0:
-            isLike2017.append(0)
-        else: 
-            isLike2017.append(1 if P[i] & P[(i + 1) // 2] else 0)
-    acc = list(accumulate(isLike2017))
-    # print(isLike2017[:20])
-    # print(acc[:20])
-    for ll, rr in zip(l, r):
-        print(acc[rr] - acc[ll - 1])
     return
 
 

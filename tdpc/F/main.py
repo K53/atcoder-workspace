@@ -4,7 +4,24 @@ import sys
 MOD = 1000000007  # type: int
 
 
+def subMod(i):
+    res = i % MOD
+    return res if res > 0 else MOD - res
+
 def solve(N: int, K: int):
+    dp = [0] * (N + 1)
+    sdp = [0] * (N + 1)
+    dp[0] = 1
+    dp[1] = 0
+    sdp[0] = 1
+    sdp[1] = 1
+    for i in range(2, N + 1):
+        dp[i] = subMod(sdp[i - 1] - (sdp[i - K - 1] if i - K - 1 >= 0 else 0))
+        sdp[i] = subMod(sdp[i - 1] + dp[i])
+    # print(dp)
+    # print(sdp)
+    print(subMod(sdp[N - 1] - sdp[N - K]))
+
     return
 
 

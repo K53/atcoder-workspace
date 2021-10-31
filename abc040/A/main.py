@@ -3,6 +3,10 @@ import sys
 
 
 def solve(n: int, x: int):
+    if x > n // 2:
+        print(n - x)
+    else:
+        print(x - 1)
     return
 
 

@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 import sys
-
+from itertools import combinations_with_replacement
 
 def solve(N: int, M: int, Q: int, a: "List[int]", b: "List[int]", c: "List[int]", d: "List[int]"):
+    ans = 0
+    l = combinations_with_replacement(range(1, M + 1), N)
+    for ll in l:
+        score = 0
+        p = sorted(list(ll))
+        for aa, bb, cc, dd in zip(a, b, c, d):
+            if p[bb - 1] - p[aa - 1] == cc:
+                score += dd
+        ans = max(ans, score)
+    print(ans)
     return
 
 

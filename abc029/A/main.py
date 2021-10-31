@@ -3,6 +3,7 @@ import sys
 
 
 def solve(W: str):
+    print(W + "s")
     return
 
 

@@ -3,6 +3,11 @@ import sys
 
 
 def solve(S: "List[str]"):
+    ans = 0
+    for ss in S:
+        if "r" in ss:
+            ans += 1
+    print(ans)
     return
 
 

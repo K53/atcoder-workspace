@@ -3,8 +3,30 @@ import sys
 
 MOD = 998244353  # type: int
 
-
+# dp[マス]
 def solve(N: int, K: int, L: "List[int]", R: "List[int]"):
+    dp = [0] * (N + 1)
+    sdp = [0] * (N + 1)
+    dp[1] = 1
+    sdp[1] = 1
+    for i in range(2, N + 1):
+        for kk in range(K):
+            l, r = L[kk], R[kk] + 1
+            dp[i] += (sdp[max(i - l, 0)] - sdp[max(i - r, 0)])
+            dp[i] %= MOD
+        sdp[i] = (sdp[i - 1] + dp[i]) % MOD
+    print(dp[-1] % MOD)
+
+    # dp = [0] * (N + 1)
+    # dp[1] = 1
+    # for i in range(2, N + 1):
+    #     for kk in range(K):
+    #         for j in range(L[kk], R[kk] + 1):
+    #             if i - j >= 1:
+    #                 dp[i] += dp[i - j]
+    # print(dp[-1] % MOD)
+    # print(dp)
+
     return
 
 

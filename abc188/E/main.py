@@ -10,32 +10,19 @@ def main():
         f, t = map(lambda x: int(x) - 1, input().split())
         edges[f].append(t)
     
-    order = []
-    for i, aa in enumerate(A):
-        order.append((aa, i))
-    order.sort()
-
     INF = 10 ** 16
-    profit = [-INF] * N
-    from collections import deque
-    def bfs(edges: "List[to]", start_node: int) -> list:
-        q = deque()
-        q.append(start_node)
-        profit[start_node] = -INF + 1
-        while q:
-            now = q.popleft()
-            for next in edges[now]:
-                if profit[next] != -INF:
-                    continue
-                q.append(next)
-                profit[next] = A[next] - A[s]
-        profit[s] = -INF
-        return
-    for _, s in order:
-        if profit[s] != -INF:
-            continue
-        bfs(edges, s)
-    print(max(profit))
+    dp = [INF] * N
+    for f in range(N):
+        for t in edges[f]:
+            dp[t] = min(dp[f], dp[t], A[f])
+    ans = -INF
+    for i in range(N):
+        ans = max(ans, A[i] - dp[i])
+    print(ans)
+    return
+
+
+
 
 if __name__ == '__main__':
     main()

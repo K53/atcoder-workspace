@@ -12,11 +12,16 @@ def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
                 dp[i][i] = 0
             self.dp = dp
         
+        # 自己ループを持つグラフの扱いは注意。
         def addEdge(self, fromNode: int, toNode: int, cost: int = 1):
             self.dp[fromNode][toNode] = cost
         
         def build(self):
             nonlocal ans
+            """
+            やっていることとしては、
+            0 〜 (via - 1)までの地点だけを利用して求めたdpテーブルを使い、viaを経由地とした時の更新処理している。
+            """
             for via in range(self.N):
                 for start in range(self.N):
                     for goal in range(self.N):
@@ -25,6 +30,7 @@ def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
                     for goal in range(self.N):
                         if self.dp[start][goal] != INF:
                             ans += self.dp[start][goal]
+            return
     wf = WarshallFloyd(N)
     for i in range(M):
         wf.addEdge(A[i] - 1, B[i] - 1, C[i])

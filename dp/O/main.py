@@ -5,6 +5,30 @@ MOD = 1000000007  # type: int
 
 
 def solve(N: int, a: "List[List[int]]"):
+    # TLE解
+    # dp = [[0] * (1 << N) for _ in range(N + 1)]
+    # dp[0][0] = 1
+    # for i in range(N):
+    #     for bit in range(1 << N):
+    #        for j in range(N):
+    #             if bit >> j & 1 and a[i][j]:
+    #                 dp[i + 1][bit] += dp[i][bit ^ 1 << j]
+    #                 dp[i + 1][bit] %= MOD
+    # print(dp[-1][-1])
+
+    dp = [[0] * (1 << N) for _ in range(N + 1)]
+    # dp[man][W] := 男性(man - 1)まで、女性集合Wまでがペアを作った状態となるための場合の数。
+    dp[0][0] = 1
+    for bit in range(1 << N):
+        man = bin(bit).count("1")
+        for woman in range(N):
+            if bit >> woman & 1 or not a[man][woman]:
+                continue
+            dp[man + 1][bit | 1 << woman] += dp[man][bit]
+            dp[man + 1][bit | 1 << woman] %= MOD
+    # for i in range(N):
+    #     print(dp[i])
+    print(dp[-1][-1])
     return
 
 

@@ -20,12 +20,12 @@ def main():
         return dist
     
     N, Q = map(int, input().split())
-    nodes = [[] for _ in range(N)]
+    G = [[] for _ in range(N)]
     for i in range(N - 1):
         a, b = map(int, input().split())
-        nodes[a - 1].append(b - 1)
-        nodes[b - 1].append(a - 1)
-    f = bfs(nodes, 0)
+        G[a - 1].append(b - 1)
+        G[b - 1].append(a - 1)
+    f = bfs(G, 0)
     # print(f)
 
     for i in range(Q):

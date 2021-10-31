@@ -1,38 +1,31 @@
 #!/usr/bin/env python3
 import sys
-import queue
 INF = 10 ** 16
-def bfs(edges: "List[to]", start_node: int) -> list:
-    q = queue.Queue()
-    dist = [(INF, -1)] * len(edges)
-    q.put(start_node)
-    dist[start_node] = (0, 0)
-    while not q.empty():
-        now = q.get()
-        for next in edges[now]:
-            if dist[next][0] != INF:
+from collections import deque
+def bfs(G: "List[to]", start_node: int) -> list:
+    q = deque()
+    dist = [INF] * len(G)
+    prev = [-1] * len(G)
+    q.append(start_node)
+    dist[start_node] = 0
+    while q:
+        now = q.popleft()
+        for next in G[now]:
+            if dist[next] != INF:
                 continue
-            q.put(next)
-            dist[next] = (dist[now][0] + 1, now)
-    return dist
-
-YES = "Yes"  # type: str
-NO = "No"
+            q.append(next)
+            dist[next] = dist[now] + 1
+            prev[next] = now + 1
+    return prev
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
-    edges = [[] for _ in range(N)]
+    G = [[] for _ in range(N)]
     for i in range(M):
-        edges[A[i] - 1].append(B[i] - 1)
-        edges[B[i] - 1].append(A[i] - 1)
-    d = bfs(edges, 0)
-    ans = []
-    for i in range(1, N):
-        if d[i][1] == -1:
-            print(NO)
-            return
-        ans.append(d[i][1] + 1)
-    print(YES)
-    print(*ans, sep="\n")
+        G[A[i] - 1].append(B[i] - 1)
+        G[B[i] - 1].append(A[i] - 1)
+    d = bfs(G, 0)
+    print("Yes")
+    print(*d[1:], sep="\n")
     return
 
 

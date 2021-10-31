@@ -4,52 +4,33 @@ import sys
 
 def solve(A: int, B: int):
     def d(S: str):
-        # dp[dig][smaller] := 先頭からdig桁決定した時の4or9がsum個あるものが何通りあるのか。smaller = Falseでは上限に達しているということ。
-        dp = [[[0] * 2 for _ in range(2)] for _ in range(len(S) + 1)]
+        N = len(S)
+        dp = [[[0] * 2 for _ in range(2)] for _ in range(N + 1)]
         dp[0][0][0] = 1
-
-        # for dig in range(len(S)):
-        #     # dig桁目はNの上限でなく、dig+1桁目はなんでも良い時。
-        #     dp[dig + 1][1][sum + 1] = dp[dig][1][sum] * 2
-        #     dp[dig + 1][1][sum] = dp[dig][1][sum] * 8
-        #     targetDigNum = int(S[dig])
-        #     # dig桁目はNの上限であり、dig+1桁目はNの上限より小さい時。
-        #     if 4 < targetDigNum < 9:
-        #         dp[dig + 1][1][sum + 1] = dp[dig][1][sum]
-        #         dp[dig + 1][1][sum] = dp[dig][1][sum] * (targetDigNum - 1)
-        #     elif targetDigNum == 4:
-        #         dp[dig + 1][1][sum + 1] = dp[dig][1][sum]
-        #     # dig桁目はNの上限であり、dig+1桁目もNの上限である時。
-        #     if targetDigNum == 4:
-        #         dp[dig + 1][0][sum + 1] += dp[dig][0][sum]
-        #     elif targetDigNum == 9:
-        #         dp[dig + 1][0][sum + 1] += dp[dig][0][sum] * 2
-        #     else:
-        #         dp[dig + 1][0][sum] += dp[dig][0][sum]
-        for dig in range(len(S)):
-            targetDigNum = int(S[dig])
+        for i in range(1, N + 1):
             for smaller in range(2):
-                for fourOrNine in range(2):
-                    ceil = 9 if smaller else targetDigNum
-                    for num in range(ceil + 1):
-                        next_smaller = 0
-                        next_fourOrNine = 0
-                        # 現状上限でない or 次の数字が上限じゃない なら次の桁も当然上限ではない。
-                        if smaller == 1 or num < targetDigNum:
-                            next_smaller = 1
-                        if fourOrNine == 1 or num == 4 or num == 9:
-                            next_fourOrNine = 1
-                        dp[dig + 1][next_smaller][next_fourOrNine] += dp[dig][smaller][fourOrNine]
-            
-
+                for j in range(2):
+                    maxNum = int(S[i - 1]) if smaller == 0 else 9
+                    for num in range(maxNum + 1):
+                        dp[i][smaller or num < int(S[i - 1])][j or num == 4 or num == 9] += dp[i - 1][smaller][j]
         return dp[-1][0][1] + dp[-1][1][1]
-        # ans = 0
-        # for i in range(2):
+
+        # for dig in range(1, len(S) + 1):
+        #     targetDigNum = int(S[dig - 1])
         #     for smaller in range(2):
-        #         ans += dp[len(S)][smaller][i] * i
-        # return ans
+        #         for fourOrNine in range(2):
+        #             ceil = 9 if smaller else targetDigNum
+        #             for num in range(ceil + 1):
+        #                 next_smaller = 0
+        #                 next_fourOrNine = 0
+        #                 # 現状上限でない or 次の数字が上限じゃない なら次の桁も当然上限ではない。
+        #                 if smaller == 1 or num < targetDigNum:
+        #                     next_smaller = 1
+        #                 if fourOrNine == 1 or num == 4 or num == 9:
+        #                     next_fourOrNine = 1
+        #                 dp[dig][next_smaller][next_fourOrNine] += dp[dig - 1][smaller][fourOrNine]
+        # return dp[-1][0][1] + dp[-1][1][1]
     print(d(str(B)) - d(str(A - 1)))
-    # print(d(str(B)) - d(str(A - 1)))
 
     return
 
