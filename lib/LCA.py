@@ -104,7 +104,7 @@ class LcaDoubling:
         return v
 
 # Usage
-N = 3
+N = 5
 edges = [(1, 2), (1, 3), (1, 4), (4, 5)]
 ld = LcaDoubling(N)
 for a, b in edges:

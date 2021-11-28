@@ -6,6 +6,11 @@ NO = "No"  # type: str
 
 
 def solve(N: int):
+    S = str(N)
+    if len(set(S[:3])) == 1 or len(set(S[1:])) == 1:
+        print(YES)
+    else:
+        print(NO)
     return
 
 

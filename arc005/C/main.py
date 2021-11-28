@@ -18,18 +18,17 @@ def main():
                 sy, sx = i, j
             if G[i][j] == "g":
                 gy, gx = i, j
-    import heapq
+    from collections import deque
     INF = 10 ** 9       # *2
     def dijkstra(G: "List[str]", H: int, W: int, startY: int, startX: int) -> list:
-        hq = []
-        heapq.heapify(hq)
+        q = deque()
         # Set start info
         dist = [[INF] * W for _ in range(H)]
-        heapq.heappush(hq, (0, startY, startX))
+        q.append((0, startY, startX))
         dist[startY][startX] = 0            # *1
         # dijkstra
-        while hq:
-            min_cost, nowY, nowX = heapq.heappop(hq)
+        while len(q) != 0:
+            min_cost, nowY, nowX = q.popleft()
             if min_cost > dist[nowY][nowX]:
                 continue
             for dy, dx in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
@@ -40,7 +39,10 @@ def main():
                 cost = 1 if G[nextY][nextX] == "#" else 0
                 if dist[nextY][nextX] > dist[nowY][nowX] + cost:
                     dist[nextY][nextX] = dist[nowY][nowX] + cost
-                    heapq.heappush(hq, (dist[nextY][nextX], nextY, nextX))
+                    if cost == 1:
+                        q.append((dist[nextY][nextX], nextY, nextX))
+                    else:
+                        q.appendleft((dist[nextY][nextX], nextY, nextX))
         return dist
     d = dijkstra(G, H, W, sy, sx)
     # for i in range(H):

@@ -3,6 +3,16 @@ import sys
 
 
 def solve(S: str):
+    f = int(S[:2])
+    l = int(S[2:])
+    if 1 <= f <= 12 and 1 <= l <= 12:
+        print("AMBIGUOUS")
+    elif 1 <= f <= 12:
+        print("MMYY")
+    elif 1 <= l <= 12:
+        print("YYMM")
+    else:
+        print("NA")
     return
 
 

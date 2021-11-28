@@ -3,6 +3,12 @@ import sys
 
 
 def solve(W: str):
+    ans = ""
+    for s in W:
+        if s in "aiueo":
+            continue
+        ans += s
+    print(ans)
     return
 
 

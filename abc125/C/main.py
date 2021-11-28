@@ -3,23 +3,7 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    import math
-    lg = [A[0]]
-    for aa in A[1:]:
-        lg.append(math.gcd(lg[-1], aa))
-    rg = [A[-1]]
-    for aa in A[:-1][::-1]:
-        rg.append(math.gcd(rg[-1], aa))
-    rg = rg[::-1]
-    ans = 0
-    for i in range(N):
-        if i == 0:
-            ans = max(ans, rg[1])
-        elif i == N - 1:
-            ans = max(ans, lg[N - 2])
-        else:
-            ans = max(ans, math.gcd(rg[i + 1], lg[i - 1]))
-    print(ans)
+    
     return
 
 

@@ -3,15 +3,15 @@ import sys
 
 
 def solve(H: int):
-    num = 1
-    ans = 0
-    for _ in range(10 ** 12):
-        ans += num
-        if H == 1:
-            break
-        H //= 2
-        num *= 2
-    print(ans)
+    now = 1
+    count = 0
+    for i in range(50):
+        a = now
+        now *= 2
+        if a <= H < now:
+            print(2 ** (count + 1) - 1)
+            return
+        count += 1
     return
 
 

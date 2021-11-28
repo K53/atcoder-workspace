@@ -3,25 +3,29 @@ from collections import deque
 
 def main():
     S = input()
-    ans = deque()
-    for s in S:
-        ans.append(s)
     Q = int(input())
-    reverse = False
+    ans = deque(S)
+    inv = False
     for _ in range(Q):
-        l = input().split()
-        if l[0] == "1":
-            reverse = not reverse
+        query = input().split()
+        if query[0] == "1":
+            inv ^= True
         else:
-            if (l[1] == "1" and not reverse) or (l[1] == "2" and reverse):
-                ans.appendleft(l[2])
+            if query[1] == "1":
+                if inv:
+                    ans.append(query[2])
+                else:
+                    ans.appendleft(query[2])
             else:
-                ans.append(l[2])
-    ans = list(ans)
-    if reverse:
-        print(*ans[::-1], sep="")
-    else:
+                if inv:
+                    ans.appendleft(query[2])
+                else:
+                    ans.append(query[2])
+    if not inv:
         print(*ans, sep="")
+    else:
+        print(*(list(ans)[::-1]), sep="")
+    return
 
 if __name__ == '__main__':
     main()

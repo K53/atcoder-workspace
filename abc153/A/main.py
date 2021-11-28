@@ -3,6 +3,10 @@ import sys
 
 
 def solve(H: int, A: int):
+    p, q = divmod(H, A)
+    if q > 0:
+        p += 1
+    print(p)
     return
 
 

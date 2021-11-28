@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 import sys
-import queue
+from collections import deque
 
 def solve(K: int):
-    q = queue.Queue()
-    for i in range(1, 10):
-        q.put(i)
-    loop = 0
-    next = 0
-    while loop < K:
-        next = q.get()
-        loop += 1
-        if str(next)[-1] == "0":
-            q.put(next * 10)
-            q.put(next * 10 + 1)
-        elif str(next)[-1] == "9":
-            q.put(next * 10 + 8)
-            q.put(next * 10 + 9)
+    q = deque()
+    for i in range(9):
+        q.append(i + 1)
+    ans = []
+    for i in range(K):
+        now = q.popleft()
+        ans.append(now)
+        kk = now % 10
+        if kk == 0:
+            q.append(now * 10 + 0)
+            q.append(now * 10 + 1)
+        elif kk == 9:
+            q.append(now * 10 + 8)
+            q.append(now * 10 + 9)
         else:
-            l = int(str(next)[-1])
-            q.put(next * 10 + l - 1)
-            q.put(next * 10 + l)
-            q.put(next * 10 + l + 1)
-    print(next)
+            q.append(now * 10 + kk - 1)
+            q.append(now * 10 + kk)
+            q.append(now * 10 + kk + 1)
+        
+    print(ans[K - 1])
     return
 
 

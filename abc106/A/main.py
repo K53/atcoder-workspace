@@ -3,6 +3,7 @@ import sys
 
 
 def solve(A: int, B: int):
+    print((A - 1) * (B - 1))
     return
 
 

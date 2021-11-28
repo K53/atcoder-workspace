@@ -3,6 +3,14 @@ import sys
 
 
 def solve(S: str, T: str):
+    ans = 10 ** 5
+    for i in range(len(S) - len(T) + 1):
+        c = 0
+        for ss, tt in zip(S[i:(i + len(T))], T):
+            if ss != tt:
+                c += 1
+        ans = min(ans, c)
+    print(ans)
     return
 
 

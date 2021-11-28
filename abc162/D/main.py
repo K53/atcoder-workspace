@@ -3,20 +3,21 @@ import sys
 
 def solve(N: int, S: str):
     rgb = [0] * 3
-    for s in S:
-        if s == "R":
+    for ss in S:
+        if ss == "R":
             rgb[0] += 1
-        elif s == "G":
+        elif ss == "G":
             rgb[1] += 1
         else:
             rgb[2] += 1
-    total = rgb[0] * rgb[1] * rgb[2]
-    sub = 0
+    t = rgb[0] * rgb[1] * rgb[2]
     for i in range(N - 2):
-        for j in range(i + 1, N - 1):
-            if S[i] != S[j] and j * 2 - i < N and S[j * 2 - i] != S[i] and S[j * 2 - i] != S[j]:
-                sub += 1
-    print(total - sub)
+        for j in range(i + 1, N + 1):
+            k = j + j - i
+            if k < N:
+                if set((S[i], S[j], S[k])) == set("RGB"):
+                    t -= 1
+    print(t)
     return
 
 

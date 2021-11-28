@@ -3,6 +3,18 @@ import sys
 
 
 def solve(H: int, N: int, A: "List[int]", B: "List[int]"):
+    maxhp = 10 ** 4 
+    INF = 10 ** 10
+    dp = [INF] * (maxhp + 1)
+    dp[0] = 0
+    for i in range(maxhp):
+        if dp[i] == INF:
+            continue
+        for nn in range(N):
+            if i + A[nn] < len(dp):
+                # print(A[nn], i + A[nn])
+                dp[i + A[nn]] = min(dp[i + A[nn]], dp[i] + B[nn])
+    print(min(dp[H:]))
     return
 
 

@@ -1,8 +1,106 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, K: int, P: "List[int]", C: "List[int]"):
+    class Doubling:
+        """ 初期化処理。
+        Parameters:
+        ----------
+        stateKind : int
+            状態の数。dvテーブルの横の長さ。
+        maxDoublingTimes : int
+            ダブリングの回数。dvテーブルの縦の長さ。
+        useSum : bool
+            和のダブリングを使用するモードの選択。
+        Returns:
+        ----------
+        None
+        """
+        def __init__(self, stateKind: int, maxDoublingTimes: int, initList: list, useSum: bool = False):
+            self.dv = []                                # 数列(状態)のダブリングテーブル。dv[k][s] := 状態sを2^k回実行したらあとの状態
+            self.sum = []                               # 和のダブリングテーブル
+            self.stateKind = stateKind                  # 状態の種類数
+            self.maxDoublingTimes = maxDoublingTimes    # 実行回数kの範囲の定義(2^0 ≦ k ≦ 2^maxDoublingTimes)
+            self.score = []
+            # --- Initialize -------------------
+            # STEP.1 テーブルの初期化 2^0(=1)回操作後の状態を生成。
+            self._initTable(initList)
+            # STEP.2 テーブルの更新。
+            if useSum:
+                self._createTableWithSum()
+            else:
+                self._createTable()
+            # ---------------------------------
+
+        # 初期化処理
+        # 初期化処理は問題毎に記述する。
+        def _initTable(self, initList: list):
+            l = []
+            cc = []
+            for i in initList:
+                l.append(i - 1)
+                cc.append(C[i - 1])
+            self.dv.append(l)
+            self.score.append(cc)
+            return
+
+        # ダブリング実施(和を含まない)
+        def _createTable(self):
+            for i in range(1, self.maxDoublingTimes):
+                l = []
+                cc = []
+                for j in range(self.stateKind):
+                    next = self.dv[i - 1][self.dv[i - 1][j]]
+                    print(j, next, self.score[i - 1][j], self.score[i - 1][next])
+                    totalscore = self.score[i - 1][j] + self.score[i - 1][next]
+                    l.append(next)
+                    cc.append(totalscore)
+                self.dv.append(l)
+                self.score.append(cc)
+        
+        """ 指定回数操作後の状態を算出する。
+        Parameters:
+        ----------
+        doubingTimes : int
+            求める状態に至る操作回数。
+        startState : int
+            開始する状態。
+        Returns:
+        ----------
+        int
+            求めるべく状態
+        """
+        def getState(self, doubingTimes: int, startState: int):
+            res = 0
+            a = []
+            for i in range(self.maxDoublingTimes):
+                if doubingTimes >> i & 1:
+                    a.append(i)
+            now = startState
+            for i in a:
+                now = self.dv[i][now]
+                res += self.score[i][now]
+            return res
+        
+        def getAllStates(self, targenTime: int):
+            return self.dv[targenTime]
+
+    import math
+    K = 4
+    d = Doubling(stateKind=N, maxDoublingTimes=int(math.log2(K)) + 1, initList=P)
+    print("------------")
+    for i in range(int(math.log2(K)) + 1):
+        print(d.dv[i])
+    print("------------")
+    for i in range(int(math.log2(K)) + 1):
+        print(d.score[i])
+    print(d.getState(doubingTimes=K, startState=0))
+    print(d.getState(doubingTimes=K, startState=1))
+    print(d.getState(doubingTimes=K, startState=2))
+    print(d.getState(doubingTimes=K, startState=3))
+    print(d.getState(doubingTimes=K, startState=4))
+
+
     return
 
 

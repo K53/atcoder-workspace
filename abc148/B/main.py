@@ -3,6 +3,11 @@ import sys
 
 
 def solve(N: int, S: str, T: str):
+    ans = []
+    for ss, tt in zip(S, T):
+        ans.append(ss)
+        ans.append(tt)
+    print(*ans, sep="")
     return
 
 

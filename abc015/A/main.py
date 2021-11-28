@@ -3,6 +3,7 @@ import sys
 
 
 def solve(A: str, B: str):
+    print(A if len(A) > len(B) else B)
     return
 
 

@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(ABCD: str):
+    for i in range(2 ** 3):
+        sum = int(ABCD[0])
+        ans = ABCD[0]
+        for bb in range(3):
+            if i >> bb & 1:
+                sum += int(ABCD[bb + 1])
+                ans += "+" + ABCD[bb + 1]
+            else:
+                sum -= int(ABCD[bb + 1])
+                ans += "-" + ABCD[bb + 1]
+        if sum == 7:
+            print(ans + "=7")
+            return
     return
 
 

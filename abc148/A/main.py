@@ -3,6 +3,7 @@ import sys
 
 
 def solve(A: int, B: int):
+    print((set([1,2,3]) - set([A, B])).pop())
     return
 
 

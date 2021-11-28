@@ -3,6 +3,10 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    import math
+    S = sum(A)
+    Z = A.count(0)
+    print(math.ceil(S / (N - Z)))
     return
 
 

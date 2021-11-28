@@ -3,6 +3,17 @@ import sys
 
 
 def solve(S: int, K: int):
+    num = 0
+    last = 1
+    for i in str(S):
+        if i != "1":
+            last = i
+            break
+        num += 1
+    if num >= K:
+        print(1)
+    else:
+        print(last)
     return
 
 

@@ -3,14 +3,16 @@ import sys
 
 
 def solve(X: int):
-    for a in range(150):
-        a5 = a ** 5
-        for b in range(150):
-            b5 = b ** 5
-            for da, db in [(1, 1), (-1, 1), (1, -1)]:
-                if a5 * da - b5 * db == X:
-                    print(a * da, b * db)
-                    return
+    for a in range(130):
+        aa = a ** 5
+        for b in range(130):
+            bb = b ** 5
+            if aa - bb == X :
+                print(a, b)
+                return
+            if aa + bb == X:
+                print(a, -b)
+                return
     return
 
 

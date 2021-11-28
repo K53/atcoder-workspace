@@ -3,6 +3,7 @@ import sys
 
 
 def solve(N: int, K: int, S: str):
+    print(S[:K - 1] + S[K - 1].lower() + S[K:])
     return
 
 

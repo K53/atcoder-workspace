@@ -3,6 +3,12 @@ import sys
 
 
 def solve(N: int, M: int):
+    if not N * 2 <= M <= N * 4:
+        print(-1, -1, -1)
+        return
+    rest = M - N * 2
+    p, q = divmod(rest, 2)
+    print(N - p - q, q, p)
     return
 
 

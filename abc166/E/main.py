@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 import sys
-
+import collections 
 
 def solve(N: int, A: "List[int]"):
+    l = []
+    r = []
+    dl = collections.defaultdict(int)
+    dr = collections.defaultdict(int)
+    for i, aa in enumerate(A):
+        l.append(i - aa)
+        r.append(i + aa)
+    for ll, rr in zip(l, r):
+        dl[ll] += 1
+        dr[rr] += 1
+    ans = 0
+    for k, num in dl.items():
+        ans += num * dr[k]
+    print(ans)
     return
 
 

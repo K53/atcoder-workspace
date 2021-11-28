@@ -3,6 +3,25 @@ import sys
 
 
 def solve(N: int, P: int, S: str):
+    if P == 2 or P == 5:
+        ans = 0
+        for i in range(N):
+            if int(S[i]) % P == 0:
+                ans += i + 1
+        print(ans)
+        return
+    num = [0] * P
+    invS = S[::-1]
+    d = 1
+    now = 0
+    for i in range(N):
+        now = (int(invS[i]) * d + now) % P
+        num[now] += 1
+        d = d * 10 % P
+    ans = num[0]
+    for i in num:
+        ans += i * (i - 1) // 2
+    print(ans)
     return
 
 

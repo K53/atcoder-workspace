@@ -3,6 +3,12 @@ import sys
 
 
 def solve(N: int, a: "List[int]"):
+    l = []
+    for i in range(N):
+        l.append((a[i], i + 1))
+    l.sort()
+    for _, i in l[::-1]:
+        print(i)
     return
 
 

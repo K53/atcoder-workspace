@@ -3,6 +3,8 @@ import sys
 
 
 def solve(N: int):
+    p, q = divmod(N, 2)
+    print(p + q)
     return
 
 

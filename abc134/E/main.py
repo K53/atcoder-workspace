@@ -3,6 +3,21 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    if N == 1:
+        print(0)
+        return
+    import collections
+    import bisect
+    d = collections.deque([A[0]])
+    ans = 1
+    for aa in A[1:]:
+        i = bisect.bisect_left(d, aa)
+        if i == 0:
+            d.appendleft(aa)
+            ans += 1
+        else:
+            d[i - 1] = aa
+    print(ans)
     return
 
 

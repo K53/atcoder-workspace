@@ -3,6 +3,19 @@ import sys
 
 
 def solve(S: int):
+    S = str(S)
+    invS = S[::-1]
+    num = [0] * 2019
+    now = 0
+    d = 1
+    for i in range(len(S)):
+        now = (int(invS[i]) * d + now) % 2019
+        num[now] += 1
+        d = d * 10 % 2019
+    ans = num[0]
+    for nn in num:
+        ans += nn * (nn - 1) // 2
+    print(ans)
     return
 
 

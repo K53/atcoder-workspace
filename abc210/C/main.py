@@ -2,23 +2,28 @@
 import sys
 
 def solve(N: int, K: int, c: "List[int]"):
-    # リストa (要素数N)
-    # a[l:r]を考える。rはこの範囲に含まれない。
-    # 例) a[0:3] → a[0]〜a[2]までの範囲
     from collections import defaultdict
     d = defaultdict(int)
-    l = 0
-    r = 0
-    ans = 0
-    for _ in range(N):
-        while r < N and d[c[r]] == 0:
-            d[c[r]] = 1
-            r += 1
-        ans = max(ans, r - l)
-        if r < N:
-            d[c[r]] = 0
-            l += 1
-    print(ans)
+    kind = 0
+    for i in range(K):
+        d[c[i]] += 1
+        if d[c[i]] == 1:
+            kind += 1
+    mk = kind
+    for i in range(N - K):
+        if d[c[i]] > 1:
+            d[c[i]] -= 1
+            d[c[i + K]] += 1
+            if d[c[i + K]] == 1:
+                kind += 1
+        else:
+            d[c[i]] -= 1
+            kind -= 1
+            d[c[i + K]] += 1
+            if d[c[i + K]] == 1:
+                kind += 1
+        mk = max(mk, kind)
+    print(mk)
     return
 
 

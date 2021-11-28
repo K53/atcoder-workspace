@@ -3,6 +3,8 @@ import sys
 
 
 def solve(N: int, A: int, B: int):
+    p, q = divmod(N, (A + B))
+    print(p * A + q if q < A else (p + 1) * A)
     return
 
 

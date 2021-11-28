@@ -3,6 +3,7 @@ import sys
 
 
 def solve(X: int, Y: int):
+    print(max(X, Y))
     return
 
 

@@ -13,11 +13,14 @@
 # 
 # verify
 # - https://yukicoder.me/problems/no/1390
+# - https://atcoder.jp/contests/abl/tasks/abl_c
+# - https://atcoder.jp/contests/abc229/tasks/abc229_e
 # ------------------------------------------------------------------------------
 from collections import defaultdict
 class UnionFind():
     def __init__(self, n):
         self.n = n
+        self.group_num = n
         self.parents = [-1] * n
 
     """ 要素xの値を取得。"""
@@ -41,6 +44,7 @@ class UnionFind():
 
         self.parents[x] += self.parents[y]
         self.parents[y] = x
+        self.group_num -= 1
         return
 
     """ 要素xの属する集合の要素数を取得。"""
@@ -65,9 +69,15 @@ class UnionFind():
         return [i for i, x in enumerate(self.parents) if x < 0]
 
     """ 集合の個数を取得。
+    計算量 : O(1)
+    """
+    def group_count_v2(self):
+        return self.group_num
+
+    """ 集合の個数を取得。
     計算量 : O(N)
     """
-    def group_count(self):
+    def group_count_v1(self):
         return len(self.roots())
 
     """ 全集合の要素一覧を取得。
@@ -93,3 +103,15 @@ print(uf)
 2: [2, 3]
 4: [4]
 """
+
+
+# ------------------------------------------------------------------------------
+# 改訂
+# 
+# 2021/11/28 追加
+#  - group_num : グループ数。併合の都度減算する。
+#  - group_count_v2() : O(1)でグループ数group_numを返す。
+# [verify]
+#  - https://atcoder.jp/contests/abl/tasks/abl_c
+#  - https://atcoder.jp/contests/abc229/tasks/abc229_e
+# ------------------------------------------------------------------------------

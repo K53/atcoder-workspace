@@ -6,6 +6,10 @@ NO = "No"  # type: str
 
 
 def solve(S: str):
+    if S == "AAA" or S == "BBB":
+        print(NO)
+    else:
+        print(YES)
     return
 
 

@@ -3,6 +3,20 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
+    rest = set(A)
+    attacker = min(rest)
+    l = set()
+    while len(rest) > 1:
+        for i in rest:
+            aa = i % attacker 
+            if aa == 0:
+                continue
+            l.add(aa)
+        rest = set([i for i in l])
+        rest.add(attacker)
+        l = set()
+        attacker = min(rest)
+    print(*rest)
     return
 
 

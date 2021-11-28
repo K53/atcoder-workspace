@@ -3,6 +3,21 @@ import sys
 
 
 def solve(N: int, M: int, x: "List[int]", y: "List[int]"):
+    G = [set([i]) for i in range(N)]
+    for i in range(M):
+        G[x[i] - 1].add(y[i] - 1)
+        G[y[i] - 1].add(x[i] - 1)
+    # print(G)
+    ans = 1
+    for i in range(2 ** N):
+        l = set([b for b in range(N) if i >> b & 1])
+        for b in range(N):
+            if i >> b & 1:
+                if not G[b] >= l:
+                    break
+        else:
+            ans = max(ans, len(l))
+    print(ans)
     return
 
 

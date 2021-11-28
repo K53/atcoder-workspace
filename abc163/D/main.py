@@ -5,12 +5,14 @@ MOD = 1000000007  # type: int
 
 
 def solve(N: int, K: int):
-    sum = 0
-    for i in range(K, N + 2):
-        min = (i - 1) * i // 2
-        max = (N + N - i + 1) * i // 2
-        sum += max - min + 1
-    print(sum % MOD)
+    l = [i for i in range(N + 1)]
+    from itertools import accumulate
+    acc = list(accumulate(l))
+    iacc = list(accumulate(l[::-1]))
+    ans = 0
+    for i in range(K, N + 1 + 1):
+        ans += iacc[i - 1] - acc[i - 1] + 1
+    print(ans % MOD)
     return
 
 

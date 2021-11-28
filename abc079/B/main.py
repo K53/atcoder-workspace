@@ -3,6 +3,10 @@ import sys
 
 
 def solve(N: int):
+    ans = [2, 1]
+    for i in range(2, N + 1):
+        ans.append(ans[i - 2] + ans[i - 1])
+    print(ans[N])
     return
 
 

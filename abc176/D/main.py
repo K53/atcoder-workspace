@@ -8,37 +8,40 @@ def main():
     for _ in range(H):
         G.append(input())
     from collections import deque
+    q = deque()
+    q.append((Cy, Cx))
     INF = 10 ** 9
-    def bfs(edges, H, W, startY, startX) -> list:
-        q = deque()
-        dist = [[INF] * W for _ in range(H)]
-        q.append((startY, startX))
-        dist[startY][startX] = 0
-        while q:
-            # for i in range(len(dist)):
-            #     print(dist[i])
-            # print("------")
-            nowy, nowx = q.popleft()
-            for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
+    dist = [[INF] * W for _ in range(H)]
+    seen = [[False] * W for _ in range(H)]
+    dist[Cy][Cx] = 0
+    while len(q) != 0:
+        nowy, nowx = q.popleft()
+        if seen[nowy][nowx]:
+            continue
+        seen[nowy][nowx] = True
+        # if (nowy, nowx) == (Dy, Dx):
+        #     break
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx == dy == 0:
+                    continue
                 nexty = nowy + dy
                 nextx = nowx + dx
-                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or edges[nexty][nextx] == "#" or dist[nexty][nextx] <= dist[nowy][nowx]:
+                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or G[nexty][nextx] == "#" or seen[nexty][nextx]:
                     continue
-                q.appendleft((nexty, nextx))
-                dist[nexty][nextx] = dist[nowy][nowx]
-            for dx, dy in [(-2, 2), (-1, 2), (0, 2), (1, 2), (2, 2), (-2, 1), (-1, 1), (1, 1), (2, 1), (-2, 0), (2, 0), (-2, -1), (-1, -1), (1, -1), (2, -1), (-2, -2), (-1, -2), (0, -2), (1, -2), (2, -2)]:
-                nexty = nowy + dy
-                nextx = nowx + dx
-                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or edges[nexty][nextx] == "#" or dist[nexty][nextx] < dist[nowy][nowx] + 1:
-                    continue
-                q.append((nexty, nextx))
-                dist[nexty][nextx] = dist[nowy][nowx] + 1
-        return dist
-    d = bfs(G, H, W, Cy, Cx)
-    # for i in range(len(d)):
-    #     print(d[i])
-    ans = d[Dy][Dx]
-    print(-1 if ans == INF else ans)
+                if abs(dx) + abs(dy) == 1:
+                    if dist[nexty][nextx] > dist[nowy][nowx]:
+                        dist[nexty][nextx] = dist[nowy][nowx]
+                        q.appendleft((nexty, nextx))
+                else:
+                    if dist[nexty][nextx] > dist[nowy][nowx] + 1:
+                        dist[nexty][nextx] = dist[nowy][nowx] + 1
+                        q.append((nexty, nextx))
+
+    # print(dist)
+    print(dist[Dy][Dx] if dist[Dy][Dx] != INF else -1)
+    return
+
 
 if __name__ == '__main__':
     main()

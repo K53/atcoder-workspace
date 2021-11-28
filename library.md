@@ -39,6 +39,24 @@ print(string.ascii_lowercase)
 # >> abcdefghijklmnopqrstuvwxyz
 ```
 
+## 2次元配列回転
+
+rotated = zip(*original[::-1])
+
+## いもす法
+
+```python
+a = [0] * 10
+# +1 と -1 のマッピング
+for ll, rr in zip(l, r):
+    a[ll] += 1
+    a[rr + 1] -= 1
+
+# 前から順に畳み込み
+for i in range(1, len(a)):
+    a[i] += a[i - 1]
+```
+
 ## 探索
 
 ### 二分探索
