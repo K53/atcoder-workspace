@@ -3,6 +3,7 @@ import sys
 
 
 def solve(S: int, T: int):
+    print(T - S + 1)
     return
 
 

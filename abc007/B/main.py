@@ -3,6 +3,13 @@ import sys
 
 
 def solve(A: str):
+    if len(A) > 1:
+        print(A[:-1])
+        return
+    if A == "a":
+        print(-1)
+        return
+    print(chr(ord(A) - 1))
     return
 
 

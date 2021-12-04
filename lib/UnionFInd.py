@@ -68,13 +68,13 @@ class UnionFind():
     def roots(self):
         return [i for i, x in enumerate(self.parents) if x < 0]
 
-    """ 集合の個数を取得。
+    """ 集合の個数を取得。 v2
     計算量 : O(1)
     """
     def group_count_v2(self):
         return self.group_num
 
-    """ 集合の個数を取得。
+    """ 集合の個数を取得。 v1
     計算量 : O(N)
     """
     def group_count_v1(self):

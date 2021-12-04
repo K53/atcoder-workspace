@@ -3,6 +3,11 @@ import sys
 
 
 def solve(A: int, B: int):
+    ans = max(A, B)
+    if A == B:
+        print(ans * 2)
+    else:
+        print(ans * 2 - 1)
     return
 
 

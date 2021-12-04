@@ -3,6 +3,7 @@ import sys
 
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
+
     return
 
 

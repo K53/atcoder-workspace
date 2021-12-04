@@ -6,6 +6,19 @@ NO = "No"  # type: str
 
 
 def solve(c: "List[List[int]]"):
+    if not c[0][0] - c[0][1] == c[1][0] - c[1][1] == c[2][0] - c[2][1]:
+        print(NO)
+        return
+    if not c[0][1] - c[0][2] == c[1][1] - c[1][2] == c[2][1] - c[2][2]:
+        print(NO)
+        return
+    if not c[0][0] - c[1][0] == c[0][1] - c[1][1] == c[0][2] - c[1][2]:
+        print(NO)
+        return
+    if not c[1][0] - c[2][0] == c[1][1] - c[2][1] == c[1][2] - c[2][2]:
+        print(NO)
+        return
+    print(YES)
     return
 
 

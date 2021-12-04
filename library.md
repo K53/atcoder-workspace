@@ -40,8 +40,7 @@ print(string.ascii_lowercase)
 ```
 
 ## 2次元配列回転
-
-rotated = zip(*original[::-1])
+-> Math.py移動
 
 ## いもす法
 
@@ -1211,9 +1210,11 @@ ans = 0
 sum = 0
 for _ in range(N):
     while r < N and "右端を進め、範囲を広げる条件":
+        # print("#", l, r, sum)
         sum += a[r]
         r += 1
     if "左端を進め、範囲を狭める条件":
+        # print(">", l, r, sum)
         ans += N - r + 1
         sum -= a[l]
         l += 1

@@ -3,6 +3,17 @@ import sys
 
 
 def solve(N: int, X: "List[int]"):
+    l = sorted(X)
+    a, b = l[len(l) // 2 - 1],  l[len(l) // 2]
+    if a == b:
+        for _ in X:
+            print(a)
+        return
+    for i in X:
+        if i <= a:
+            print(b)
+        else:
+            print(a)
     return
 
 

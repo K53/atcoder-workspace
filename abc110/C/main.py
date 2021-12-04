@@ -4,7 +4,6 @@ import sys
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-
 def solve(S: str, T: str):
     return
 

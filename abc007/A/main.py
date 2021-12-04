@@ -3,6 +3,7 @@ import sys
 
 
 def solve(n: int):
+    print(n - 1)
     return
 
 

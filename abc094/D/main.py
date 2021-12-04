@@ -2,18 +2,6 @@
 import sys
 
 def solve(n: int, a: "List[int]"):
-    a.sort()
-    last = a[-1]
-    center = max(last // 2, last - last // 2)
-    c = a[0]
-    for i in a:
-        if i <= center:
-            c = i
-        else:
-            if last - i > c:
-                c = i
-            break
-    print(last, c)
     return
 
 

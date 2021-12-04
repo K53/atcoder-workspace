@@ -3,6 +3,22 @@ import sys
 
 
 def solve(W: int, H: int, N: int, x: "List[int]", y: "List[int]", a: "List[int]"):
+    max_x = W
+    min_x = 0
+    max_y = H
+    min_y = 0
+    for i in range(N):
+        if a[i] == 1:
+            min_x = max(min_x, x[i])
+        elif a[i] == 2:
+            max_x = min(max_x, x[i])
+        elif a[i] == 3:
+            min_y = max(min_y, y[i])
+        elif a[i] == 4:
+            max_y = min(max_y, y[i])
+    xx = max(0, max_x - min_x)
+    yy = max(0, max_y - min_y)
+    print(xx * yy)
     return
 
 

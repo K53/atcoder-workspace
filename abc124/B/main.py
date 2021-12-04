@@ -3,6 +3,13 @@ import sys
 
 
 def solve(N: int, H: "List[int]"):
+    m = 0
+    ans = 0
+    for hh in H:
+        if hh >= m:
+            ans += 1
+            m = hh
+    print(ans)
     return
 
 
