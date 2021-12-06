@@ -4,7 +4,20 @@ import sys
 
 def solve(N: int, D: int, L: "List[int]", R: "List[int]"):
     a = [(rr, ll) for ll, rr in zip(L, R)]
-    
+    a.sort()
+    # print(a)
+    now = 0
+    ans = 0
+    broken = 0
+    for rr, ll in a:
+        if ll <= broken:
+            continue
+        if now < ll:
+            now = rr
+            ans += 1
+            broken = rr + D - 1
+            # print(broken)
+    print(ans)
     return
 
 

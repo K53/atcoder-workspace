@@ -6,6 +6,27 @@ NO = "No"  # type: str
 
 
 def solve(A: "List[List[int]]", N: int, b: "List[int]"):
+    B = set(b)
+    S = []
+    for i in range(3):
+        S.append(set(A[i]))
+        l = set()
+        for j in range(3):
+            l.add(A[j][i])
+        S.append(l)
+    
+    ll = set()
+    lll = set()
+    for i in range(3):
+        ll.add(A[i][i])
+        lll.add(A[i][2 - i])
+    S.append(ll)
+    S.append(lll)
+    for ss in S:
+        if B >= ss:
+            print(YES)
+            return
+    print(NO)
     return
 
 

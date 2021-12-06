@@ -6,6 +6,7 @@ NO = "No"  # type: str
 
 
 def solve(H: int, N: int, A: "List[int]"):
+    print(YES if sum(A) >= H else NO)
     return
 
 

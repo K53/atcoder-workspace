@@ -1,75 +1,87 @@
 #!/usr/bin/env python3
 import sys
+from collections import defaultdict
+class UnionFind():
+    def __init__(self, n):
+        self.n = n
+        self.group_num = n
+        self.parents = [-1] * n
 
+    """ 要素xの値を取得。"""
+    def find(self, x):
+        if self.parents[x] < 0:
+            return x
+        else:
+            self.parents[x] = self.find(self.parents[x])
+            return self.parents[x]
+
+    """ 2つの要素の併合。"""
+    def union(self, x, y):
+        x = self.find(x)
+        y = self.find(y)
+
+        if x == y:
+            return
+
+        if self.parents[x] > self.parents[y]:
+            x, y = y, x
+
+        self.parents[x] += self.parents[y]
+        self.parents[y] = x
+        self.group_num -= 1
+        return
+
+    """ 要素xの属する集合の要素数を取得。"""
+    def size(self, x):
+        return -self.parents[self.find(x)]
+
+    """ 2つの要素が同一の集合に属するか。"""
+    def same(self, x, y):
+        return self.find(x) == self.find(y)
+
+    """ 要素xと同一の集合の要素を全取得。
+    計算量 : O(N)
+    """
+    def members(self, x):
+        root = self.find(x)
+        return [i for i in range(self.n) if self.find(i) == root]
+
+    """ 各集合の根を全取得。
+    計算量 : O(N)
+    """
+    def roots(self):
+        return [i for i, x in enumerate(self.parents) if x < 0]
+
+    """ 集合の個数を取得。 v2
+    計算量 : O(1)
+    """
+    def group_count_v2(self):
+        return self.group_num
+
+    """ 集合の個数を取得。 v1
+    計算量 : O(N)
+    """
+    def group_count_v1(self):
+        return len(self.roots())
+
+    """ 全集合の要素一覧を取得。
+    計算量 : O(N)
+    """
+    def all_group_members(self):
+        group_members = defaultdict(list)
+        for member in range(self.n):
+            group_members[self.find(member)].append(member)
+        return group_members
+
+    def __str__(self):
+        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
+    
 
 def solve(N: int, M: int, K: int, A: "List[int]", B: "List[int]", C: "List[int]", D: "List[int]"):
-    class UnionFind():
-        def __init__(self, n):
-            self.n = n
-            self.parents = [-1] * n # 根は自分を含めて下に何個の要素がぶら下がっているかが負の数で表される。
-            
-        def find(self, x):
-            if self.parents[x] < 0:
-                return x
-            else:
-                self.parents[x] = self.find(self.parents[x])
-                return self.parents[x]
-        
-        def union(self, x, y):
-            x = self.find(x)
-            y = self.find(y)
-            
-            if x == y:
-                return
-            
-            if self.parents[x] > self.parents[y]:
-                x, y = y, x
-            
-            self.parents[x] += self.parents[y]
-            self.parents[y] = x
-        
-        # 要素xの属する集合の要素数を返す
-        def size(self, x):
-            return -self.parents[self.find(x)]
-        
-        # 要素x,yが同じ集合かを返す
-        def same(self, x, y):
-            return self.find(x) == self.find(y)
-        
-        def members(self, x):
-            root = self.find(x)
-            return [i for i in range(self.n) if self.find(i) == root]
-        
-        def roots(self):
-            return [i for i, x in enumerate(self.parents) if x < 0]
-
-        # 集合の数を返す
-        def group_count(self):
-            return len(self.roots())
-        
-        def all_group_members(self):
-            return {r: self.members(r) for r in self.roots()}
-        
-        def __str__(self):
-            return '\n'.join('{}: {}'.format(r, self.members(r)) for r in self.roots())
     uf = UnionFind(N)
-    friend = [0] * N
-    block = [[] for _ in range(N)]
     for aa, bb in zip(A, B):
         uf.union(aa - 1, bb - 1)
-        friend[aa - 1] += 1
-        friend[bb - 1] += 1
-    for cc, dd in zip(C, D):
-        block[cc - 1].append(dd - 1)
-        block[dd - 1].append(cc - 1)
-    ans = []
-    for i in range(N):
-        q = uf.size(i) - friend[i] - 1 # 自分1
-        for b in block[i]:
-            if uf.same(i, b):
-                q -= 1
-        ans.append(q)
-    print(*ans, sep=" ")
+        
     return
 
 

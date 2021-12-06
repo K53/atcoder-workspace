@@ -42,18 +42,19 @@ print(string.ascii_lowercase)
 ## 2次元配列回転
 -> Math.py移動
 
-## いもす法
-
+## 区間スケジューリング
 ```python
-a = [0] * 10
-# +1 と -1 のマッピング
-for ll, rr in zip(l, r):
-    a[ll] += 1
-    a[rr + 1] -= 1
-
-# 前から順に畳み込み
-for i in range(1, len(a)):
-    a[i] += a[i - 1]
+# https://atcoder.jp/contests/typical-algorithm/tasks/typical_algorithm_b
+l = [(bb, aa) for aa, bb in zip(A, B)]
+l.sort()
+now = 0
+ans = 0
+for bb, aa in l:
+    if now < aa:
+        now = bb
+        ans += 1
+print(ans)
+return
 ```
 
 ## 探索

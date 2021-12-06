@@ -1,37 +1,47 @@
 #!/usr/bin/env python3
 import sys
-from itertools import groupby
-
-def runLengthEncode(S: str) -> "List[tuple(str, int)]":
-    grouped = groupby(S)
-    res = []
-    for k, v in grouped:
-        res.append((k, int(len(list(v)))))
-    return res
+from itertools import accumulate
 
 def solve(H: int, W: int, S: "List[str]"):
-    rotS = []
+    l = [[0] * W for i in range(H)]
+    r = [[0] * W for i in range(H)]
+    u = [[0] * W for i in range(H)]
+    d = [[0] * W for i in range(H)]
+    for hh in range(H):
+        for ww in range(W):
+            if S[hh][ww] == "#":
+                l[hh][ww] = 0
+            elif ww == 0:
+                l[hh][ww] = 1
+            else:
+                l[hh][ww] = l[hh][ww - 1] + 1
+        for ww in range(W)[::-1]:
+            if S[hh][ww] == "#":
+                r[hh][ww] = 0
+            elif ww == W - 1:
+                r[hh][ww] = 1
+            else:
+                r[hh][ww] = r[hh][ww + 1] + 1
     for ww in range(W):
-        rot = []
         for hh in range(H):
-            rot.extend(S[hh][ww])
-        rotS.append(rot)
-    fieldx = []
-    fieldy = []
-    for ss in S:
-        f = []
-        for m, n in runLengthEncode(ss):
-            f.extend([0 if m == "#" else n] * n)
-        fieldx.append(f)    
-    for rs in rotS:
-        f = []
-        for m, n in runLengthEncode(rs):
-            f.extend([0 if m == "#" else n] * n)
-        fieldy.append(f)
-    ans = 0 
-    for ww in range(W):
-        for hh in range(H):
-            ans = max(ans, fieldx[hh][ww] + fieldy[ww][hh] - 1)
+            if S[hh][ww] == "#":
+                u[hh][ww] = 0
+            elif hh == 0:
+                u[hh][ww] = 1
+            else:
+                u[hh][ww] = u[hh - 1][ww] + 1         
+        for hh in range(H)[::-1]:
+            if S[hh][ww] == "#":
+                d[hh][ww] = 0
+            elif hh == H - 1:
+                d[hh][ww] = 1
+            else:
+                d[hh][ww] = d[hh + 1][ww] + 1         
+
+    ans = 0
+    for hh in range(H):
+        for ww in range(W):
+            ans = max(ans, l[hh][ww] + r[hh][ww] + u[hh][ww] + d[hh][ww] - 3)
     print(ans)
     return
 

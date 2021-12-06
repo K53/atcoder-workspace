@@ -3,17 +3,23 @@ import sys
 
 def main():
     N, W = map(int, input().split())
-    use = [0] * (2 * 10 ** 5 + 1)
-    for _ in range(N):
-        s, t, p = map(int, input().split())
-        use[s] += p
-        use[t] -= p
-    t = 0
-    for i in range(2 * 10 ** 5 + 1):
-        t += use[i]
-        if t > W:
+
+    # テーブルの初期化
+    imos = [0] * (2 * 10 ** 5 + 1)
+    for i in range(N):
+        ss, tt, pp = map(int, input().split())
+        imos[ss] += pp
+        imos[tt] -= pp
+
+    # ビルド
+    for i in range(1, len(imos)):
+        imos[i] += imos[i - 1]
+    
+    for m in imos:
+        if m > W:
             print("No")
             return
+    # print(imos)
     print("Yes")
     return 
 
