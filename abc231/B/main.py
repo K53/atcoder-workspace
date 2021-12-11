@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
 
-
-def solve(S: str):
-    l = "oxxoxxoxxoxxoxx"
-    for i in range(3):
-        if l[i:(len(S) + i)] == S:
-            print(YES)
-            return
-    print(NO)
+def solve(N: int, S: "List[str]"):
+    import collections 
+    d = collections.defaultdict(int)
+    for i in S:
+        d[i] += 1
+    ans = ""
+    now = 0
+    for k, v in d.items():
+        if now < v:
+            ans = k
+            now = v
+    print(ans)
     return
 
 
@@ -22,8 +24,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    N = int(next(tokens))  # type: int
+    S = [next(tokens) for _ in range(N)]  # type: "List[str]"
+    solve(N, S)
 
 if __name__ == '__main__':
     main()

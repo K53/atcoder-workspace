@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
+MOD = 998244353  # type: int
 
 
-def solve(S: str):
-    l = "oxxoxxoxxoxxoxx"
-    for i in range(3):
-        if l[i:(len(S) + i)] == S:
-            print(YES)
-            return
-    print(NO)
+def solve(N: int, K: int, A: "List[int]"):
     return
 
 
@@ -22,8 +15,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    N = int(next(tokens))  # type: int
+    K = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, K, A)
 
 if __name__ == '__main__':
     main()

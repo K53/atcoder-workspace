@@ -2,11 +2,13 @@
 import sys
 
 
-def solve(N: int):
-    if N >= 42:
-        print("AGC" + str(N + 1).zfill(3))
-    else:
-        print("AGC" + str(N).zfill(3))
+def solve(N: int, Q: int, A: "List[int]", x: "List[int]"):
+    A.sort()
+    import bisect
+    for xx in x:
+        num = bisect.bisect_left(A, xx)
+        # print(num)
+        print(N - num)
     return
 
 
@@ -18,7 +20,10 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    solve(N)
+    Q = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    x = [int(next(tokens)) for _ in range(Q)]  # type: "List[int]"
+    solve(N, Q, A, x)
 
 if __name__ == '__main__':
     main()

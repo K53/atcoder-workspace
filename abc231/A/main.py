@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
 
-
-def solve(S: str):
-    l = "oxxoxxoxxoxxoxx"
-    for i in range(3):
-        if l[i:(len(S) + i)] == S:
-            print(YES)
-            return
-    print(NO)
+def solve(D: int):
+    print(D / 100)
     return
 
 
@@ -22,8 +14,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    D = int(next(tokens))  # type: int
+    solve(D)
 
 if __name__ == '__main__':
     main()
