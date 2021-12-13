@@ -3,6 +3,12 @@ import sys
 
 
 def solve(S: str, N: int, l: "List[int]", r: "List[int]"):
+    S = list(S)
+    for ll, rr in zip(l, r):
+        ll -= 1
+        rr -= 1
+        S = S[:ll] + S[ll:(rr + 1)][::-1] + S[(rr + 1):]
+    print(*S, sep="")
     return
 
 

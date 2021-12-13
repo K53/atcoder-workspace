@@ -3,6 +3,14 @@ import sys
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    import statistics
+    aa = statistics.median(A)
+    bb = statistics.median(B)
+    # print(aa, bb)
+    if N % 2 == 0:
+       print(int(bb * 2 - aa * 2 + 1))
+    else:
+        print(bb - aa + 1)
     return
 
 
