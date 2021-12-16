@@ -3,6 +3,10 @@ import sys
 
 
 def solve(N: int, R: int):
+    if N >= 10:
+        print(R)
+    else:
+        print(R + 100 * (10 - N))
     return
 
 
