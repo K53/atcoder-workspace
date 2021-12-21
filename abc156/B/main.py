@@ -3,6 +3,16 @@ import sys
 
 
 def solve(N: int, K: int):
+    def base10toKint(base10value, toBase):
+        ans = []
+        p = base10value
+        while p >= toBase:
+            p, q = divmod(p, toBase)
+            ans.append(str(q))
+        ans.append(str(p))
+        return "".join(ans[::-1])
+    num = base10toKint(base10value=N, toBase=K)
+    print(len(str(num)))
     return
 
 

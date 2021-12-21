@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 import sys
 from itertools import accumulate
-import bisect
 
 def solve(N: int, a: "List[int]"):
+    x = 0
+    y = sum(a)
+    ans = 10 ** 16
+    for i in range(N - 1):
+        x += a[i]
+        y -= a[i]
+        ans = min(ans, abs(x - y))
+    print(ans)
     return
 
 
