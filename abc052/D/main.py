@@ -3,6 +3,10 @@ import sys
 
 
 def solve(N: int, A: int, B: int, X: "List[int]"):
+    ans = 0
+    for i in range(N - 1):
+        ans += min((X[i + 1] - X[i]) * A, B)
+    print(ans)
     return
 
 

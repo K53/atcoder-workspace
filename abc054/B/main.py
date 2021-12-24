@@ -4,8 +4,22 @@ import sys
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-
 def solve(N: int, M: int, A: "List[str]", B: "List[str]"):
+    def check(sx, sy):
+        for dy in range(M):
+            for dx in range(M):
+                if sy + dy >= N or sx + dx >= N:
+                    return False
+                if not A[sy + dy][sx + dx] == B[dy][dx]:
+                    return False
+        print(YES)
+        return True
+    
+    for sy in range(N):
+        for sx in range(N):
+            if check(sx, sy):
+                return
+    print(NO)
     return
 
 
