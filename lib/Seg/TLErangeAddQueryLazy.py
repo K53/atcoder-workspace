@@ -1,4 +1,16 @@
-#!/usr/bin/env python3
+# ------------------------------------------------------------------------------
+#     セグメント木 (1-indexed) Range Add Query (RAQ)
+# ------------------------------------------------------------------------------
+# 解説
+# index 0は使用しない。ノードNの子はノード2Nとノード2N+1
+#
+# リンク
+# 
+# 計算量
+# 
+# verify
+# - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_E&lang=ja # Range Add Query (RAQ)
+# ------------------------------------------------------------------------------
 
 INF = 2 ** 31 - 1
 class SegmentTree:
@@ -69,24 +81,19 @@ class SegmentTree:
 # print(tr.getPoint(2))
 # print(tr.getPoint(3))
 
-
-def main():
-    n, q = map(int, input().split())
-    tr = SegmentTree(monoid=INF, bottomLen=2**18)
-    for _ in range(q):
-        c = list(map(int, input().split()))
-        if c[0] == 0:
-            s, t, x = c[1], c[2], c[3]
-            tr.update(s, t + 1, x)
-            # print("--")
-            # print(tr.tree)
-            # print(tr.lazy)
-        else:
-            s, t = c[1], c[2]
-            print(tr.query(s, t + 1))
-            # print("--")
-            # print(tr.tree)
-            # print(tr.lazy)
-    
-if __name__ == '__main__':
-    main()
+n, q = map(int, input().split())
+tr = SegmentTree(monoid=INF, bottomLen=2**18)
+for _ in range(q):
+    c = list(map(int, input().split()))
+    if c[0] == 0:
+        s, t, x = c[1], c[2], c[3]
+        tr.update(s, t + 1, x)
+        # print("--")
+        # print(tr.tree)
+        # print(tr.lazy)
+    else:
+        s, t = c[1], c[2]
+        print(tr.query(s, t + 1))
+        # print("--")
+        # print(tr.tree)
+        # print(tr.lazy)

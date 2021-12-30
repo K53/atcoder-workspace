@@ -1,132 +1,84 @@
 #!/usr/bin/env python3
 
 class SegmentTree:
-    def __init__(self, initList, identityElement, func):
-        assert (func(identityElement, identityElement) == identityElement)
-        self.N = len(initList)
-        self.initList = initList
-        self.identityElement = identityElement
+    def __init__(self, initVal: int, func: "function(int, int)"):
+        self.initVal = initVal
         self.func = func
-        self._seg_length_half = 2 ** ((self.N - 1).bit_length())
-        self.tree = [identityElement] * (2 * self._seg_length_half)
-        self._build()
+        self.bottomLen = 5 * 10 ** 5 + 1
+        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+        self.segLen = self.bottomLen * 2
+        self.tree = [initVal] * self.segLen
 
-    def _build(self):
-        # Set value at the bottom
-        for i in range(self.N):
-            self.tree[i + self._seg_length_half - 1] = self.initList[i]    
-        # Build value
-        for i in range(self._seg_length_half - 2, -1, -1):
-            self.tree[i] = self.func(self.tree[2 * i + 1], self.tree[2 * i + 2])
+    """ 一点加算
+    tree[index] += val
+    """
+    def pointAdd(self, index: int, val: int):
+        segIndex = index + self.offset
+        self.tree[segIndex] += val # Add
+        while True:
+            segIndex //= 2
+            if segIndex == 0:
+                break
+            self.tree[segIndex] = self.func(self.tree[segIndex * 2], self.tree[segIndex * 2 + 1])
     
-    def pointupdate(self, k, x):
-        '''Update : A[k] = x '''
-        pos = k + self._seg_length_half - 1
-        # Set value at k-th
-        self.tree[pos] = x
-        # Build bottom-up
-        while pos:
-            pos = (pos - 1) // 2
-            self.tree[pos] = self.func(self.tree[pos * 2 + 1], self.tree[pos * 2 + 2])
-    
-    def pointgetval(self, k):
-        ''' Return A[k] '''
-        return self.tree[k + self._seg_length_half - 1]
+    """ 一点更新
+    tree[index] = val
+    """
+    def pointUpdate(self, index: int, val: int):
+        segIndex = index + self.offset
+        self.tree[segIndex] = val # Update
+        while True:
+            segIndex //= 2
+            if segIndex == 0:
+                break
+            self.tree[segIndex] = self.func(self.tree[segIndex * 2], self.tree[segIndex * 2 + 1])
 
-    def segquery(self, left, right):
-        ''' Return func(A[left], ... , A[right-1]) '''
-        # if not left < right
-        if right <= left:
-            return self.identityElement
-        
-        res = self.identityElement
-        leftpos = left + self._seg_length_half - 1 # leftmost segment
-        rightpos = right - 1 + self._seg_length_half - 1 # rightmost segment
-
-        while leftpos < rightpos-1:
-            if leftpos & 1 == 0:
-                # if leftpos is right-child
-                res = self.func(res, self.tree[leftpos])
-            if rightpos & 1 == 1:
-                # if rightpos is leftchild
-                res = self.func(res, self.tree[rightpos])
-                rightpos -= 1
-            # move up
-            leftpos = leftpos // 2
-            rightpos = (rightpos-1) // 2
-        
-        res = self.func(res, self.tree[leftpos])
-        if leftpos != rightpos:
-            res = self.func(res, self.tree[rightpos])
+    """ 区間最小値 (RMQ)
+    """
+    def rangeQuery(self, l: int, r: int):
+        l += self.offset
+        r += self.offset
+        res = self.initVal
+        while l < r:
+            if l % 2 == 1:
+                res = self.func(res, self.tree[l])
+                l += 1
+            l //= 2
+            if r % 2 == 1:
+                res = self.func(res, self.tree[r - 1])
+                r -= 1
+            r //= 2
         return res
 
-    def segsearch_right(self, condfunc, left = 0):
-        ''' Return min_i satisfying condfunc( func( A[left], ... , A[i])) 
-        if impossible : return -1
-        '''
-        # if impossible (ie. condfunc( func( A[left], ... , A[-1])) is False)
-        if not condfunc(self.segquery(left, self.N)):
-            return -1
-        
-        # possible
-        func_value = self.identityElement
-        rightpos = left + self._seg_length_half - 1
-        while True: 
-            # while rightpos is the left-child, move bottom-up
-            while rightpos & 1 == 1:
-                rightpos //= 2
-            # try
-            up_value_trial = self.func(func_value, self.tree[rightpos])
-            if not condfunc(up_value_trial):
-                # move up and right
-                func_value = up_value_trial
-                rightpos = (rightpos - 1) // 2 + 1
-            else:
-                # move top-down
-                while rightpos < self._seg_length_half - 1:
-                    down_value_trial = self.func(func_value, self.tree[rightpos * 2 + 1])
-                    if condfunc(down_value_trial):
-                        # move left-child
-                        rightpos = rightpos * 2 + 1
-                    else:
-                        # move right-child
-                        func_value = down_value_trial
-                        rightpos = rightpos * 2 + 2
-                return rightpos - self._seg_length_half + 1
-
-    def __str__(self):
-        cnt = 0
-        res = []
-        for i in range((self.N - 1).bit_length() + 1):
-            num = 2 ** i
-            res.append(" ".join(f'{j}' for j in self.tree[cnt:cnt + num]))
-            cnt += num
-        return "\n".join(res)
+def myOr(x, y):
+    return x | y
 
 # Generated by 1.1.7.1 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)
 def main():
     N = int(input())
     S = list(input())
-    nums = [[0] * N for _ in range(26)]
-    for i in range(N):
-        nums[ord(S[i]) - ord("a")][i] = 1
-    st =[SegmentTree(initList=nums[i], func=lambda a, b : a | b, identityElement=0) for i in range(26)]
     Q = int(input())
+    trs = [SegmentTree(initVal=0, func=myOr) for _ in range(26)]
+    for i in range(N):
+        tr = trs[ord(S[i]) - ord("a")]
+        tr.pointUpdate(i, 1) 
+
     for _ in range(Q):
-        t, a, b = input().split()
-        if t == "1":
-            i, c = int(a) - 1, b
-            st[ord(S[i]) - ord("a")].pointupdate(i, 0)
-            S[i] = c
-            st[ord(c) - ord("a")].pointupdate(i, 1)
+        c = list(input().split())
+        if c[0] == "1":
+            a = int(c[1]) - 1
+            b = c[2]
+            trs[ord(S[a]) - ord("a")].pointUpdate(a, 0)
+            trs[ord(b) - ord("a")].pointUpdate(a, 1)
+            S[a] = b
         else:
-            l, r = int(a) - 1, int(b) - 1
+            a = int(c[1]) - 1
+            b = int(c[2]) - 1
             ans = 0
-            for stst in st:
-                ans += stst.segquery(l, r + 1)
+            for tr in trs:
+                ans += tr.rangeQuery(a, b + 1)
             print(ans)
     return
-
 
 if __name__ == '__main__':
     main()
