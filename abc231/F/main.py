@@ -1,21 +1,60 @@
 #!/usr/bin/env python3
 import sys
+class SegmentTree:
+    def __init__(self, monoid: int, bottomLen: int):
+        self.monoid = monoid
+        self.bottomLen = bottomLen
+        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+        self.segLen = self.bottomLen * 2
+        self.tree = [monoid] * self.segLen
+
+    """ 一点加算 区間和 (RSQ)
+    """
+    def pointAdd(self, index: int, val: int):
+        segIndex = index + self.offset
+        self.tree[segIndex] += val
+        while True:
+            segIndex //= 2
+            if segIndex == 0:
+                break
+            self.tree[segIndex] = self.tree[segIndex * 2] + self.tree[segIndex * 2 + 1]
+        return
+
+    """ 区間和 (RSQ)
+    """
+    def rangeSumQuery(self, l: int, r: int):
+        l += self.offset
+        r += self.offset
+        res = 0
+        while l < r:
+            if l % 2 == 1:
+                res += self.tree[l]
+                l += 1
+            l //= 2
+            if r % 2 == 1:
+                res += self.tree[r - 1]
+                r -= 1
+            r //= 2
+        return res
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
-    AB = [(aa, bb) for aa, bb in zip(A, B)]
-    num = sorted(AB)
-    print(num)
+    compressedA = {val : index for index, val in enumerate(sorted(list(set(A))))}
+    compressedB = {val : index for index, val in enumerate(sorted(list(set(B))))}
+
+    AB = [[] for _ in range(N)]
+    for aa, bb in zip(A, B):
+        AB[compressedA[aa]].append(compressedB[bb])
+
+    seg = SegmentTree(monoid=0, bottomLen=2 ** 18)
     ans = 0
-    for i in range(N):
-        l = [x for _, x in sorted(num[:(i + 1)], key=lambda x:x[1])]
-        print("now", num[i][0])
-        print(l)
-        print(num, num[i][1])
-        # print(len(l) - bisect.bisect_left(l, num[i][1]))
-        print(len(l) - l.index(num[i][1]))
-        # ans += len(l) - bisect.bisect_left(l, num[i][1])
-        ans += len(l) - l.index(num[i][1])
+    num = 0 # セグ木内の要素数。
+    for i in range(N):  # Aが小さい方から順にセグ木に入れていく。
+        for bb in AB[i]:  # Aが同じ値ならBの値は同時に評価してansに加算する必要がある。
+            seg.pointAdd(bb, 1)
+            num += 1
+        for bb in AB[i]:
+            ans += num - seg.rangeSumQuery(0, bb) # Aは小さいものが入ってるのでBは大きいものの数を数えたい。セグ木は小さいものをカウントするので全体数numから引く。
     print(ans)
     return
 
