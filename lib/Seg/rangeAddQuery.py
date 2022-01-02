@@ -13,12 +13,12 @@
 # ------------------------------------------------------------------------------
 
 class SegmentTree:
-    def __init__(self, initVal: int, bottomLen: int):
-        self.initVal = initVal
+    def __init__(self, monoid: int, bottomLen: int):
+        self.monoid = monoid
         self.bottomLen = bottomLen
         self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
         self.segLen = self.bottomLen * 2
-        self.tree = [initVal] * self.segLen
+        self.tree = [monoid] * self.segLen
 
     """ 区間加算 (RAQ)
     """
@@ -59,7 +59,7 @@ class SegmentTree:
 # print(tr.getPoint(3))
 
 n, q = map(int, input().split())
-tr = SegmentTree(initVal=0, bottomLen=2**18)
+tr = SegmentTree(monoid=0, bottomLen=2**18)
 for _ in range(q):
     com, a, b = map(int, input().split())
     if com == 0:
