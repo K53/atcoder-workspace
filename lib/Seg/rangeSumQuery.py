@@ -13,15 +13,14 @@
 # ------------------------------------------------------------------------------
 
 class SegmentTree:
-    def __init__(self, initVal: int, bottomLen: int):
-        self.initVal = initVal
+    def __init__(self, monoid: int, bottomLen: int):
+        self.monoid = monoid
         self.bottomLen = bottomLen
         self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
         self.segLen = self.bottomLen * 2
-        self.tree = [initVal] * self.segLen
+        self.tree = [monoid] * self.segLen
 
     """ 一点加算 区間和 (RSQ)
-    tree[index] += val
     """
     def pointAdd(self, index: int, val: int):
         segIndex = index + self.offset
@@ -51,7 +50,7 @@ class SegmentTree:
         return res
 
 # Range Sum Query
-tr = SegmentTree(initVal=0, bottomLen=2**18)
+tr = SegmentTree(monoid=0, bottomLen=2**18) ### !! デバッグ用に小さいレンジにした時は提出前に直すこと
 tr.pointAdd(1, 1)
 tr.pointAdd(2, 2)
 tr.pointAdd(3, 3)

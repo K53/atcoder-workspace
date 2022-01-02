@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(N: int, A: "List[int]"):
+def solve(N: int, M: int, A: "List[int]", U: "List[int]", V: "List[int]", T: "List[int]"):
     return
 
 
@@ -14,8 +14,16 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
+    M = int(next(tokens))  # type: int
     A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, A)
+    U = [int()] * (M)  # type: "List[int]"
+    V = [int()] * (M)  # type: "List[int]"
+    T = [int()] * (M)  # type: "List[int]"
+    for i in range(M):
+        U[i] = int(next(tokens))
+        V[i] = int(next(tokens))
+        T[i] = int(next(tokens))
+    solve(N, M, A, U, V, T)
 
 if __name__ == '__main__':
     main()

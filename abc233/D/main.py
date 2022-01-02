@@ -1,8 +1,41 @@
 #!/usr/bin/env python3
 import sys
-
+from itertools import accumulate
+from collections import defaultdict
 
 def solve(N: int, K: int, A: "List[int]"):
+    L = [0] + list(accumulate(A))
+    # s = set(L)
+    d = defaultdict(int)
+    for ll in L:
+        d[ll] += 1
+    # print(L)
+    # print(dict(d))
+    ans = 0
+    for i in range(N):
+        # print("#", i, L[i] + K, d[L[i] + K])
+        d[L[i]] -= 1
+        ans += d[L[i] + K]
+    # return ans
+    print(ans)
+    return
+
+import random
+
+def ac(N: int, K: int, A: "List[int]"):
+    S = defaultdict(int)
+    prev = 0
+    for i in range(N):
+        prev += A[i]
+        S[prev] += 1
+    count = 0
+    bias = 0
+    for i in range(N):
+        count += S[K-bias]
+        bias += -A[i]
+        S[-bias]-=1
+    return count
+    print(count)
     return
 
 
@@ -16,7 +49,18 @@ def main():
     N = int(next(tokens))  # type: int
     K = int(next(tokens))  # type: int
     A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    # print(solve(N, K, A))
     solve(N, K, A)
+    # for _ in range(5):
+    #     N = 5
+    #     K = 3
+    #     A = [random.randint(-10, 10) for _ in range(N)]
+    #     a = solve(N, K, A)
+    #     b = ac(N, K, A)
+    #     if a != b:
+    #         print(K, A)
+    #         print(a, "!=", b)
+
 
 if __name__ == '__main__':
     main()

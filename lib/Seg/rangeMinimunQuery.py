@@ -12,12 +12,12 @@
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=ja # Range Minimum Query (RMQ)
 # ------------------------------------------------------------------------------
 class SegmentTree:
-    def __init__(self, initVal: int, bottomLen: int):
-        self.initVal = initVal
+    def __init__(self, monoid: int, bottomLen: int):
+        self.monoid = monoid
         self.bottomLen = bottomLen
         self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
         self.segLen = self.bottomLen * 2
-        self.tree = [initVal] * self.segLen
+        self.tree = [monoid] * self.segLen
 
     """ 一点更新 区間最小値 (RMQ)
     tree[index] = val
@@ -37,7 +37,7 @@ class SegmentTree:
     def rangeMinQuery(self, l: int, r: int):
         l += self.offset
         r += self.offset
-        res = self.initVal
+        res = self.monoid
         while l < r:
             if l % 2 == 1:
                 res = min(res, self.tree[l])
@@ -51,7 +51,7 @@ class SegmentTree:
 
 # Range Minimum Query
 INF = 10 ** 9
-tr = SegmentTree(initVal=INF, bottomLen=2**18)
+tr = SegmentTree(monoid=INF, bottomLen=2**18)
 tr.pointUpdate(1, 1)
 tr.pointUpdate(2, 2)
 tr.pointUpdate(3, 3)

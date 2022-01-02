@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 import sys
 
+YES = "Yes"  # type: str
+NO = "No"  # type: str
 
-def solve(N: int):
+
+def solve(S: str, L: int, R: int):
     return
 
 
@@ -13,8 +16,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    N = int(next(tokens))  # type: int
-    solve(N)
+    S = next(tokens)  # type: str
+    L = int(next(tokens))  # type: int
+    R = int(next(tokens))  # type: int
+    solve(S, L, R)
 
 if __name__ == '__main__':
     main()
