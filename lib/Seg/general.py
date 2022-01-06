@@ -11,8 +11,6 @@
 # verify
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_B&lang=ja # Range Sum Query (RSQ)
 # ------------------------------------------------------------------------------
-#!/usr/bin/env python3
-
 class SegmentTree:
     def __init__(self, monoid: int, bottomLen: int, operation: "function"):
         self.monoid = monoid

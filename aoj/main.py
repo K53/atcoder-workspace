@@ -15,7 +15,7 @@ class SegmentTree:
     """
     def pointUpdateWithoutRebuild(self, index: int, val: int):
         segIndex = index + self.offset
-        self.tree[segIndex] = val          # 各マスの更新方法
+        self.tree[segIndex] += val          # 各マスの更新方法
         return
     
     """ 全区間更新
@@ -33,7 +33,7 @@ class SegmentTree:
     """
     def pointUpdate(self, index: int, val: int):
         segIndex = index + self.offset
-        self.tree[segIndex] = val          # 各マスの更新方法
+        self.tree[segIndex] += val          # 各マスの更新方法
         while True:
             segIndex //= 2
             if segIndex == 0:
@@ -60,16 +60,34 @@ def add(a: int, b: int):
     return a + b
 
 def main():
-    N = int(input())
+    N, Q = map(int, input().split())
     A = list(map(int, input().split()))
-    tr = SegmentTree(monoid=0, bottomLen=2**18, operation=add)
-    ans = 0
+    queries = []
+    qq = []
     for i in range(N):
-        aa = A[i]
-        tr.pointUpdate(aa, 1)
-        print(i + 1 - tr.rangeQuery(0, aa + 1))
-        ans += i + 1 - tr.rangeQuery(0, aa + 1)
-    print(ans)
+        qq.append((A[i], i, 0))
+    tr = SegmentTree(monoid=0, bottomLen=2**18, operation=add)
+    count = SegmentTree(monoid=0, bottomLen=2**18, operation=add)
+    for i in range(Q):
+        query = list(map(int, input().split()))
+        queries.append(query)
+        qq.append((query[-1], i, 1))
+    qq.sort()
+    ans = [-1] * Q
+    # print(qq)
+    for qqq in qq[::-1]:
+        # print(qqq)
+        if qqq[2] == 0:
+            tr.pointUpdate(qqq[1], qqq[0])
+            count.pointUpdate(qqq[1], 1)
+        else:
+            num = tr.rangeQuery(queries[qqq[1]][1] - 1, queries[qqq[1]][2])
+            c = count.rangeQuery(queries[qqq[1]][1] - 1, queries[qqq[1]][2])
+            ans[qqq[1]] = num - c * queries[qqq[1]][3]
+        # print(tr.tree)
+    print(*ans, sep="\n")
+    return
+
 
 if __name__ == '__main__':
     main()
