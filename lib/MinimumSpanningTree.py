@@ -65,7 +65,7 @@ import heapq
 INF = 10 ** 9
 class Prim():
     def __init__(self, N: int) -> None:
-        # self.minimumG = [[] for _ in range(N)] # 全域最小木自体が欲しい場合にはこれを有効にする。
+        # self.minimumG = [[] for _ in range(N)] # 全域最小木自体が欲しい場合にはこれを有効にする。(未実装 -> クラスカル法推奨)
         self.G = [[] for _ in range(N)]
         self.seen = [[] for _ in range(N)]
         self.minimunCost = 0
