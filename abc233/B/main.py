@@ -3,6 +3,7 @@ import sys
 
 
 def solve(L: int, R: int, S: str):
+    print(S[:(L - 1)] + S[(L - 1):R][::-1] + S[R:])
     return
 
 
