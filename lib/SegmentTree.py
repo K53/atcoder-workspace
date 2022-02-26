@@ -54,7 +54,7 @@ class SegmentTree:
                 break
             self.tree[segIndex] = self.func(self.tree[segIndex * 2], self.tree[segIndex * 2 + 1])
 
-    """ 区間最小値 (RMQ)
+    """ 区間最小値 (RMQ) / 区間和 (RSQ)
     """
     def rangeQuery(self, l: int, r: int):
         l += self.offset

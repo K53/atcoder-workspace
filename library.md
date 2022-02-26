@@ -4,12 +4,12 @@
 N = 0 # 頂点数
 M = 0 # 辺の数
 a,b = [], [] # 連結した頂点。a-b
-nodes = [[] for _ in range(N)]
+G = [[] for _ in range(N)]
 for i in range(M):
-    nodes[a[i] - 1].append(b[i] - 1)
-    nodes[b[i] - 1].append(a[i] - 1)
+    G[a[i] - 1].append(b[i] - 1)
+    G[b[i] - 1].append(a[i] - 1)
 
-print(nodes)
+print(G)
 ```
 
 ## 入力受け取り
