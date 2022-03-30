@@ -30,10 +30,8 @@ class Dijkstra():
         return
     
     # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, cost: int, bothDirection: bool):
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
         self.G[fromNode].append((cost, toNode))
-        if bothDirection:
-            self.G[toNode].append((cost, fromNode))
     
     def build(self, startNode: int):
         hq = []
@@ -57,7 +55,8 @@ class Dijkstra():
 N = 4
 dk = Dijkstra(N)
 for a, b, c in [(0, 3, 10), (1, 2, 10), (2, 3, 20), (1, 3, 15)]:
-    dk.addEdge(a, b, c, bothDirection=True)
+    dk.addEdge(a, b, c)
+    dk.addEdge(b, a, c)
 d = dk.build(startNode=0)
 print(d)
 "-> [0, 25, 30, 10]"

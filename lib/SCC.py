@@ -37,7 +37,7 @@ class SCC():
     def addEdge(self, fromNode: int, toNode: int):
         # グラフ構築
         self.G[fromNode].append(toNode)
-        # 逆向きグラフの構築
+        # 逆向きグラフを別途構築
         self.rG[toNode].append(fromNode)
 
     # DFS

@@ -44,3 +44,25 @@ print(rotated180)
     ('3', '2', '1')
 ]
 """
+
+# 左右反転
+flipHorizontal = [o[::-1] for o in original]
+print(flipHorizontal)
+"""
+[
+    ('3', '2', '1'), 
+    ('4', '9', '8'), 
+    ('5', '6', '7')
+]
+"""
+
+# 上下反転
+flipVertical = [o for o in original][::-1]
+"""
+[
+    ('7', '6', '5'), 
+    ('8', '9', '4'), 
+    ('1', '2', '3')
+]
+"""
+print(flipVertical)

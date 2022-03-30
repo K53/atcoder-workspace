@@ -27,13 +27,13 @@ print(len(list(compressed))) # 要素の長さ
 
 # 双方向 (復元用リストも作成する)
 compressed = {}
-compressed_to_row = []
+compressed_to_raw = []
 for index, val in enumerate(sorted(list(set(L)))):
     compressed[val] = index
-    compressed_to_row.append(val)
+    compressed_to_raw.append(val)
 print(compressed)
 "-> {2: 0, 5: 1, 6: 2, 9: 3}"
-print(compressed_to_row)
+print(compressed_to_raw)
 "-> [2, 5, 6, 9]"
-print(len(compressed_to_row)) # 要素の長さ
+print(len(compressed_to_raw)) # 要素の長さ
 "-> 4"
