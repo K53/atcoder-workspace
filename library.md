@@ -1232,3 +1232,11 @@ def max2D(LL: "List[List[int]]", init: int = 0):
         res = max(res, max(LL[i]))
     return res
 ```
+
+## 最下位ビットの取り出し
+
+```python
+for p in range(20):
+    print(bin(p))
+    print(p, ":", p&-p) # 最下位ビットを取り出し
+```
