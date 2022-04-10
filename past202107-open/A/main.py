@@ -6,6 +6,14 @@ NO = "No"  # type: str
 
 
 def solve(S: int):
+    s = str(S)
+    odd, even = 0, 0
+    for i in range(len(s[:-1])):
+        if i % 2 == 0:
+            odd += int(s[i])
+        else:
+            even += int(s[i])
+    print(YES if (odd * 3 + even) % 10 == int(s[-1]) else NO)
     return
 
 

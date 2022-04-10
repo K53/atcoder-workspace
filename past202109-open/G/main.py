@@ -1,8 +1,32 @@
 #!/usr/bin/env python3
 import sys
-
+import bisect
 
 def solve(N: int, K: int, A: "List[int]", B: "List[int]", C: "List[int]"):
+    # false -> true
+    def is_ok(k: int):
+        s = 0
+        for aa, bb, cc in zip(A, B, C):
+            if k >= bb:
+                s += min(aa, (k - bb) // cc + 1)
+        return s >= K
+
+    def binSearch(ng: int, ok: int):
+        # print(ok, ng)              # はじめの2値の状態
+        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+            mid = (ok + ng) // 2
+            # print("target > ", mid)
+            result = is_ok(mid)
+            # print(result)
+            if result:
+                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+            else:
+                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+        return ok
+    
+    ans = binSearch(0, 10 ** 18 + 1)
+    print(ans)
     return
 
 

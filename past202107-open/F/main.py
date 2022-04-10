@@ -6,6 +6,20 @@ NO = "No"  # type: str
 
 
 def solve(N: int, D: "List[int]", S: "List[int]", T: "List[int]"):
+    sch = [[0] * 25 for _ in range(10 ** 5)]
+    for dd, ss, tt in zip(D, S, T):
+        sch[dd - 1][ss] += 1
+        sch[dd - 1][tt] -= 1
+    
+    for dd in range(10 ** 5):
+        now = 0
+        for i in range(25):
+            now += sch[dd][i]
+            if now >= 2:
+                print(YES)
+                return
+            sch[dd][i] = now
+    print(NO)
     return
 
 

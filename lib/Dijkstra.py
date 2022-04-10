@@ -11,6 +11,7 @@
 # 
 # Order
 #   O((V + E) * logV)
+#   O(V + ElogE) <- これが正しいかも https://atcoder.jp/contests/past202107-open/editorial/2205
 # Note
 #   *1 https://atcoder.jp/contests/abc191/tasks/abc191_e 
 #       - 多始点ダイクストラの場合の注意。

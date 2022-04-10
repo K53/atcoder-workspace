@@ -3,6 +3,20 @@ import sys
 
 
 def solve(N: int, S: "List[str]"):
+    l = []
+    for ss in S:
+        c = 0
+        for i in range(len(ss)):
+            if ss[i] == "0":
+                c -= 1
+            else:
+                l.append((int(ss[i:]), c, ss))
+                break
+        else:
+            l.append((0, c, ss))
+    l.sort()
+    for ll in l:
+        print(ll[-1])
     return
 
 

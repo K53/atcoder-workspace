@@ -6,6 +6,16 @@ NO = "No"  # type: str
 
 
 def solve(S: str, L: int, R: int):
+    if len(S) != 1 and S[0] == "0":
+        print(NO)
+        return
+    if len(str(R)) < len(S):
+        print(NO)
+        return
+    if not (L <= int(S) <= R):
+        print(NO)
+        return
+    print(YES)
     return
 
 

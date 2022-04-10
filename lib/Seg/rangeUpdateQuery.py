@@ -10,8 +10,8 @@
 # 
 # verify
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_D&lang=ja # Range Update Query (RUQ)
+# - https://atcoder.jp/contests/past202109-open/tasks/past202109_j
 # ------------------------------------------------------------------------------
-
 class SegmentTree:
     def __init__(self, initVal: int, bottomLen: int):
         self.initVal = initVal
@@ -23,15 +23,18 @@ class SegmentTree:
     """ 区間加算 (RAQ)
     """
     def rangeUpdate(self, l: int, r: int, val: int):
+        # 最下層のオフセットに変換
         l += self.offset
         r += self.offset
+        
+        # 最も長い区間を選択して値を反映していく。
         while l < r:
             if l % 2 == 1:
-                self.tree[l] = val
+                self.tree[l] += val # 任意の演算方法に変換する (今回は加算)
                 l += 1
             l //= 2
             if r % 2 == 1:
-                self.tree[r - 1] = val
+                self.tree[r - 1] += val # 任意の演算方法に変換する (今回は加算)
                 r -= 1
             r //= 2
         return
@@ -39,15 +42,15 @@ class SegmentTree:
     """ 一点取得
     """
     def getPoint(self, index: int):
+        # 最下層のオフセットに変換
         segIndex = index + self.offset
         res = self.tree[segIndex]
         while True:
             segIndex //= 2
             if segIndex == 0:
                 break
-            res += self.tree[segIndex]
+            res += self.tree[segIndex]  # 全ての区間の情報を集計 任意の演算方法に変換する (今回は加算)
         return res
-
 
 # # Range Update Query
 # n = 4

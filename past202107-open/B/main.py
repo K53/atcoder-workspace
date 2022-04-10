@@ -3,6 +3,10 @@ import sys
 
 
 def solve(A: int, B: int, C: int):
+    if A > B * C:
+        print(C)
+    else:
+        print(A / B)
     return
 
 

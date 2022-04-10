@@ -5,6 +5,8 @@
 # ------------------------------------------------------------------------------
 #     トポロジカルソート (Kahnの方法)
 # ------------------------------------------------------------------------------
+# → DAG判定可能 (DFSのTarjanの方法でもできるはずだがライブラリ未整備)、SCCでもDAG判定は可能。
+# 
 # 解説
 # - 1. Kahnの方法
 # - キューを用いる方法。入次数が0のものから確定させて行く。
@@ -31,6 +33,7 @@
 # - https://atcoder.jp/contests/tenka1-2016-quala/tasks/tenka1_2016_qualA_c (辞書順最小を求める問題 文字列)
 # - https://atcoder.jp/contests/joi2007ho/tasks/joi2007ho_d (単一のトポロジカル順序かの判定)
 # - https://atcoder.jp/contests/abc216/tasks/abc216_d 
+# - https://atcoder.jp/contests/past202107-open/tasks/past202107_j (DAG判定)
 # ------------------------------------------------------------------------------
 from collections import deque
 import heapq
@@ -45,14 +48,10 @@ class TopologicalTree:
         return
     
     # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
+    def addEdge(self, fromNode: int, toNode: int):
         self.G[fromNode].append(toNode)
         self.degree[toNode] += 1
-        if bothDirection:
-            self.G[toNode].append(fromNode)
-            self.degree[fromNode] += 1
         
-    
     def topologicalSort(self):
         deq = deque([node for node in range(self.N) if self.degree[node] == 0]) # 入次数0のものがスタート
 
@@ -98,6 +97,10 @@ class TopologicalTree:
                 return True
         else:
             return False
+    
+    # トポロジカルソートした結果の数列が何通りあるか -> bitDP
+    # https://ferin-tech.hatenablog.com/entry/2017/01/24/184750
+
 # usage
 N, M = 4, 3
 x = [2, 3, 2]
@@ -105,14 +108,14 @@ y = [1, 4, 4]
 
 tr = TopologicalTree(N)
 for i in range(M):
-    tr.addEdge(x[i] - 1, y[i] - 1, bothDirection=False)
+    tr.addEdge(x[i] - 1, y[i] - 1)
 l = tr.topologicalSort()
 print(l)
 "-> [1, 2, 0, 3]"
 l = tr.topologicalSort_heapq()
 print(l)
 "-> [1, 0, 2, 3] # heapqによる辞書順最小の場合。"
-# -> None # DAG出ない場合。
+# -> None # DAGでない場合 (= DAG判定)。
 
 # ------------------------------------------------------------------------------
 #     トポロジカルソート (Tarjanの方法)
@@ -142,11 +145,9 @@ class TopologicalTree:
         return
     
     # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, bothDirection: bool):
+    def addEdge(self, fromNode: int, toNode: int):
         self.G[fromNode].append(toNode)
-        if bothDirection:
-            self.G[toNode].append(fromNode)
-    
+
     def _rec(self, now: int):
         self.seen[now] = True
         for next in self.G[now]:
@@ -172,9 +173,12 @@ class TopologicalTree:
                 return True
         else:
             return False
+    
+    # トポロジカルソートした結果の数列が何通りあるか -> bitDP
+    # https://ferin-tech.hatenablog.com/entry/2017/01/24/184750
 
 # usage
 tr = TopologicalTree(N)
 for i in range(M):
-    tr.addEdge(x[i] - 1, y[i] - 1, False)
+    tr.addEdge(x[i] - 1, y[i] - 1)
 l = tr.topologicalSort()

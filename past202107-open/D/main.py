@@ -3,6 +3,14 @@ import sys
 
 
 def solve(N: int, S: str):
+    S = list(S)
+    ll = [list("axa"), list("ixi"), list("uxu"), list("exe"), list("oxo")]
+    for i in range(N - 2):
+        if S[i:(i + 3)] in ll:
+            S[i] = "."
+            S[i + 1] = "."
+            S[i + 2] = "."
+    print(*S, sep="")
     return
 
 

@@ -3,6 +3,11 @@ import sys
 
 
 def solve(N: int, S: str):
+    T = []
+    for ss in S:
+        T = [tt for tt in T if tt != ss]
+        T.append(ss)
+    print(*T, sep="")
     return
 
 

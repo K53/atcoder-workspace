@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 import sys
 
+l = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 def solve(N: int):
+    ans = []
+    while N >= 36:
+        N, q = divmod(N, 36)
+        ans.append(l[q])
+    ans.append(l[N])
+    print(*ans[::-1], sep="")
     return
 
 

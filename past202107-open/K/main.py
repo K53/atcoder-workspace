@@ -1,8 +1,47 @@
 #!/usr/bin/env python3
 import sys
-
+import heapq
 
 def solve(N: int, M: int, A: "List[int]", U: "List[int]", V: "List[int]", T: "List[int]"):
+    INF = 10 ** 16
+    class Dijkstra():
+        def __init__(self, N: int) -> None:
+            self.N = N 
+            self.G = [[] for _ in range(N)]
+            return
+        
+        # 辺の追加
+        def addEdge(self, fromNode: int, toNode: int, cost: int):
+            self.G[fromNode].append((cost, toNode))
+        
+        def build(self, startNode: int):
+            hq = []
+            heapq.heapify(hq)
+            # Set start info
+            dist = [[INF, 0] for _ in range(self.N)]
+            heapq.heappush(hq, ([0, A[startNode]], startNode))
+            dist[startNode] = [0, A[startNode]]
+            # dijkstra
+            while hq:
+                min_cost, now = heapq.heappop(hq)
+                if min_cost[0] > dist[now][0]:
+                    continue
+                for cost, next in self.G[now]:
+                    if dist[next][0] > dist[now][0] + cost:
+                        dist[next][0] = dist[now][0] + cost
+                        dist[next][1] = dist[now][1] + A[next]
+                        heapq.heappush(hq, (dist[next], next))
+                    elif dist[next][0] == dist[now][0] + cost and dist[next][1] < dist[now][1] + A[next]:
+                        dist[next][1] = dist[now][1] + A[next]
+                        heapq.heappush(hq, (dist[next], next))
+            return dist
+
+    dk = Dijkstra(N)
+    for uu, vv, tt in zip(U, V, T):
+        dk.addEdge(uu - 1, vv - 1, tt)
+        dk.addEdge(vv - 1, uu - 1, tt)
+    d = dk.build(startNode=0)
+    print(d[-1][-1])
     return
 
 

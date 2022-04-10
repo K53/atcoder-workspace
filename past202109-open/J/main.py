@@ -1,8 +1,53 @@
 #!/usr/bin/env python3
 import sys
+class SegmentTree:
+    def __init__(self, initVal: int, bottomLen: int):
+        self.initVal = initVal
+        self.bottomLen = bottomLen
+        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+        self.segLen = self.bottomLen * 2
+        self.tree = [initVal] * self.segLen
 
+    """ 区間加算 (RAQ)
+    """
+    def rangeUpdate(self, l: int, r: int, val: int):
+        # 最下層のオフセットに変換
+        l += self.offset
+        r += self.offset
+        
+        # 最も長い区間を選択して値を反映していく。
+        while l < r:
+            if l % 2 == 1:
+                self.tree[l] ^= val # 任意の演算方法に変換する (今回はXOR)
+                l += 1
+            l //= 2
+            if r % 2 == 1:
+                self.tree[r - 1] ^= val # 任意の演算方法に変換する (今回はXOR)
+                r -= 1
+            r //= 2
+        return
+    
+    """ 一点取得
+    """
+    def getPoint(self, index: int):
+        # 最下層のオフセットに変換
+        segIndex = index + self.offset
+        res = self.tree[segIndex]
+        while True:
+            segIndex //= 2
+            if segIndex == 0:
+                break
+            res ^= self.tree[segIndex]  # 全ての区間の情報を集計 任意の演算方法に変換する (今回はXOR)
+        return res
 
 def solve(N: int, Q: int, t: "List[int]", k: "List[int]"):
+    tr = SegmentTree(initVal=0, bottomLen=2**19)
+    for tt, kk in zip(t, k):
+        if tt == 1:
+            isReversed = tr.getPoint(kk)
+            print(2 * N - kk + 1 if isReversed else kk)
+        else:
+            tr.rangeUpdate(N - kk + 1, N + kk + 1, 1)
     return
 
 

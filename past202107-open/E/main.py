@@ -3,6 +3,15 @@ import sys
 
 
 def solve(N: int):
+    x3 = [1]
+    for i in range(30):
+        x3.append(x3[-1] * 3)
+
+    for k in range(1, 31):
+        if (1 * x3[k] + 1) * x3[30 - k] == N:
+            print(k)
+            return
+    print(-1)
     return
 
 
