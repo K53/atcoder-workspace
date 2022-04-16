@@ -1,8 +1,41 @@
 #!/usr/bin/env python3
 import sys
 
-
 def solve(N: int, s: "List[str]"):
+    ans = []
+    for i in range(0, N * 4, 4):
+        if s[0][i + 1] != "#":
+            ans.append(1)
+            continue
+        if s[2][i + 1] != "#":
+            ans.append(7)
+            continue     
+        if s[4][i + 1] != "#":
+            ans.append(4)
+            continue     
+        if s[2][i + 2] != "#":
+            ans.append(0)
+            continue     
+        a = (s[1][i + 1] == "#", s[1][i + 3] == "#", s[3][i + 1] == "#", s[3][i + 3] == "#")
+        if a == (1,1,1,1):
+            ans.append(8)
+            continue           
+        if a == (1,1,0,1):
+            ans.append(9)
+            continue           
+        if a == (0,1,1,0):
+            ans.append(2)
+            continue           
+        if a == (0,1,0,1):
+            ans.append(3)
+            continue           
+        if a == (1,0,0,1):
+            ans.append(5)
+            continue           
+        if a == (1,0,1,1):
+            ans.append(6)
+            continue           
+    print(*ans, sep="")
     return
 
 

@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
+from collections import defaultdict
 import sys
 
 
-def solve(A: int, R: int, N: int):
-    ans = A
-    for i in range(N - 1):
-        ans *= R
-        if ans > 10 ** 9:
-            print("large")
-            return
-    print(ans)
+def solve(N: int, A: "List[int]"):
+    d = defaultdict(int)
+    for aa in A:
+        d[aa] += 1
+    f = -1
+    t = -1
+    for num in range(1, N + 1):
+        count = d[num]
+        if count == 2:
+            f = num
+        if count == 0:
+            t = num
+    print("Correct" if f == -1 else f"{f} {t}")
     return
 
 
@@ -20,10 +26,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    A = int(next(tokens))  # type: int
-    R = int(next(tokens))  # type: int
     N = int(next(tokens))  # type: int
-    solve(A, R, N)
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, A)
 
 if __name__ == '__main__':
     main()

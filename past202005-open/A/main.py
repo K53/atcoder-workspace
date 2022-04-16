@@ -3,6 +3,12 @@ import sys
 
 
 def solve(s: str, t: str):
+    if s == t:
+        print("same")
+    elif s.lower() == t.lower():
+        print("case-insensitive")
+    else:
+        print("different")
     return
 
 

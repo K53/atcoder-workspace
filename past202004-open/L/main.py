@@ -2,14 +2,7 @@
 import sys
 
 
-def solve(A: int, R: int, N: int):
-    ans = A
-    for i in range(N - 1):
-        ans *= R
-        if ans > 10 ** 9:
-            print("large")
-            return
-    print(ans)
+def solve(N: int, K: int, D: int, A: "List[int]"):
     return
 
 
@@ -20,10 +13,11 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    A = int(next(tokens))  # type: int
-    R = int(next(tokens))  # type: int
     N = int(next(tokens))  # type: int
-    solve(A, R, N)
+    K = int(next(tokens))  # type: int
+    D = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, K, D, A)
 
 if __name__ == '__main__':
     main()

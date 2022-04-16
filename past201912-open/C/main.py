@@ -2,14 +2,8 @@
 import sys
 
 
-def solve(A: int, R: int, N: int):
-    ans = A
-    for i in range(N - 1):
-        ans *= R
-        if ans > 10 ** 9:
-            print("large")
-            return
-    print(ans)
+def solve(A: int, B: int, C: int, D: int, E: int, F: int):
+    print(sorted([A, B, C, D, E, F])[-3])
     return
 
 
@@ -21,9 +15,12 @@ def main():
                 yield word
     tokens = iterate_tokens()
     A = int(next(tokens))  # type: int
-    R = int(next(tokens))  # type: int
-    N = int(next(tokens))  # type: int
-    solve(A, R, N)
+    B = int(next(tokens))  # type: int
+    C = int(next(tokens))  # type: int
+    D = int(next(tokens))  # type: int
+    E = int(next(tokens))  # type: int
+    F = int(next(tokens))  # type: int
+    solve(A, B, C, D, E, F)
 
 if __name__ == '__main__':
     main()

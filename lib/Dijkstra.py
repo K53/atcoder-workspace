@@ -20,8 +20,11 @@
 #   *2 https://atcoder.jp/contests/tkppc4-1/tasks/tkppc4_1_h
 #       - INFの値は毎回吟味すること。
 # verify
-# - https://atcoder.jp/contests/abc214/tasks/abc214_c
+# - https://atcoder.jp/contests/abc214/tasks/abc214_c (グラフ)
+# - https://atcoder.jp/contests/past201912-open/tasks/past201912_j (グリッド)
 # ------------------------------------------------------------------------------
+
+#  グラフ
 import heapq
 INF = 10 ** 16
 class Dijkstra():
@@ -62,33 +65,56 @@ d = dk.build(startNode=0)
 print(d)
 "-> [0, 25, 30, 10]"
 
+# グリッド
+import heapq
+INF = 10 ** 16
+class Dijkstra():
+    def __init__(self, H: int, W: int, G: "list[list[int]]") -> None:
+        self.H = H
+        self.W = W
+        self.G = G
+        return
+    
+    def build(self, startY: int, startX: int):
+        hq = []
+        heapq.heapify(hq)
+        # Set start info
+        dist = [[INF for _ in range(self.W)] for _ in range(self.H)]
+        heapq.heappush(hq, (0, startY, startX)) # (cost, y, x)
+        dist[startY][startX] = 0
+        # dijkstra
+        while hq:
+            min_cost, nowy, nowx = heapq.heappop(hq)
+            if min_cost > dist[nowy][nowx]:
+                continue
+            for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
+                nexty = nowy + dy
+                nextx = nowx + dx
+                if nexty < 0 or nextx < 0 or nexty >= self.H or nextx >= self.W:
+                    continue
+                cost = self.G[nexty][nextx]
+                if dist[nexty][nextx] > dist[nowy][nowx] + cost:
+                    dist[nexty][nextx] = dist[nowy][nowx] + cost
+                    heapq.heappush(hq, (dist[nexty][nextx], nexty, nextx))
+        return dist
 
-
-
-# 旧ダイクストラ
-# ----------------------------------------------------------------
-# Input
-#   1. タプル(重み, 行先)の二次元配列(隣接リスト)
-#   2. 探索開始ノード(番号)
-# Output
-#   スタートから各ノードへの最小コスト
-# ----------------------------------------------------------------
-# import heapq
-# INF = 10 ** 9       # *2
-# def dijkstra(edges: "List[List[(cost, to)]]", start_node: int) -> list:
-#     hq = []
-#     heapq.heapify(hq)
-#     # Set start info
-#     dist = [INF] * len(edges)
-#     heapq.heappush(hq, (0, start_node))
-#     dist[start_node] = 0            # *1
-#     # dijkstra
-#     while hq:
-#         min_cost, now = heapq.heappop(hq)
-#         if min_cost > dist[now]:
-#             continue
-#         for cost, next in edges[now]:
-#             if dist[next] > dist[now] + cost:
-#                 dist[next] = dist[now] + cost
-#                 heapq.heappush(hq, (dist[next], next))
-#     return dist
+# Usage
+H = 5
+W = 6
+Grid = [
+    [9, 9, 9, 9, 1, 0],
+    [9, 9, 9, 9, 1, 9],
+    [9, 9, 9, 1, 1, 1],
+    [9, 1, 1, 1, 9, 1],
+    [0, 1, 9, 9, 9, 0]
+]
+dk = Dijkstra(H, W, G)
+d = dk.build(startY=0, startX=0)
+print(d)
+"""
+-> [36, 29, 26, 17, 8, 8]
+[27, 20, 21, 14, 7, 16]
+[18, 11, 12, 5, 6, 7]
+[9, 2, 3, 4, 13, 8]
+[0, 1, 10, 13, 17, 8]
+"""

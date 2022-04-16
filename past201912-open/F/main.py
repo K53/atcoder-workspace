@@ -2,14 +2,21 @@
 import sys
 
 
-def solve(A: int, R: int, N: int):
-    ans = A
-    for i in range(N - 1):
-        ans *= R
-        if ans > 10 ** 9:
-            print("large")
-            return
-    print(ans)
+def solve(S: str):
+    f = False
+    word = []
+    all = []
+    for ss in S:
+        word.append(ss)
+        if ss.isupper():
+            f ^= 1
+            if not f:
+                c = "".join(word)
+                all.append((c.lower(), c))
+                word.clear()
+    all.sort()
+    ans = [aa[-1] for aa in all]
+    print(*ans, sep="")        
     return
 
 
@@ -20,10 +27,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    A = int(next(tokens))  # type: int
-    R = int(next(tokens))  # type: int
-    N = int(next(tokens))  # type: int
-    solve(A, R, N)
+    S = next(tokens)  # type: str
+    solve(S)
 
 if __name__ == '__main__':
     main()
