@@ -5,19 +5,18 @@ MOD = 998244353  # type: int
 
 
 def solve(N: int, M: int, K: int):
-    ans = 0
     dp = [[0] * (K + 1) for _ in range(N)]
-    for mm in range(K - M, K):
+    for mm in range(1, M + 1):
         dp[0][mm] = 1
     # dp[i][k] := i人目の子供まで配り終えて、残りがk個である組み合わせ
     for i in range(N - 1):
         for kk in range(1, K + 1):
             for mm in range(1, M + 1):
-                if kk - mm < 0:
+                if kk + mm > K:
                     continue
-                dp[i + 1][kk - mm] += dp[i][kk]
-                dp[i + 1][kk - mm] %= MOD
-    print(dp)
+                dp[i + 1][kk + mm] += dp[i][kk]
+                dp[i + 1][kk + mm] %= MOD
+    # print(dp)
     print(sum(dp[-1]) % MOD)
     return
 
