@@ -17,24 +17,22 @@
 # - https://yukicoder.me/submissions/632551 # セグ木上の二分探索
 # ------------------------------------------------------------------------------
 
-# 2冪に変換するための長さ算出処理
-def getSegLenOfThePowerOf2(ln: int):
-    if ln <= 0:
-        return 1
-    else:    
-        import math
-        decimalPart, integerPart = math.modf(math.log2(ln))
-        return 2 ** (int(integerPart) + 1)
-
-# 2べきでなくてもいい
 class SegTree:
-    def __init__(self, monoid, bottomList, func):
+    def __init__(self, monoid, bottomList, func, convertLengthToThePowerOf2: bool = False):
         self.monoid = monoid
         self.func = func
-        self.bottomLen = len(bottomList)
-        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
-        self.segLen = self.bottomLen * 2
-        self.tree = [monoid] * self.segLen
+        if convertLengthToThePowerOf2:
+            self.actualLen = len(bottomList)
+            self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        else:
+            self.actualLen = len(bottomList)
+            self.bottomLen = len(bottomList)
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
         self.build(bottomList)
 
     """
@@ -48,6 +46,17 @@ class SegTree:
         # ビルド
         for i in range(self.offset - 1, 0, -1):
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
+
+    """
+    直近の2べきの長さを算出
+    """
+    def getSegLenOfThePowerOf2(self, ln: int):
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + 1)
 
     """
     一点加算 他演算
@@ -71,24 +80,6 @@ class SegTree:
         while i > 1:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
-    
-    # """ # 未検証 多分動かない -> LazySegmentTreeへ
-    # 区間更新
-    # O(log(self.bottomLen))
-    # """
-    # def rangeUpdate(self, l: int, r: int, val: int):
-    #     l += self.offset
-    #     r += self.offset
-    #     while l < r:
-    #         if l & 1:
-    #             self.tree[l] = self.func(self.tree[l], val) 
-    #             l += 1
-    #         if r & 1:
-    #             r -= 1
-    #             self.tree[r] = self.func(self.tree[r], val) 
-    #         l >>= 1
-    #         r >>= 1
-    #     return
 
     """
     区間取得
@@ -122,21 +113,10 @@ class SegTree:
     二分探索
     O(log(self.bottomLen))
     ※ セグ木上の二分探索を使う場合は2べきにすること。
+    # !!!! ng側が返却される !!!!!
     """
-    def queryKthItem(self, K: int):
-        print("セグ木上の二分探索を使う場合は2べきにすること。")
-        index = 1
-        restK = K
-        while index < self.offset:
-            if restK <= self.tree[index << 1]:
-                index <<= 1
-            else:
-                restK -= self.tree[index << 1] # 左に進む場合は右側の分を差し引く。
-                index <<= 1
-                index += 1
-        return index - self.offset
-
     def max_right(self, l, is_ok: "function"):
+        print("セグ木上の二分探索を使う場合は2べきにすること。")
         l += self.offset
         ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
         ans = self.monoid
@@ -253,8 +233,8 @@ print(seg.tree) # [0, 4, 2, 2, 1, 1, 2, 0, 0, 1, 0, 1, 2, 0, 0, 0]
 # |   1   |   1   |   2   |   0   |
 # | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | <- 0~7に対応
 
-print(seg.queryKthItem(1)) # 1
-print(seg.queryKthItem(2)) # 3
-print(seg.queryKthItem(3)) # 4
-print(seg.queryKthItem(4)) # 4
-print(seg.queryKthItem(5)) # 7
+# ng側が返るので注意。 K番目の要素算出では x < K とすることでng側が答えになる。
+print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
+print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
+print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
+print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
