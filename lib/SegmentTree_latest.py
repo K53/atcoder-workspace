@@ -11,8 +11,9 @@
 # verify
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=ja # Range Min Query (RMQ)
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_B&lang=ja # Range Sum Query (RSQ)
-# - https://atcoder.jp/contests/arc033/tasks/arc033_3 # セグ木の二分探索 / セグ木上の二分探索
-# - https://yukicoder.me/submissions/757494 # セグ木の二分探索
+# - https://atcoder.jp/contests/arc033/submissions/31404125 # セグ木の二分探索 / セグ木上の二分探索
+# - https://yukicoder.me/submissions/757494 # セグ木の二分探索 (yuki 833)
+# - https://yukicoder.me/submissions/757820 # セグ木上の二分探索 (yuki 833) 上より100~200ms高速
 # - https://yukicoder.me/submissions/757554 # インデックス付きのセグ木
 # - https://yukicoder.me/submissions/632551 # セグ木上の二分探索
 # ------------------------------------------------------------------------------
@@ -112,11 +113,11 @@ class SegTree:
     """
     二分探索
     O(log(self.bottomLen))
-    ※ セグ木上の二分探索を使う場合は2べきにすること。
+    ※ セグ木上の二分探索をする場合は2べきにすること。
     # !!!! ng側が返却される !!!!!
     """
     def max_right(self, l, is_ok: "function"):
-        print("セグ木上の二分探索を使う場合は2べきにすること。")
+        print("セグ木上の二分探索をする場合は2べきにすること。")
         l += self.offset
         ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
         ans = self.monoid
@@ -132,7 +133,27 @@ class SegTree:
             if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
                 ans = self.func(ans, self.tree[ll])
                 ll += 1
-        return ll - self.offset # ng側が返る？？
+        return ll - self.offset # ng側が返る
+
+    # 未検証
+    def min_left(self, r, is_ok):
+        r += self.offset
+        rr = max(r // (~r & -~r), 1)
+        ans = self.monoid
+        while is_ok(self.func(self.tree[rr], ans)):
+            ans = self.func(self.tree[rr], ans)
+            rr -= 1
+            while rr & 1:
+                rr >>= 1
+            if rr == 0:
+                return -1
+        while rr < self.offset:
+            rr <<= 1
+            if is_ok(self.func(self.tree[rr+1], ans)):
+                ans = self.func(self.tree[rr+1], ans)
+            else:
+                rr += 1
+        return rr - self.offset
 
 print("#---case1---#")
 # Usage
@@ -238,3 +259,9 @@ print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
 print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
 print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
 print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
+
+
+print(seg.min_left(-1, lambda x: x < 1)) # 4
+print(seg.min_left(-1, lambda x: x < 2)) # 4
+print(seg.min_left(-1, lambda x: x < 3)) # 3
+print(seg.min_left(-1, lambda x: x < 4)) # 1

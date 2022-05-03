@@ -9,16 +9,17 @@ def solve(N: int, A: "List[int]", B: "List[int]"):
         nodes[B[i] - 1].append(A[i] - 1)
     for i in range(N):
         nodes[i].sort()
-
+    print(nodes)
     eularTourNodes = []
     sys.setrecursionlimit(10 ** 9)
     def getEularTourNodes(now: int, pre: int = -1):
-        eularTourNodes.append(now)
+        print(now, pre)
+        eularTourNodes.append(now) # 到達時
         for next in nodes[now]:
             if next == pre:
                 continue
             getEularTourNodes(next, now)
-            eularTourNodes.append(now)
+        eularTourNodes.append(now) # 帰着時
         return
     getEularTourNodes(0)
     
