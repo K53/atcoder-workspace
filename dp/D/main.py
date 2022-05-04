@@ -2,15 +2,19 @@
 import sys
 
 def solve(N: int, W: int, w: "List[int]", v: "List[int]"):
-    dp = [[0] * (W + 1) for _ in range(N + 1)]
-    for i in range(1, N + 1):
+    INF = 10 ** 16
+    dp = [[-INF for _ in range(W + 1)] for _ in range(N + 1)]
+    dp[0][0] = 0
+    for i in range(N):
         for j in range(W + 1):
-            # i番目の品を選ばない
-            dp[i][j] = max(dp[i - 1][j], dp[i][j])
-            # i - 1番目の品を選ぶ
-            if j + w[i - 1] < W + 1:
-                dp[i][j + w[i - 1]] = dp[i - 1][j] + v[i - 1]
-    print(dp[-1][-1])
+            if dp[i][j] == -INF:
+                continue
+            if j + w[i] < W + 1:
+                dp[i + 1][j + w[i]] = max(dp[i + 1][j + w[i]], dp[i][j] + v[i])
+            dp[i + 1][j] = max(dp[i + 1][j], dp[i][j])
+    # for i in range(N + 1):
+    #     print(dp[i])
+    print(max(dp[-1]))
     return
 
 

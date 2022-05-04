@@ -1,29 +1,25 @@
 #!/usr/bin/env python3
-from bisect import bisect_left
-from itertools import accumulate
 import sys
 
-MOD = 998244353
-
 def main():
-    N, Q = map(int, input().split())
+    N = int(input())
     A = list(map(int, input().split()))
-    B = []
+    l = [0] * N
     for aa in A:
-        for i in range(1, aa + 1):
-            B.append(i)
-    SB = list(accumulate(B))
-    m = len(SB)
-    # print(SB)
-    for _ in range(Q):
-        S = int(input())
-        if S == SB[-1]:
-            print(m)
-            continue
-        ans = bisect_left(SB, S)
-        print(ans + 1 if ans < m else -1)
+        l[aa - 1] += 1
+    q = []
+    w = []
+    for i, ll in enumerate(l):
+        if ll == 0:
+            q.append(i)
+        if ll > 1:
+            for _ in range(ll - 1):
+                w.append(i)
+    ans = 0
+    for qq, ww in zip(q, w):
+        ans += abs(qq - ww)
+    print(ans)
     return
 
 if __name__ == '__main__':
     main()
-

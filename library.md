@@ -12,6 +12,10 @@ for i in range(M):
 print(G)
 ```
 
+## 辞書のソート
+
+sorted(d.items(), key=lambda x:x[0])
+
 ## 入力受け取り
 
 ```python

@@ -2,7 +2,7 @@
 import sys
 
 def solve(N: int, K: int, a: "List[int]"):
-    dp = [2] + [0] * K
+    dp = [2] + [0] * K # dp[i] := i個残っている時からゲームを開始するとどっちが勝つか。
     for i in range(1, K + 1):
         for aa in a:
             if i - aa < 0 or dp[i - aa] == 1:
