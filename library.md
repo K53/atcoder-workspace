@@ -64,26 +64,7 @@ return
 ## 探索
 
 ### 二分探索
-
-```python
-# True ------ ok | ng ---- False
-def is_ok(k: int):
-    return k * (k + 1) // 2 <= n + 1    # 条件式
-
-def binSearch(ok: int, ng: int):
-    # print(ok, ng)              # はじめの2値の状態
-    while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
-        mid = (ok + ng) // 2
-        # print("target > ", mid)
-        result = is_ok(mid)
-        # print(result)
-        if result:
-            ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
-        else:
-            ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
-        # print(ok, ng)          # 半分に切り分ける毎の2値の状態
-    return ok    # 関数呼び出し時の引数のngは絶対評価されないのでngに書く値が答えになりうるならその数マイナス1を指定する。
-```
+→ BinarySearch.py
 
 ### ビット全探索
 
@@ -498,109 +479,7 @@ cmp = d.scc() # 強連結成分分解
 ```
 
 ### BFS
-
-```python
-# = bfs(グラフ) =======================================================================
-# ----------------------------------------------------------------
-# Input
-#   1. 隣接リスト
-#   2. 開始ノード
-# Output
-#   スタートから各ノードへの最小コスト
-# Order
-#   O(V + E)
-# ----------------------------------------------------------------
-from collections import deque
-def bfs(edges: "List[to]", start_node: int) -> list:
-    INF = 10 ** 16
-    q = deque()
-    dist = [INF] * len(edges)
-    q.append(start_node)
-    dist[start_node] = 0
-    while q:
-        now = q.popleft()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.append(next)
-            dist[next] = dist[now] + 1
-    return dist
-# = bfs(グリッド) =======================================================================
-# ----------------------------------------------------------------
-# Input
-#   1. 全てのマスが隣接したフィールドの二次元配列
-#   2. 1の高さ
-#   3. 1の幅
-#   4. スタート地点のy座標
-#   5. スタート地点のx座標
-# Output
-#   スタートから各ノードへの最小コスト
-# Order
-#    O(V + E)
-# Note
-#   開始点が壁の場合には除く必要あり。
-# ----------------------------------------------------------------
-from collections import deque
-def bfs(edges, H, W, startY, startX) -> list:
-    INF = 10 ** 16
-    q = deque()
-    dist = [[INF] * W for _ in range(H)]
-    q.append((startY, startX))
-    dist[startY][startX] = 0
-    while q:
-        nowy, nowx = q.popleft()
-        for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
-            nexty = nowy + dy
-            nextx = nowx + dx
-            if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
-                continue
-            q.append((nexty, nextx))
-            dist[nexty][nextx] = dist[nowy][nowx] + 1
-    return dist
-# ======================================================================================
-
-# ======================================================================================
-# 多始点BFS
-# 未検証
-def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
-    from collections import deque
-    INF = 10 ** 16
-    q = deque()
-    dist = [INF] * len(edges)
-    for start_node in start_nodes:
-        q.append(start_node)
-        dist[start_node] = 0
-    while q:
-        now = q.popleft()
-        for next in edges[now]:
-            if dist[next] != INF:
-                continue
-            q.append(next)
-            dist[next] = dist[now] + 1
-    return dist
-
-# ======================================================================================
-# 多始点BFS(グリッド)
-def multiStartBfs(edges, H, W, startPoints: "List[set(startY, startX)]") -> list:
-        from collections import deque
-        INF = 10 ** 16
-        q = deque()
-        dist = [[INF] * W for _ in range(H)]
-        for startY, startX in startPoints:
-            q.append((startY, startX))
-            dist[startY][startX] = 0
-        while q:
-            nowy, nowx = q.popleft()
-            for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
-                nexty = nowy + dy
-                nextx = nowx + dx
-                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
-                    continue
-                q.append((nexty, nextx))
-                dist[nexty][nextx] = dist[nowy][nowx] + 1
-        return dist
-# ======================================================================================
-```
+→ BFS.py
 
 ## 動的計画法
 

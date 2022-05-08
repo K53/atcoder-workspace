@@ -1,63 +1,66 @@
 #!/usr/bin/env python3
 import sys
 import heapq
-INF = 10 ** 13
 SILVER_MAX = 2500
-
-def dijkstra(edges: "List[List[(cost, to, silver)]]", C: "List[int]", D: "List[int]", start_node: int, init_silver: int):
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    # dist[i][s] := 銀貨をs枚持った状態で頂点iに到達する時のコスト
-    dist = [[INF] * (SILVER_MAX + 1) for _ in range(len(edges))]
-    heapq.heappush(hq, (0, start_node, init_silver))
-    dist[start_node][init_silver] = 0
+INF = 10 ** 16
+class Dijkstra():
+    def __init__(self, N: int) -> None:
+        self.N = N 
+        self.G = [[] for _ in range(N)]
+        return
     
-    # dijkstra
-    while hq:
-        min_cost, node_now, silver_now = heapq.heappop(hq)
-        # いつも通り、既に最短コストのパスが発見されているならスキップ
-        if min_cost > dist[node_now][silver_now]:
-            continue
-
-        # 補充(状態変化)
-        # 2500枚を超えて銀貨に換える必要がないためフィルタ
-        if silver_now + C[node_now] <= SILVER_MAX:
-            # 交換後の銀貨の枚数
-            silver_next = silver_now + C[node_now]
-            if dist[node_now][silver_next] > min_cost + D[node_now]:    # 交換にかかる時間を加味して比較。そこで交換する方がいいか判定。
-                dist[node_now][silver_next] = min_cost + D[node_now]
-                heapq.heappush(hq, (dist[node_now][silver_next], node_now, silver_next))
-
-        # 辺の通過
-        # 駅を移動するのに銀貨を消費する。
-        for cost, next, silver in edges[node_now]: 
-            remain_silver = min(silver_now - silver, SILVER_MAX)
-            if remain_silver < 0:                                       # 手持ちの銀貨で移動不可ならスキップ
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, time_cost: int, silver_cost: int):
+        self.G[fromNode].append((time_cost, silver_cost, toNode))
+    
+    def build(self, startNode: int, silver_init: int, C: list, D: list):
+        hq = []
+        heapq.heapify(hq)
+        # Set start info
+        dist = [[INF] * (SILVER_MAX + 1) for _ in range(self.N)]
+        heapq.heappush(hq, (0, startNode, silver_init))
+        dist[startNode][silver_init] = 0
+        # dijkstra
+        while hq:
+            min_time_cost, node_now, silver_now = heapq.heappop(hq)
+            if min_time_cost > dist[node_now][silver_now]:
                 continue
-               
-            if dist[next][remain_silver] > min_cost + cost:             # いつも通り
-                dist[next][remain_silver] = min_cost + cost
-                heapq.heappush(hq, (dist[next][remain_silver], next, remain_silver))
-    return dist
+
+            # State Change
+            silver_next = silver_now + C[node_now]
+            if silver_next < SILVER_MAX:
+                if dist[node_now][silver_next] > dist[node_now][silver_now] + D[node_now]:
+                    dist[node_now][silver_next] = dist[node_now][silver_now] + D[node_now]
+                    heapq.heappush(hq, (dist[node_now][silver_next], node_now, silver_next))
+
+            # Move Node
+            for time_cost, silver_cost, node_next in self.G[node_now]:
+                silver_next = silver_now - silver_cost
+                if silver_next < 0:
+                    continue
+                if dist[node_next][silver_next] > dist[node_now][silver_now] + time_cost:
+                    dist[node_next][silver_next] = dist[node_now][silver_now] + time_cost
+                    heapq.heappush(hq, (dist[node_next][silver_next], node_next, silver_next))
+        return dist
 
 def main():
     N, M, S = map(int, input().split())
     init_silver = min(S, SILVER_MAX)
 
-    edges = [[] for _ in range(N)]
+    dk = Dijkstra(N)
     for _ in range(M):
         u, v, a, b = map(int, input().split())
-        edges[u - 1].append((b, v - 1, a))
-        edges[v - 1].append((b, u - 1, a))
+        dk.addEdge(u - 1, v - 1, b, a)
+        dk.addEdge(v - 1, u - 1, b, a)
+
     C, D = [], []
-    for i in range(N):
+    for _ in range(N):
         c, d = map(int, input().split())
         C.append(c)
         D.append(d)
-    
-    dist = dijkstra(edges, C, D, 0, init_silver)
-    print(*[min(d) for d in dist[1:]], sep="\n")
+    dist = dk.build(0, init_silver, C, D)
+    for i in range(1, N):
+        print(min(dist[i]))
 
 if __name__ == '__main__':
     main()

@@ -2,34 +2,42 @@
 import sys
 import heapq
 INF = 10 ** 18
-def dijkstra(edges: "List[List[(cost, departure, to)]]", start_node: int) -> list:
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [INF] * len(edges)
-    heapq.heappush(hq, (0, start_node))
-    dist[start_node] = 0
-    # dijkstra
-    while hq:
-        min_cost, now = heapq.heappop(hq)
-        if min_cost > dist[now]:
-            continue
-        for cost, departure, next in edges[now]:
-            rest = 0 if min_cost % departure == 0 else departure - min_cost % departure
-            if dist[next] > dist[now] + cost + rest:
-                dist[next] = dist[now] + cost + rest
-                heapq.heappush(hq, (dist[next], next))
-    return dist
+class Dijkstra():
+    def __init__(self, N: int) -> None:
+        self.N = N
+        self.G = [[] for _ in range(N)]
+        return
+    
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, cost: int, time: int):
+        self.G[fromNode].append((cost, time, toNode))
+    
+    def build(self, startNode: int):
+        hq = []
+        heapq.heapify(hq)
+        # Set start info
+        dist = [INF] * self.N
+        heapq.heappush(hq, (0, startNode))
+        dist[startNode] = 0
+        # dijkstra
+        while hq:
+            min_cost, now = heapq.heappop(hq)
+            if min_cost > dist[now]:
+                continue
+            for cost, time, next in self.G[now]:
+                wait = 0 if min_cost % time == 0 else time - min_cost % time
+                if dist[next] > dist[now] + cost + wait:
+                    dist[next] = dist[now] + cost + wait
+                    heapq.heappush(hq, (dist[next], next))
+        return dist
+
 
 def solve(N: int, M: int, X: int, Y: int, A: "List[int]", B: "List[int]", T: "List[int]", K: "List[int]"):
-    edegs = [[] for _ in range(N)]
-    for i in range(M):
-        a, b, c, st = A[i], B[i], T[i], K[i]
-        edegs[a - 1].append((c, st, b - 1))
-        edegs[b - 1].append((c, st, a - 1))
-    dist = dijkstra(edegs, X - 1)
-    # print("###")
-    # print(dist)
+    dk = Dijkstra(N)
+    for aa, bb, tt, kk in zip(A, B, T, K):
+        dk.addEdge(aa - 1, bb - 1, tt, kk)
+        dk.addEdge(bb - 1, aa - 1, tt, kk)
+    dist = dk.build(X - 1)
     ans = dist[Y - 1]
     print(-1 if ans == INF else ans)
     return 

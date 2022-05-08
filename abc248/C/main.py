@@ -1,20 +1,38 @@
 #!/usr/bin/env python3
+from itertools import accumulate
 import sys
 
 MOD = 998244353  # type: int
 
-
 def solve(N: int, M: int, K: int):
+
+    # # dp[i][j] := i項目までの時に、和がjとなる場合の和 
+    # dp = [[0] * (K + 1) for _ in range(N + 1)]
+    # dp[0][0] = 1
+    # for i in range(N):
+    #     for j in range(K + 1):
+    #         for mm in range(M):
+    #             if j - (mm + 1) >= 0:
+    #                 dp[i + 1][j] += dp[i][j - (mm + 1)]
+    #                 dp[i + 1][j] %= MOD
+    # print(sum(dp[-1]) % MOD)
+
+    # 累積和で高速化
     # dp[i][j] := i項目までの時に、和がjとなる場合の和 
     dp = [[0] * (K + 1) for _ in range(N + 1)]
     dp[0][0] = 1
-    for i in range(N):
+    sdp = list(accumulate(dp[0]))
+    for i in range(1, N + 1):
         for j in range(K + 1):
-            for mm in range(M):
-                if j - (mm + 1) >= 0:
-                    dp[i + 1][j] += dp[i][j - (mm + 1)]
-                    dp[i + 1][j] %= MOD
+            if j - i < 0:
+                continue
+            j -= i # 0を配る場合は考慮しないので先に分配しておく。
+            dp[i][j] = sdp[j] - (sdp[j - M] if j - M >= 0 else 0)
+            dp[i][j] %= MOD
+        # print(dp[i])
+        sdp = list(accumulate(dp[i]))
     print(sum(dp[-1]) % MOD)
+
     return
 
 
