@@ -33,6 +33,7 @@ class LcaDoubling:
     
     def addEdge(self, a: int, b: int, cost: int):
         self.G[a].append((cost, b))
+        print("Really directed Graph?")
         return
     
     def build(self):
