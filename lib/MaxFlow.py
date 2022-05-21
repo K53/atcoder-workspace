@@ -25,6 +25,7 @@ class FordFulkerson:
         # G[fromNode] = [toNode, capacity, [fromNode, capacity, [...]]] # 循環参照のためGを出力すると無限に続く。
         self.G = [[] for _ in range(N)] 
 
+     # from / to なの良くない 要改善
     def addEdge(self, fromNode, toNode, capacity):
         forward = [toNode, capacity, None]
         forward[2] = backward = [fromNode, 0, forward]

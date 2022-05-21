@@ -37,12 +37,15 @@ class Dijkstra():
     # 辺の追加
     def addEdge(self, fromNode: int, toNode: int, cost: int):
         self.G[fromNode].append((cost, toNode))
+        print("Really directed Graph?")
+        return
     
     def build(self, startNode: int):
         hq = []
         heapq.heapify(hq)
         # Set start info
         dist = [INF] * self.N
+        # prev = [-1] * self.N # 経路復元する場合は移動時に直前の頂点や辺を記録して遷移していく。
         heapq.heappush(hq, (0, startNode))
         dist[startNode] = 0
         # dijkstra
@@ -53,6 +56,7 @@ class Dijkstra():
             for cost, next in self.G[now]:
                 if dist[next] > dist[now] + cost:
                     dist[next] = dist[now] + cost
+                    # prev[next] = now # 頂点nextに至る直前の頂点を更新。
                     heapq.heappush(hq, (dist[next], next))
         return dist
 
@@ -134,7 +138,9 @@ class Dijkstra():
     # 辺の追加
     def addEdge(self, fromNode: int, toNode: int, time_cost: int, silver_cost: int):
         self.G[fromNode].append((time_cost, silver_cost, toNode))
-    
+        print("Really directed Graph?")
+        return
+        
     def build(self, startNode: int, silver_init: int, C: list, D: list):
         hq = []
         heapq.heapify(hq)

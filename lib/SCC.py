@@ -39,6 +39,8 @@ class SCC():
         self.G[fromNode].append(toNode)
         # 逆向きグラフを別途構築
         self.rG[toNode].append(fromNode)
+        print("Really directed Graph?")
+        return
 
     # DFS
     def _dfs(self, now: int):

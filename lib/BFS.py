@@ -12,15 +12,15 @@
 #  省略 検証済み
 # ------------------------------------------------------------------------------
 from collections import deque
-def bfs(edges: "List[to]", start_node: int) -> list:
+def bfs(G: "List[to]", start_node: int) -> list:
     INF = 10 ** 16
     q = deque()
-    dist = [INF] * len(edges)
+    dist = [INF] * len(G)
     q.append(start_node)
     dist[start_node] = 0
     while q:
         now = q.popleft()
-        for next in edges[now]:
+        for next in G[now]:
             if dist[next] != INF:
                 continue
             q.append(next)
@@ -46,7 +46,7 @@ def bfs(edges: "List[to]", start_node: int) -> list:
 #  省略 検証済み
 # ------------------------------------------------------------------------------
 from collections import deque
-def bfs(edges, H, W, startY, startX) -> list:
+def bfs(G, H, W, startY, startX) -> list:
     INF = 10 ** 16
     q = deque()
     dist = [[INF] * W for _ in range(H)]
@@ -57,7 +57,7 @@ def bfs(edges, H, W, startY, startX) -> list:
         for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
             nexty = nowy + dy
             nextx = nowx + dx
-            if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
+            if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or G[nexty][nextx] == "#":
                 continue
             q.append((nexty, nextx))
             dist[nexty][nextx] = dist[nowy][nowx] + 1
@@ -76,17 +76,17 @@ def bfs(edges, H, W, startY, startX) -> list:
 # verify
 #  未検証
 # ------------------------------------------------------------------------------
-def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
+def multiStartBfs(G: "List[to]", start_nodes: "List[int]") -> list:
     from collections import deque
     INF = 10 ** 16
     q = deque()
-    dist = [INF] * len(edges)
+    dist = [INF] * len(G)
     for start_node in start_nodes:
         q.append(start_node)
         dist[start_node] = 0
     while q:
         now = q.popleft()
-        for next in edges[now]:
+        for next in G[now]:
             if dist[next] != INF:
                 continue
             q.append(next)
@@ -111,7 +111,7 @@ def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
 # verify
 #  未検証
 # ------------------------------------------------------------------------------
-def multiStartBfs(edges, H, W, startPoints: "List[set(startY, startX)]") -> list:
+def multiStartBfs(G, H, W, startPoints: "List[set(startY, startX)]") -> list:
         from collections import deque
         INF = 10 ** 16
         q = deque()
@@ -124,7 +124,7 @@ def multiStartBfs(edges, H, W, startPoints: "List[set(startY, startX)]") -> list
             for dx, dy in [(0, 1), (1, 0), (-1, 0), (0, -1)]:
                 nexty = nowy + dy
                 nextx = nowx + dx
-                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or edges[nexty][nextx] == "#":
+                if nexty < 0 or nextx < 0 or nexty >= H or nextx >= W or dist[nexty][nextx] != INF or G[nexty][nextx] == "#":
                     continue
                 q.append((nexty, nextx))
                 dist[nexty][nextx] = dist[nowy][nowx] + 1

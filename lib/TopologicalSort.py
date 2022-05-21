@@ -51,6 +51,8 @@ class TopologicalTree:
     def addEdge(self, fromNode: int, toNode: int):
         self.G[fromNode].append(toNode)
         self.degree[toNode] += 1
+        print("Really directed Graph?")
+        return
         
     def topologicalSort(self):
         deq = deque([node for node in range(self.N) if self.degree[node] == 0]) # 入次数0のものがスタート
@@ -147,6 +149,8 @@ class TopologicalTree:
     # 辺の追加
     def addEdge(self, fromNode: int, toNode: int):
         self.G[fromNode].append(toNode)
+        print("Really directed Graph?")
+        return
 
     def _rec(self, now: int):
         self.seen[now] = True
