@@ -1,33 +1,36 @@
 #!/usr/bin/env python3
 import sys
-MOD = 998244353
-input = sys.stdin.readline
+# MOD = 998244353
+MAX = 500
+MOD = 1000000007  # type: int
+
+fac, finv, inv = [1, 1], [1, 1], [0, 1]
+# fac : 階乗(1,2,6,...)
+# inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
+# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
+def cmbInit():
+    for i in range(2, MAX):
+        fac.append(fac[i - 1] * i % MOD)
+        inv.append(MOD - inv[MOD % i] * (MOD // i) % MOD)
+        finv.append(finv[i - 1] * inv[i] % MOD)
+
+# 二項係数計算
+def cmbMod(n: int, k: int):
+    if n < k: return 0
+    if n < 0 or k < 0: return 0
+    return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD
 
 def main():
-    A, B, N, M = map(int, input().split())
-    # False ------ ng | ok ---- True
-    def is_ok(k: int):
-        if A >= k:
-            return B + (A - k) // N >= k
-        elif B >= k:
-            return A + (B - k) // M >= k
-        return False
-
-    def binSearch(ng: int, ok: int):
-        # print(ok, ng)              # はじめの2値の状態
-        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
-            mid = (ok + ng) // 2
-            # print("target > ", mid)
-            result = is_ok(mid)
-            # print(result)
-            if result:
-                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
-            else:
-                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
-            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
-        return ok  
-
-    print(binSearch(10 ** 18 + 1, 0))
+    N = int(input())
+    A = list(map(int, input().split()))
+    ans = 0
+    cmbInit()
+    for i in range(N):
+        ans += A[i] * cmbMod(N - 1, i)
+        # print(A[i], cmbMod(N - 1, i))
+        # print(ans)
+        ans %= MOD
+    print(ans)
     return
 
 if __name__ == '__main__':

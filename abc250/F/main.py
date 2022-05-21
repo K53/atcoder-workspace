@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import sys
 
-MOD = 5  # type: int
 
-
-def solve(m: int):
+def solve(N: int, X: "List[int]", Y: "List[int]"):
     return
 
 
@@ -15,8 +13,13 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    m = int(next(tokens))  # type: int
-    solve(m)
+    N = int(next(tokens))  # type: int
+    X = [int()] * (N)  # type: "List[int]"
+    Y = [int()] * (N)  # type: "List[int]"
+    for i in range(N):
+        X[i] = int(next(tokens))
+        Y[i] = int(next(tokens))
+    solve(N, X, Y)
 
 if __name__ == '__main__':
     main()

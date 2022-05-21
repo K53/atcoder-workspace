@@ -3,6 +3,22 @@ import sys
 
 
 def solve(N: int, S: str):
+    d = dict()
+    ans = set()
+    for i in range(N):
+        if not S[i] in d.keys():
+            d[S[i]] = i
+    
+    for k, v in d.items():
+        dd = dict()
+        for i in range(v + 1, N):
+            if not S[i] in dd.keys():
+                dd[S[i]] = i
+        
+        for kk, vv in dd.items():
+            for i in range(vv + 1, N):
+                ans.add(k + kk + S[i])
+    print(len(ans))
     return
 
 
