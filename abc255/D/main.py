@@ -5,33 +5,32 @@ import itertools
 
 
 def solve(N: int, Q: int, A: "List[int]", X: "List[int]"):
-    nums = [0] * Q
-    counts = [0] * Q
-    sX = sorted(X)
-    for aa in A:
-        idx = bisect.bisect_right(sX, aa) - 1
-        # print(idx)
-        nums[idx] += aa
-        counts[idx] += 1
-    # print(nums)
-    # print(counts)
-    s_nums = [0] + list(itertools.accumulate(nums))
-    s_counts = [0] + list(itertools.accumulate(counts))
-    s_nums.append(s_nums[-1])
-    s_counts.append(s_counts[-1])
+    sortedA = sorted(A)
+    sumA = [0] + list(itertools.accumulate(sortedA))
+    # print(sumA)
     for xx in X:
-        idx = bisect.bisect_right(sX, xx) - 1
-        ans = 0
-        if s_nums[idx + 1] - s_nums[idx] != s_counts[idx + 1] - s_counts[idx]:
+        idx = bisect.bisect_left(sortedA, xx)
+        # print(idx, idx * xx, sumA[idx])
+        # print(idx, sumA[-1] - sumA[idx], (len(sumA) - idx - 1) * xx)
+        print(idx * xx - sumA[idx] + (sumA[-1] - sumA[idx] - (len(sumA) - idx - 1) * xx))
+    
+    # s_nums = [0] + list(itertools.accumulate(nums))
+    # s_counts = [0] + list(itertools.accumulate(counts))
+    # s_nums.append(s_nums[-1])
+    # s_counts.append(s_counts[-1])
+    # for xx in X:
+    #     idx = bisect.bisect_right(sX, xx) - 1
+    #     ans = 0
+    #     if s_nums[idx + 1] - s_nums[idx] != s_counts[idx + 1] - s_counts[idx]:
 
-        # print((s_nums[-1] - s_nums[idx]) - (s_counts[-1] - s_counts[idx]) * xx)
-            ans += (s_nums[-1] - s_nums[idx]) - (s_counts[-1] - s_counts[idx]) * xx
-        # if idx != 0:
-        # print(s_nums[idx] - s_nums[0])
-        # print(s_counts[idx] - s_counts[0])
-        # print((s_counts[idx] - s_counts[0]) * xx - (s_nums[idx] - s_nums[0]))
-        ans += (s_counts[idx] - s_counts[0]) * xx - (s_nums[idx] - s_nums[0])
-        print(ans)
+    #     # print((s_nums[-1] - s_nums[idx]) - (s_counts[-1] - s_counts[idx]) * xx)
+    #         ans += (s_nums[-1] - s_nums[idx]) - (s_counts[-1] - s_counts[idx]) * xx
+    #     # if idx != 0:
+    #     # print(s_nums[idx] - s_nums[0])
+    #     # print(s_counts[idx] - s_counts[0])
+    #     # print((s_counts[idx] - s_counts[0]) * xx - (s_nums[idx] - s_nums[0]))
+    #     ans += (s_counts[idx] - s_counts[0]) * xx - (s_nums[idx] - s_nums[0])
+    #     print(ans)
 
 
 
