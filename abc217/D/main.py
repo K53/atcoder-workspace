@@ -1,21 +1,151 @@
 #!/usr/bin/env python3
 import sys
+import bisect
 
+INF = 10 ** 9
+class BIT:
+    def __init__(self, N):
+        self.N = N
+        self.bit = [0] * (self.N + 1) # 1-indexedのため
+        
+    def add(self, pos, val):
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            A[pos] += val 
+        '''
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] += val
+            i += i & -i
+
+    def sum(self, pos):
+        ''' Sum
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            Return Sum(A[0], ... , A[pos])
+        '''
+        res = 0
+        i = pos + 1 # convert from 0-index to 1-index
+        while i > 0:
+            res += self.bit[i]
+            i -= i & -i    
+        return res
+    
+    def lowerLeft(self, w):
+        '''
+        O(logN)
+        A0 ~ Aiの和がw以上となる最小のindex(値)を返す。
+        Ai ≧ 0であること。
+        '''
+        if (w < 0):
+            return 0
+        total = self.sum(self.N - 1)
+        if w > total:
+            return -1
+        x = 0
+        k = 1 << (self.N.bit_length() - 1)
+        while k > 0:
+            if x + k < self.N and self.bit[x + k] < w:
+                w -= self.bit[x + k]
+                x += k
+            k //= 2
+        return x
+        
+    def __str__(self):
+        '''
+        index0は不使用なので表示しない。
+        '''
+        return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
+    
+class MultiSet:
+    def __init__(self, allVals: "list[int]" ,isSorted: bool = False):
+        # print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
+        self.arr = allVals if isSorted else sorted(allVals)
+        self.bit = BIT(len(allVals))
+        self.ammounts = 0
+        
+    def insert(self, val: int, count: int = 1):
+        idx = bisect.bisect_left(self.arr, val)
+        self.bit.add(idx, count)
+        self.ammounts += count
+    
+    def delete(self, val: int, count : int = 1):
+        k = bisect.bisect_left(self.arr, val)
+        self.bit.add(k, -count)
+        self.ammounts -= count
+    
+    def getKth(self, k: int) -> int:
+        '''getKth
+        k : 0-indexed
+        小さい方からK番目の値を取得。
+        '''
+        return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
+    
+    def countLessThanOrEqualTo(self, val: int) -> int:
+        '''
+        val以下(≦ val)の要素数を返す。
+        '''
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val))
+    
+    def countUnder(self, val: int) -> int:
+        '''
+        val未満(< val)の要素数を返す。
+        '''
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val) - 1) # sum()は負なら0が返るのでvalがarrの最下端の数字でもOK
+
+    def upperBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|-|< - - ->|
+                 l u
+        valより大きい値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countLessThanOrEqualTo(val) + k)
+
+    def lowerBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|<-| - - ->|
+                 l  u
+        val以上の値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countUnder(val) + k)
+
+    def __str__(self):
+        res = []
+        for i in range(len(self.arr)):
+            count = self.bit.sum(i) - (self.bit.sum(i - 1) if i - 1 >= 0 else 0)
+            for _ in range(count):
+                res.append(i)
+        return "[" + ", ".join(f'{self.arr[v]}' for v in res) + "]"
 
 def solve(L: int, Q: int, c: "List[int]", x: "List[int]"):
-    L = 10 ** 9
-    Q = 2 * 10 ** 5
-    c = [1] * (10 ** 5 + 5 * 10 ** 4) + [2] * 10 ** 5
-    x = [i for i in range(1, 2 * 10 ** 5 + 1, 2)] + [i for i in range(2, 2 * 10 ** 5 + 10, 2)]
-    import bisect
-    l = [0, L]
-    for i in range(Q):
-        if c[i] == 1:
-            new = bisect.bisect_left(l, x[i])
-            l.insert(new, x[i])
+    kinds = set((0, L))
+    revkinds = set((0, -L))
+    for qq in range(Q):
+        kinds.add(x[qq])
+        revkinds.add(-x[qq])
+    ms = MultiSet(list(kinds), False)
+    revms = MultiSet(list(revkinds), False)
+    ms.insert(0)
+    revms.insert(0)
+    ms.insert(L)
+    revms.insert(-L)
+
+    for qq in range(Q):
+        if c[qq] == 1:
+            ms.insert(x[qq])
+            revms.insert(-x[qq])
         else:
-            k = bisect.bisect_left(l, x[i])
-            print(l[k] - l[k - 1])
+            # print(ms.countUnder(x[qq]))
+            left = ms.getKth(ms.countUnder(x[qq]) - 1)
+
+            # print(revms.countUnder(-x[qq]))
+            right = revms.getKth(revms.countUnder(-x[qq]) - 1)
+            print(-right - left)
     return
 
 
