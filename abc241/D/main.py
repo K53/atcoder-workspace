@@ -1,209 +1,147 @@
 #!/usr/bin/env python3
 
-from collections import defaultdict
-import re
+import bisect
+INF = 10 ** 9
 
+class BIT:
+    def __init__(self, N):
+        self.N = N
+        self.bit = [0] * (self.N + 1) # 1-indexedのため
+        
+    def add(self, pos, val):
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            A[pos] += val 
+        '''
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] += val
+            i += i & -i
 
-class BalancingTree:
-    def __init__(self, n):
-        self.N = n
-        self.root = self.node(None, 1<<n)
-
-    def append(self, v):# v を追加（その時点で v はない前提）
-        print(v, "$1")
-        v += 1
-        nd = self.root
-        if not nd.value:
-            nd.value = v
-            return
-        while True:
-            if v == nd.value:
-                # v がすでに存在する場合に何か処理が必要ならここに書く
-                return 0
-            else:
-                mi, ma = min(v, nd.value), max(v, nd.value)
-                if mi < nd.pivot:   # 小さい値を左へ
-                    nd.value = ma
-                    if nd.left: # すでに左が埋まってるなら同じ処理を繰り返し
-                        nd = nd.left
-                        v = mi
-                        print(v, "$")
-                    else:
-                        p = nd.pivot
-                        nd.left = self.node(mi, p - (p&-p)//2)
-                        break
-                else:
-                    nd.value = mi
-                    if nd.right:
-                        nd = nd.right
-                        v = ma
-                        print(v, "#")
-                    else:
-                        p = nd.pivot
-                        nd.right = self.node(ma, p + (p&-p)//2)
-                        break
-
-    def leftmost(self, nd):
-        if nd.left: return self.leftmost(nd.left)
-        return nd
-
-    def rightmost(self, nd):
-        if nd.right: return self.rightmost(nd.right)
-        return nd
-
-    def upper_bound(self, v): # vより真に小さいやつの中での最大値（なければ-1）
-        v += 1
-        nd = self.root
-        prev = 0
-        if not nd.value:
+    def sum(self, pos):
+        ''' Sum
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            Return Sum(A[0], ... , A[pos])
+        '''
+        res = 0
+        i = pos + 1 # convert from 0-index to 1-index
+        while i > 0:
+            res += self.bit[i]
+            i -= i & -i    
+        return res
+    
+    def lowerLeft(self, w):
+        '''
+        O(logN)
+        A0 ~ Aiの和がw以上となる最小のindexを返す。
+        '''
+        if (w < 0):
             return -1
-        if nd.value < v: prev = nd.value
-        while True:
-            if v <= nd.value:
-                if nd.left:
-                    nd = nd.left
-                else:
-                    return prev - 1
-            else:
-                prev = nd.value
-                if nd.right:
-                    nd = nd.right
-                else:
-                    return prev - 1
+        x = 0
+        k = 1 << (self.N.bit_length() - 1)
+        while k > 0:
+            if x + k < self.N and self.bit[x + k] < w:
+                w -= self.bit[x + k]
+                x += k
+            k //= 2
+        return x
 
-    def lower_bound(self, v): # vより真に大きいやつの中での最小値（なければRoot）
-        v += 1
-        nd = self.root
-        prev = 0
-        # print(nd.value, v)
-        if not nd.value:
-            return -1
-        if nd.value > v: prev = nd.value
-        # print("!", prev)
-        while True:
-            if v < nd.value:
-                prev = nd.value
-                if nd.left:
-                    nd = nd.left
-                else:
-                    # print("#", v, nd.value)
-                    return prev - 1
-            else:
-                if nd.right:
-                    nd = nd.right
-                else:
-                    # print("-", v, nd.value)
-                    return prev - 1
+class MultiSet:
+    def __init__(self, allVals: "list[int]" ,isSorted: bool = False):
+        self.arr = allVals if isSorted else sorted(allVals) #eg. [0, 1, 2, 4] 
+        self.bit = BIT(len(allVals)) #eg. [0, 1, 1, 2, 4] 
+        self.ammounts = 0
+        
+    def insert(self, val: int, count: int = 1):
+        idx = bisect.bisect_left(self.arr, val)
+        self.bit.add(idx, count)
+        self.ammounts += count
+    
+    def delete(self, val: int, count : int = 1):
+        k = bisect.bisect_left(self.arr, val)
+        self.bit.add(k, -count)
+        self.ammounts -= count
+    
+    def getKth(self, k: int) -> int:
+        '''getKth
+        k : 0-indexed
+        小さい方からK番目の値を取得。
+        '''
+        return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
+    
+    def countLessThanOrEqualTo(self, val: int) -> int:
+        '''
+        val以下(≦ val)の要素数を返す。
+        '''
+        # print("#", bisect.bisect_right(self.arr, val))
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val))
+    
+    def countUnder(self, val: int) -> int:
+        '''
+        val未満(≦ val)の要素数を返す。
+        '''
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val) - 1) # sum()は負なら0が返るのでvalがarrの最下端の数字でもOK
 
-    # @property
-    # def max(self):
-    #     return self.upper_bound((1<<self.N)-1)
+    def upperBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|-|< - - ->|
+                 l u
+        valより大きい値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countLessThanOrEqualTo(val) + k)
 
-    # @property
-    # def min(self):
-    #     return self.lower_bound(-1)
+    def lowerBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|<-| - - ->|
+                 l u
+        valより大きい値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countUnder(val) + k)
 
-    # def delete(self, v, nd = None, prev = None): # 値がvのノードがあれば削除（なければ何もしない）
-    #     v += 1
-    #     if not nd: nd = self.root
-    #     if not prev: prev = nd
-    #     while v != nd.value:
-    #         prev = nd
-    #         if v <= nd.value:
-    #             if nd.left:
-    #                 nd = nd.left
-    #             else:
-    #                 #####
-    #                 return
-    #         else:
-    #             if nd.right:
-    #                 nd = nd.right
-    #             else:
-    #                 #####
-    #                 return
-    #     if (not nd.left) and (not nd.right):
-    #         if not prev.left:
-    #             prev.right = None
-    #         elif not prev.right:
-    #             prev.left = None
-    #         else:
-    #             if nd.pivot == prev.left.pivot:
-    #                 prev.left = None
-    #             else:
-    #                 prev.right = None
-
-    #     elif nd.right:
-    #         # print("type A", v)
-    #         nd.value = self.leftmost(nd.right).value
-    #         self.delete(nd.value - 1, nd.right, nd)    
-    #     else:
-    #         # print("type B", v)
-    #         nd.value = self.rightmost(nd.left).value
-    #         self.delete(nd.value - 1, nd.left, nd)
-
-    def __contains__(self, v: int) -> bool:
-        return self.lower_bound(v - 1) == v
-
-    class node:
-        def __init__(self, v, p):
-            self.value = v
-            self.pivot = p
-            self.left = None
-            self.right = None
-
-    # def debug(self):
-    #     def debug_info(nd_):
-    #         return (nd_.value - 1, nd_.pivot - 1, nd_.left.value - 1 if nd_.left else -1, nd_.right.value - 1 if nd_.right else -1)
-
-    #     def debug_node(nd):
-    #         re = []
-    #         if nd.left:
-    #             re += debug_node(nd.left)
-    #         if nd.value: re.append(debug_info(nd))
-    #         if nd.right:
-    #             re += debug_node(nd.right)
-    #         return re
-    #     print("Debug - root =", self.root.value - 1, debug_node(self.root)[:50])
-
-    # def debug_list(self):
-    #     def debug_node(nd):
-    #         re = []
-    #         if nd.left:
-    #             re += debug_node(nd.left)
-    #         if nd.value: re.append(nd.value - 1)
-    #         if nd.right:
-    #             re += debug_node(nd.right)
-    #         return re
-    #     return debug_node(self.root)[:-1]
-
+    def __str__(self):
+        res = []
+        for i in range(len(self.arr)):
+            count = self.bit.sum(i) - (self.bit.sum(i - 1) if i - 1 >= 0 else 0)
+            for _ in range(count):
+                res.append(i)
+        return "[" + ", ".join(f'{v}' for v in res) + "]"
+  
 # Generated by 2.12.0 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)
 def main():
     Q = int(input())
-    BT = BalancingTree(18)
-    # d = defaultdict(int)
-    for _ in range(10 ** 3):
+    queries = []
+    numbers = set()
+    for _ in range(Q):
         qq = list(map(int, input().split()))
+        queries.append(qq)
+        numbers.add(qq[1])
+    compressed = {}
+    compressed_to_raw = []
+    for index, val in enumerate(sorted(list(numbers))):
+        compressed[val] = index
+        compressed_to_raw.append(val)
+    tree = MultiSet(list(compressed.values()), False)
+    revtree = MultiSet([-i for i in compressed.values()], False)
+    for i in range(Q):
+        qq = queries[i]
         if qq[0] == 1:
-            x = qq[1]
-            # d[x] += 1
-            # x = x * 10 ** 6 + d[x]
-            BT.append(x)
-        # elif qq[0] == 2:
-        #     # BT.debug()
-        #     res = qq[1]# * 10 ** 6
-        #     for kk in range(qq[2]):
-        #         res = BT.upper_bound(res)
-        #         # print(res)
-        #     print(res)
-        #     # print(res // 10 ** 6)
+            tree.insert(compressed[qq[1]])
+            revtree.insert(-compressed[qq[1]])
+        elif qq[0] == 2:
+            x, k = qq[1], qq[2]
+            ans = revtree.lowerBound(-compressed[x], k - 1)
+            print(-1 if ans == -INF else compressed_to_raw[-ans])
+            pass
         else:
-            # BT.debug()
-            res = qq[1]# * 10 ** 6 
-            # for kk in range(qq[2]):
-            #     res = BT.lower_bound(res)
-            #     # print(res)
-            print(res)
-            # print(res // 10 ** 6)
+            x, k = qq[1], qq[2]
+            ans = tree.lowerBound(compressed[x], k - 1)
+            print(-1 if ans == -INF else compressed_to_raw[ans])
     return
 
 if __name__ == '__main__':
