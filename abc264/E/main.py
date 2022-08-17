@@ -1,116 +1,70 @@
 #!/usr/bin/env python3
 import sys
-from collections import defaultdict
-from collections import deque
+from collections import defaultdict, deque
 
-def bfs(G: "List[to]", start_node: int) -> list:
-    INF = 10 ** 16
-    q = deque()
-    dist = [INF] * len(G)
-    q.append(start_node)
-    dist[start_node] = 0
-    while q:
-        now = q.popleft()
-        for next in G[now]:
-            if dist[next] != INF:
-                continue
-            q.append(next)
-            dist[next] = dist[now] + 1
-    return dist
-
+ 
 class UnionFind():
     def __init__(self, n):
         self.n = n
-        self.group_num = n
         self.parents = [-1] * n
-
-    """ 要素xの値を取得。"""
+ 
     def find(self, x):
         if self.parents[x] < 0:
             return x
         else:
             self.parents[x] = self.find(self.parents[x])
             return self.parents[x]
-
-    """ 2つの要素の併合。"""
+ 
     def union(self, x, y):
         x = self.find(x)
         y = self.find(y)
-
+ 
         if x == y:
             return
-
-        if self.parents[x] > self.parents[y]:
+ 
+        if self.parents[x] > self.parents[y]:  # マージテク
             x, y = y, x
-
+ 
         self.parents[x] += self.parents[y]
         self.parents[y] = x
-        self.group_num -= 1
-        return
-
-    """ 要素xの属する集合の要素数を取得。"""
+ 
     def size(self, x):
         return -self.parents[self.find(x)]
-
-    """ 2つの要素が同一の集合に属するか。"""
+ 
     def same(self, x, y):
         return self.find(x) == self.find(y)
-
-    """ 要素xと同一の集合の要素を全取得。
-    計算量 : O(N)
-    """
+ 
     def members(self, x):
         root = self.find(x)
         return [i for i in range(self.n) if self.find(i) == root]
-
-    """ 各集合の根を全取得。
-    計算量 : O(N)
-    """
+ 
     def roots(self):
         return [i for i, x in enumerate(self.parents) if x < 0]
-
-    """ 集合の個数を取得。 v2
-    計算量 : O(1)
-    """
-    def group_count_v2(self):
-        return self.group_num
-
-    """ 集合の個数を取得。 v1
-    計算量 : O(N)
-    """
-    def group_count_v1(self):
+ 
+    def group_count(self):
         return len(self.roots())
-
-    """ 全集合の要素一覧を取得。
-    計算量 : O(N)
-    """
+ 
     def all_group_members(self):
         group_members = defaultdict(list)
         for member in range(self.n):
             group_members[self.find(member)].append(member)
         return group_members
-
+ 
     def __str__(self):
         return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
-    
-
+ 
+ 
 def solve(N: int, M: int, E: int, U: "List[int]", V: "List[int]", Q: int, X: "List[int]"):
-    uf = UnionFind(N + M)
-    G = [[] for _ in range(N + M)]
+    sx = set(X)
+    uf = UnionFind(N + 1)
     for i in range(E):
-        if i + 1 in X:
-            continue
-        else:
-            uf.union(U[i] - 1, V[i] - 1)
-            G[U[i] - 1].append(V[i] - 1)
-            G[V[i] - 1].append(U[i] - 1)
-    for i in range(N):
-        bfs(G, i)
-
-    
-    
-        
-
+        if i + 1 not in sx:
+            uf.union(min(U[i] - 1, N), min(V[i] - 1, N))
+    ans = deque()
+    for xx in X[::-1]:
+        ans.appendleft(uf.size(N) - 1)
+        uf.union(min(U[xx - 1] - 1, N), min(V[xx - 1] - 1, N))
+    print(*ans, sep="\n")
     return
 
 
