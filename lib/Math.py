@@ -1,10 +1,52 @@
 # ------------------------------------------------------------------------------
+#     直交座標の回転
+# ------------------------------------------------------------------------------
+# - 一般式
+#   - 点(cur_X, cur_Y)を点(x0, y0)を中心にθ度回転した後の点(new_X, new_Y)
+#   　new_X - x0 = (cur_X - x0) * cosθ - (cur_Y - y0) * sinθ
+#   　new_Y - y0 = (cur_X - x0) * sinθ + (cur_Y - y0) * cosθ
+#
+# - point
+#   - 90度回転などの場合、誤差が出るのでsinやcosではなく最初から整数値で計算するべき。
+# 
+# - 参考
+#   - https://mathwords.net/heimenkaiten
+# 
+# - verify
+#   - https://atcoder.jp/contests/abc275/tasks/abc275_c
+# ------------------------------------------------------------------------------
+
+#           ↑y
+#           |   ■
+#   □(1)    |
+#           |
+#           |
+# ----------+----------->x
+#           |
+#           |
+#           |      □(2)
+#
+# (1) 正の方向(反時計回り)
+x0, y0 = 0, 0
+cur_X, cur_Y = 3, 4
+new_X = (cur_X - x0) * 0 + (cur_Y - y0) * -1 + x0
+new_Y = (cur_X - x0) * 1 + (cur_Y - y0) * 0 + y0
+print(new_X, new_Y) # -4, 3
+
+# (2) 正の方向(反時計回り)
+x0, y0 = 0, 0
+cur_X, cur_Y = 3, 4
+new_X = (cur_X - x0) * 0 + (cur_Y - y0) * 1 + x0
+new_Y = (cur_X - x0) * -1 + (cur_Y - y0) * 0 + y0
+print(new_X, new_Y) # 4, -3
+
+
+# ------------------------------------------------------------------------------
 #     2次元配列回転
 # ------------------------------------------------------------------------------
 # - verify
 #   - https://atcoder.jp/contests/abc107/tasks/abc107_b (時計・反時計)
 # ------------------------------------------------------------------------------
-
 
 original = [
     ('1', '2', '3'), 
@@ -130,3 +172,43 @@ K = 7
 num = base10toKint(base10value=val, toBase=K)
 print(num)
 """-> 15"""
+
+
+# ------------------------------------------------------------------------------
+#     外積
+# ------------------------------------------------------------------------------
+# 2つのベクトルABとCDが交差するかの判定
+#
+# 解説 -> https://qiita.com/zu_rin/items/e04fdec4e3dec6072104
+#
+#
+
+def outerProduct(A_x: int, A_y: int, B_x: int, B_y: int, C_x: int, C_y: int, D_x: int, D_y: int):
+    s = (B_x-A_x) * (C_y-A_y) - (C_x-A_x) * (B_y-A_y)
+    t = (B_x-A_x) * (D_y-A_y) - (D_x-A_x) * (B_y-A_y) 
+    return s * t # < 0 であれば2つのベクトルABとCDは交差する。
+
+
+# ------------------------------------------------------------------------------
+#     数列の和
+# ------------------------------------------------------------------------------
+#
+#
+# - ref
+#   https://rikeilabo.com/formula-list-of-arithmetic-progression
+#   https://rikeilabo.com/formula-list-of-geometric-progression
+# ------------------------------------------------------------------------------
+
+# 等差数列(初項a0, 末項l, 項数n)
+def getArithmeticSequenceSum(a0: int, l: int, n: int):
+    return (a0 + l) * n // 2
+
+# 等差数列(初項a0, 公差d, 項数n)
+def getArithmeticSequenceSum(a0: int, d: int, n: int):
+    return (2 * a0 + (n - 1) * d) * n // 2
+
+# 等比数列(初項a0, 公比r, 項数n)
+def getGeometricSequenceSum(a0: int, r: int, n: int):
+    if r == 1:
+        return a0 * n
+    return a0 * (1 - pow(r, n)) // (1 - r)

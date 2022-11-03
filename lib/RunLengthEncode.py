@@ -1,7 +1,7 @@
 # verify
 # - https://atcoder.jp/contests/abc047/tasks/arc063_a
 # -------
-
+# ランレングス圧縮
 # RUN LENGTH ENCODING str -> list(tuple())
 # example) "aabbbbaaca" -> [('a', 2), ('b', 4), ('a', 2), ('c', 1), ('a', 1)] 
 from itertools import groupby

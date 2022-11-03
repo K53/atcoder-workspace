@@ -21,6 +21,7 @@
 #       - INFの値は毎回吟味すること。
 # verify
 # - https://atcoder.jp/contests/abc214/tasks/abc214_c (グラフ)
+# - https://yukicoder.me/problems/no/1995 (グラフ + 座標圧縮)
 # - https://atcoder.jp/contests/past201912-open/tasks/past201912_j (グリッド)
 # - https://atcoder.jp/contests/abc164/tasks/abc164_e (拡張ダイクストラ)
 # ------------------------------------------------------------------------------
@@ -28,6 +29,7 @@
 #  グラフ
 import heapq
 INF = 10 ** 16
+# グラフ + 座標圧縮 の問題の場合、開始点と終了点を圧縮後の座標の集合に加え忘れないこと。
 class Dijkstra():
     def __init__(self, N: int) -> None:
         self.N = N 

@@ -28,15 +28,15 @@
 #       - O(log(n))
 #       - 遅延削除を採用。heapqから任意の要素を削除することはできないため、dictで論理削除する。
 #       - 先頭要素取得に影響しない場合は論理削除。影響する場合は物理削除し、次の先頭要素がすでに論理削除済みであれば遅延させていた物理削除を実行。(繰り返す)
-#   - getKth() : K番目の要素取得  <- point!
+#   - getKth() : K番目の要素取得。存在しない場合はINFが返る。  <- point!
 #       - O(log(n))
 #   - countLessThanOrEqualTo() : val以下(≦ val)の要素数を返す。
 #       - O(log(n))
 #   - countUnder() : val未満(< val)の要素数を返す。
 #       - O(log(n))
-#   - upperBound() : valより大きい値において、小さい方からk番目の値を取得
+#   - upperBound(val, k) : valより大きい値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合はINFが返る。
 #       - O(log(n))
-#   - lowerBound() : val以上の値において、小さい方からk番目の値を取得
+#   - lowerBound(val, k) : val以上の値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合はINFが返る。
 #       - O(log(n))
 #
 # リンク
@@ -52,9 +52,9 @@ import bisect
 INF = 10 ** 9
 
 class MultiSet:
-    def __init__(self, allVals: "list[int]" ,isSorted: bool = False):
+    def __init__(self, allVals: "list[int]"):
         # print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
-        self.arr = allVals if isSorted else sorted(allVals)
+        self.arr = sorted(allVals)
         self.bit = BIT(len(allVals))
         self.ammounts = 0
         
@@ -126,7 +126,7 @@ class MultiSet:
 # usage
 print("-- MultiSet -------------------------------")
 l = [0, 1, 2, 3, 4]
-tree = MultiSet(l, True)
+tree = MultiSet(l)
 tree.insert(2)
 print(tree.bit) # [0, 0, 1, 1, 0]
 # |           1           |     |

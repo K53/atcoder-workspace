@@ -94,6 +94,14 @@ class SCC():
 d = SCC(6)
 A = [1, 5, 3, 5, 4, 0, 4]
 B = [4, 2, 0, 5, 1, 3, 2]
+# イメージ
+#  (1)
+#  ↓ ↑
+#  (4)
+#   ↓
+#  (2) ⇆ (5) ⇆ (5)
+#
+#  (3) ⇆ (0)
 for aa, bb in zip(A, B):
     d.addEdge(fromNode=aa, toNode=bb)
 # ビルド
@@ -104,5 +112,7 @@ print(associates) # SCC後の対応表(indexがノード番号。値が0-index�
 print(d.getAllSccGroups())
 '-> [[5], [1, 4], [2], [0, 3]]'
 # SCCは不要で、強連結成分分解した後のトポロジカルソートされたリストが欲しいなら以下の方が早い。
-print(d.topologicalSortedList)
+# print(d.topologicalSortedList)
 '-> [5, 1, 4, 2, 0, 3]'
+
+print(d.lastOrder)
