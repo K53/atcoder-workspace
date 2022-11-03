@@ -2,46 +2,25 @@
 import sys
 
 MOD = 998244353  # type: int
-MOD = 1000000007  # type: int
-
-fac, finv, inv = [1, 1], [1, 1], [0, 1]
-# fac : 階乗(1,2,6,...)
-# inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
-# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
-def cmbInit():
-    for i in range(2, MAX):
-        fac.append(fac[i - 1] * i % MOD)
-        inv.append(MOD - inv[MOD % i] * (MOD // i) % MOD)
-        finv.append(finv[i - 1] * inv[i] % MOD)
-
-# 二項係数計算
-def cmbMod(n: int,k: int):
-    if n < k: return 0
-    if n < 0 or k < 0: return 0
-    return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD
-
 
 def solve(N: int, M: int, K: int):
+    MODinv = pow(M,MOD-2,MOD)
     dp = [[0] * (N + 1) for _ in range(K + 1)]
     dp[0][0] = 1
     for i in range(K):
         for now in range(N + 1):
+            # すでにNマスに到着している
+            if now == N:
+                dp[i + 1][now] += dp[i][now]
+                dp[i + 1][now] %= MOD
+                continue
             for mm in range(1, M + 1):
-                if now + mm <= N:
-                    dp[i + 1][now + mm] += dp[i][now]
-                else:
-                    over = now + mm - N
-                    dp[i + 1][N - over] += dp[i][now]
-    s = 0
-    for i in range(K + 1):
-        s += dp[i][-1] * M ** (K + 1 - i)
-        # print(dp[i][-1] * M ** (K + 1 - i))
-    print(s)
-    print(M ** (K + 1 - 0))
-    print((78125 * 184124175) % MOD)
-    
-
-
+                dest = N - (now + mm - N) if now + mm > N else now + mm 
+                dp[i + 1][dest] += (dp[i][now] * MODinv)
+                dp[i + 1][dest] %= MOD
+    # for i in range(K + 1):
+    #     print(dp[i])
+    print(dp[-1][-1])
     return
 
 

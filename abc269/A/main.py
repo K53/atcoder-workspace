@@ -2,7 +2,9 @@
 import sys
 
 
-def solve(S: str):
+def solve(a: int, b: int, c: int, d: int):
+    print((a + b) * (c - d))
+    print("Takahashi")
     return
 
 
@@ -13,8 +15,11 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    a = int(next(tokens))  # type: int
+    b = int(next(tokens))  # type: int
+    c = int(next(tokens))  # type: int
+    d = int(next(tokens))  # type: int
+    solve(a, b, c, d)
 
 if __name__ == '__main__':
     main()

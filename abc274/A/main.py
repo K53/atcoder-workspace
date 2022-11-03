@@ -2,7 +2,19 @@
 import sys
 
 
-def solve(S: str):
+def solve(A: int, B: int):
+    # print(B /A)
+    num = B * 10000 // A
+    # print(str(num)[-1])
+    # print(num)
+    if int(str(num)[-1]) >= 5:
+        num += 10
+        num //= 10
+        num *= 10
+    ans = num / 10000
+    # print(ans)
+    print("{:.3f}".format(ans))
+
     return
 
 
@@ -13,8 +25,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    solve(A, B)
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(S: str):
+def solve(H: "List[int]"):
     return
 
 
@@ -13,8 +13,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    H = [int(next(tokens)) for _ in range(2)]  # type: "List[int]"
+    solve(H)
 
 if __name__ == '__main__':
     main()

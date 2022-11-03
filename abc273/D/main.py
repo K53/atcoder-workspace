@@ -8,8 +8,8 @@ from collections import defaultdict
 def main():
     H, W, now_y, now_x = map(int, input().split())
     N = int(input())
-    d_yoko = defaultdict(list)
-    d_tate = defaultdict(list)
+    d_yoko = defaultdict(lambda : [0])
+    d_tate = defaultdict(lambda : [0])
     qs = []
     for _ in range(N):
         r, c = map(int, input().split())
@@ -18,77 +18,47 @@ def main():
     for r, c in qs:
         d_yoko[r].append(c)
         d_tate[c].append(r)
+    for d in d_yoko.values():
+        d.append(W + 1)
+    for d in d_tate.values():
+        d.append(H + 1)
     Q = int(input())
     for _ in range(Q):
         dl = input().split()
         d, l = dl[0], int(dl[1])
         if d == "L":
-            # print(d_yoko[now_y])
             idx = bisect_left(d_yoko[now_y], now_x) 
-            # print(idx)
-            if idx == 0:
+            if d_yoko[now_y][idx - 1] < now_x - l:
                 now_x = now_x - l
             else:
-                if d_yoko[now_y][idx - 1] < now_x - l:
-                    now_x = now_x - l
-                else:
-                    now_x = d_yoko[now_y][idx - 1] + 1
-            if now_x <= 0:
-                now_x = 1
-            elif now_x >= W + 1:
-                now_x = W
+                now_x = d_yoko[now_y][idx - 1] + 1
 
             print(now_y, now_x)
         elif d == "R":
-            # print(d_yoko[now_y], now_x)
             idx = bisect_left(d_yoko[now_y], now_x) 
-            if idx == len(d_yoko[now_y]):
+            print(d_yoko[now_y], idx)
+            if d_yoko[now_y][idx] > now_x + l:
                 now_x = now_x + l
             else:
-                if d_yoko[now_y][idx] > now_x + l:
-                    # print("")
-                    now_x = now_x + l
-                else:
-                    # print("a",d_yoko[now_y][idx], now_x + l)
-                    # print(d_yoko[now_y][idx - 1])
-                    now_x = d_yoko[now_y][idx - 1] - 1
-            if now_x <= 0:
-                now_x = 1
-            elif now_x >= W + 1:
-                now_x = W
+                now_x = d_yoko[now_y][idx] - 1
+
 
             print(now_y, now_x)
         elif d == "U":
-            # print(d_yoko[now_y])
             idx = bisect_left(d_tate[now_x], now_y) 
-            # print(idx)
-            if idx == 0:
+            if d_tate[now_x][idx - 1] < now_y - l:
                 now_y = now_y - l
             else:
-                if d_tate[now_x][idx - 1] < now_y - l:
-                    now_y = now_y - l
-                else:
-                    now_y = d_tate[now_x][idx - 1] + 1
-            if now_y <= 0:
-                now_y = 1
-            elif now_y >= H + 1:
-                now_y = H
+                now_y = d_tate[now_x][idx - 1] + 1
 
             print(now_y, now_x)
         else:
-            idx = bisect_left(d_tate[now_x], now_y) 
-            if idx == len(d_tate[now_x]):
+            idx = bisect_left(d_tate[now_x], now_y)
+            if d_tate[now_x][idx] > now_y + l:
                 now_y = now_y + l
             else:
-                if d_tate[now_x][idx] > now_y + l:
-                    now_y = now_y + l
-                else:
-                    now_y = d_tate[now_x][idx - 1] - 1
-            if now_y <= 0:
-                now_y = 1
-            elif now_y >= H + 1:
-                now_y = H
-                
+                now_y = d_tate[now_x][idx] - 1
+
             print(now_y, now_x)
 
             

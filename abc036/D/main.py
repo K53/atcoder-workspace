@@ -3,37 +3,36 @@ import sys
 sys.setrecursionlimit(10 ** 9)
 
 MOD = 1000000007  # type: int
-from collections import deque
 
+aa = []
 def solve(N: int, x: "List[int]", y: "List[int]"):
-    # dp[now][color] := ノードnowを根とした部分木において、ノードnowを色colorで塗る場合の数。
-    # 根において分岐がある場合、それらの総積で更新される。なので配列の初期値は1。
-    # dp[now] = dp[next1] * dp[next2] * ...
-    #      [now]
-    #      /   \
-    # [next1] [next2]
-    #
-    # ここで色を考慮すると、
-    # nowを白に塗るなら他のノードは関係ないので、dp[now][白] = (dp[next1][白]＋ dp[next1][黒]) * (...) * ...
-    # nowを黒に塗るなら隣は白いノードである必要があるため dp[now][黒] = dp[next1][白] * dp[next2][白] * ...
-
-    dp = [[1] * 2 for _ in range(N)]
     G = [[] for _ in range(N)]
-    for xx, yy in zip(x, y):
-        G[xx - 1].append(yy - 1)
-        G[yy - 1].append(xx - 1)
+    for i in range(N - 1):
+        G[x[i] - 1].append(y[i] - 1)
+        G[y[i] - 1].append(x[i] - 1)
+    # dp[i][color] = 島iのcolorの時の場合の和 (白|黒)
+    dp = [[1, 1] for _ in range(N)]
 
-    l = []
-    def dfs(now: int, pre: int):
+    def dfs(pre: int, now: int):
+        # print(pre, now)
+        # --- 子ノードを探索 -----------------------
         for next in G[now]:
             if next == pre:
                 continue
-            dfs(next, now)
-            l.append(next)
+            dfs(now, next)
+        print("#", now + 1)
+        print(dp[now][0], dp[now][1])
+        print(dp[pre][0])
+        print(dp[pre][1])
+        dp[pre][0] *= dp[now][0] + dp[now][1]
+        dp[pre][1] *= dp[now][0]
+        aa.append(now + 1)
+        print(dp)
         return
-
-    dfs(0, -1)
-    print(l)
+    dfs(-1, 0)
+    print(dp)
+    print((dp[0][0] + dp[0][1]) % MOD)
+    print(aa)
     return
 
 

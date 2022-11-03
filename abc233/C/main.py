@@ -10,15 +10,16 @@ def main():
     ans = 0
     def dfs(depth: int, acc: int):
         nonlocal ans
-        # --- 探索終了条件 ----------------------------
-        if depth >= N:
-            if acc == X:
-                ans += 1
-            return
-        # --- 次の探索(分岐) --------------------------
-        for a in l[depth][1:]:
-            dfs(depth + 1, acc * a)
+        # print(depth, acc)
+        # --- 子ノードを探索 -----------------------
+        for num in l[depth][1:]:
+            if depth + 1 == N:
+                if acc * num == X:
+                    ans += 1
+            else:
+                dfs(depth + 1, acc * num)
         return
+
     dfs(0, 1)
     print(ans)
 

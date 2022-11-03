@@ -2,7 +2,7 @@
 import sys
 
 
-def solve(N: int, M: int, A: "List[int]"):
+def solve(N: int, M: int, X: "List[int]", Y: "List[int]", P: "List[int]", Q: "List[int]"):
     return
 
 
@@ -15,8 +15,17 @@ def main():
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
     M = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(M)]  # type: "List[int]"
-    solve(N, M, A)
+    X = [int()] * (N)  # type: "List[int]"
+    Y = [int()] * (N)  # type: "List[int]"
+    for i in range(N):
+        X[i] = int(next(tokens))
+        Y[i] = int(next(tokens))
+    P = [int()] * (M)  # type: "List[int]"
+    Q = [int()] * (M)  # type: "List[int]"
+    for i in range(M):
+        P[i] = int(next(tokens))
+        Q[i] = int(next(tokens))
+    solve(N, M, X, Y, P, Q)
 
 if __name__ == '__main__':
     main()

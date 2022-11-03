@@ -1,209 +1,186 @@
 #!/usr/bin/env python3
 import sys
-from collections import defaultdict
-class UnionFind():
-    def __init__(self, n):
-        self.n = n
-        self.group_num = n
-        self.parents = [-1] * n
+import bisect
 
-    """ 要素xの値を取得。"""
-    def find(self, x):
-        if self.parents[x] < 0:
-            return x
-        else:
-            self.parents[x] = self.find(self.parents[x])
-            return self.parents[x]
+class BIT:
+    def __init__(self, N):
+        self.N = N
+        self.bit = [0] * (self.N + 1) # 1-indexedのため
+        
+    def add(self, pos, val):
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            A[pos] += val 
+        '''
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] += val
+            i += i & -i
 
-    """ 2つの要素の併合。"""
-    def union(self, x, y):
-        x = self.find(x)
-        y = self.find(y)
+    def deleteNonNegative(self, pos, val) -> int:
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            A[pos] += val 
+        '''
+        actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] -= actualSubstractVal
+            i += i & -i
+        return actualSubstractVal
 
-        if x == y:
-            return
+    def sum(self, pos):
+        ''' Sum
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            Return Sum(A[0], ... , A[pos])
+            posに負の値を指定されるとSum()すなわち0を返すのでマイナスの特段の考慮不要。
+        '''
+        res = 0
+        i = pos + 1 # convert from 0-index to 1-index
+        while i > 0:
+            res += self.bit[i]
+            i -= i & -i    
+        return res
+    
+    def lowerLeft(self, w):
+        '''
+        O(logN)
+        A0 ~ Aiの和がw以上となる最小のindex(値)を返す。
+        Ai ≧ 0であること。
+        '''
+        if (w < 0):
+            return 0
+        total = self.sum(self.N - 1)
+        if w > total:
+            return -1
+        x = 0
+        k = 1 << (self.N.bit_length() - 1)
+        while k > 0:
+            if x + k < self.N and self.bit[x + k] < w:
+                w -= self.bit[x + k]
+                x += k
+            k //= 2
+        return x
+        
+    def __str__(self):
+        '''
+        index0は不使用なので表示しない。
+        '''
+        return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
+    
 
-        if self.parents[x] > self.parents[y]:
-            x, y = y, x
 
-        self.parents[x] += self.parents[y]
-        self.parents[y] = x
-        self.group_num -= 1
-        return
+INF = 10 ** 9
 
-    """ 要素xの属する集合の要素数を取得。"""
-    def size(self, x):
-        return -self.parents[self.find(x)]
+class MultiSet:
+    def __init__(self, allVals: "list[int]" ,isSorted: bool = False):
+        # print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
+        self.arr = allVals if isSorted else sorted(allVals)
+        self.bit = BIT(len(allVals))
+        self.ammounts = 0
+        
+    def insert(self, val: int, count: int = 1):
+        idx = bisect.bisect_left(self.arr, val)
+        self.bit.add(idx, count)
+        self.ammounts += count
+    
+    def delete(self, val: int, count : int = 1):
+        k = bisect.bisect_left(self.arr, val)
+        self.bit.add(k, -count)
+        self.ammounts -= count
+    
+    def deleteIgnoreOverSubstract(self, val: int, count : int = 1):
+        '''
+        MultiSetで保持している個数以上の削除を求められたら無視する。
+        '''
+        k = bisect.bisect_left(self.arr, val)
+        actualSubstractVal = self.bit.deleteNonNegative(k, count)
+        self.ammounts -= actualSubstractVal
+    
+    def getKth(self, k: int) -> int:
+        '''getKth
+        k : 0-indexed
+        小さい方からK番目の値を取得。
+        '''
+        return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
+    
+    def countLessThanOrEqualTo(self, val: int) -> int:
+        '''
+        val以下(≦ val)の要素数を返す。
+        '''
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val))
+    
+    def countUnder(self, val: int) -> int:
+        '''
+        val未満(< val)の要素数を返す。
+        '''
+        return 0 if val < self.arr[0] else self.bit.sum(bisect.bisect_left(self.arr, val) - 1) # sum()は負なら0が返るのでvalがarrの最下端の数字でもOK
 
-    """ 2つの要素が同一の集合に属するか。"""
-    def same(self, x, y):
-        return self.find(x) == self.find(y)
+    def upperBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|-|< - - ->|
+                 l u
+        valより大きい値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countLessThanOrEqualTo(val) + k)
 
-    """ 要素xと同一の集合の要素を全取得。
-    計算量 : O(N)
-    """
-    def members(self, x):
-        root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
-
-    """ 各集合の根を全取得。
-    計算量 : O(N)
-    """
-    def roots(self):
-        return [i for i, x in enumerate(self.parents) if x < 0]
-
-    """ 集合の個数を取得。 v2
-    計算量 : O(1)
-    """
-    def group_count_v2(self):
-        return self.group_num
-
-    """ 集合の個数を取得。 v1
-    計算量 : O(N)
-    """
-    def group_count_v1(self):
-        return len(self.roots())
-
-    """ 全集合の要素一覧を取得。
-    計算量 : O(N)
-    """
-    def all_group_members(self):
-        group_members = defaultdict(list)
-        for member in range(self.n):
-            group_members[self.find(member)].append(member)
-        return group_members
+    def lowerBound(self, val: int, k: int) -> int:
+        '''upperBound
+        | - - - -|<-| - - ->|
+                 l  u
+        val以上の値において、小さい方からk番目の値を取得
+        k: 0-indexed
+        (存在しないindexではINFが返る。)
+        '''
+        return self.getKth(self.countUnder(val) + k)
 
     def __str__(self):
-        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
-    
+        res = []
+        for i in range(len(self.arr)):
+            count = self.bit.sum(i) - (self.bit.sum(i - 1) if i - 1 >= 0 else 0)
+            for _ in range(count):
+                res.append(i)
+        return "[" + ", ".join(f'{self.arr[v]}' for v in res) + "]"
 
 
 def solve(N: int, K: int, P: "List[int]"):
-    # N = 2 * 10 ** 5
-    # K = 3
-    # P = list(reversed(range(1, N + 1)))
-    import bisect
-
-    class BIT:
-
-        def __init__(self,len_A):
-            self.N = len_A + 10
-            self.bit = [0]*(len_A+10)
-            
-        # sum(A0 ~ Ai)
-        # O(log N)
-        def query(self,i):
-            res = 0
-            idx = i+1
-            while idx:
-                res += self.bit[idx]
-                idx -= idx&(-idx)
-            return res
-
-        # Ai += x
-        # O(log N)
-        def update(self,i,x):
-            idx = i+1
-            while idx < self.N:
-                self.bit[idx] += x
-                idx += idx&(-idx)
-        
-        # min_i satisfying {sum(A0 ~ Ai) >= w} (Ai >= 0)
-        # O(log N)
-        def lower_left(self,w):
-            if (w < 0):
-                return -1
-            x = 0
-            k = 1<<(self.N.bit_length()-1)
-            while k > 0:
-                if x+k < self.N and self.bit[x+k] < w:
-                    w -= self.bit[x+k]
-                    x += k
-                k //= 2
-            return x
-
-
-    class OrderBIT:
-
-        def __init__(self,all_values,sort_flag = False):
-            if sort_flag:
-                self.A = all_values
-            else:
-                self.A = sorted(all_values)
-            self.B = BIT(len(all_values))
-            self.num = 0
-            
-        def insert_val(self,x,c=1):
-            k = bisect.bisect_left(self.A,x)
-            self.B.update(k,c)
-            self.num += c
-        
-        def delete_val(self,x,c=1):
-            k = bisect.bisect_left(self.A,x)
-            self.B.update(k,-c)
-            self.num -= c
-        
-        # find the k-th min_val (k:0-indexed)
-        def find_kth_val(self,k):
-            if self.num <= k:
-                ##### MINIMUM VAL #######
-                return (-10**9, -1)
-            return (self.A[self.B.lower_left(k+1)], self.B.lower_left(k+1))
-        
-        # count the number of values lower than or equal to x
-        def count_lower(self,x):
-            if x < self.A[0]:
-                return 0
-            return self.B.query(bisect.bisect_right(self.A,x)-1)
-
-        # min_val higher than x
-        def find_higher(self,x):
-            return self.find_kth_val(self.count_lower(x))
-    ans = [-1] * N
-    if K == 1:
-        ans[P[0] - 1] = 1
     d = dict()
-    uf = UnionFind(N + 1)
-    bt = OrderBIT(range(1,N + 1), sort_flag=True)
-    # for i in range(N):
-    #     res = bt.insert_val(P[i])
-    for i in range(N):
-        res = bt.find_higher(P[i])
-        # print(res)
-        if res[0] == -1000000000:
-            if uf.size(P[i]) != K:
-                # print(i, res)
-                bt.insert_val(P[i])
+    tree = MultiSet(P)
+    ans = [-1] * N
+    for t in range(N):
+        pp = P[t]
+        num = tree.lowerBound(pp, 0)
+        if num == -INF:
+            if K == 1:
+                ans[pp - 1] = t + 1
+                continue
+            d[pp] = [pp]
+            tree.insert(pp)
+        else:
+            # copy
+            d[num].append(pp)
+            if len(d[num]) == K:
+                for i in d[num]:
+                    ans[i - 1] = t + 1
             else:
-                # print(uf.find(P[i]))
-                rr = uf.find(P[i])
-                d[rr] = i + 1
-        else: 
-            # print(i, res)
-            uf.union(res[0], P[i])
-            if uf.size(P[i]) != K:
-                bt.delete_val(res[0])
-                bt.insert_val(P[i])
-            else:
-                bt.delete_val(res[0])
-                rr = uf.find(P[i])
-                d[rr] = i + 1
-    # print(avl_key)
-    for r, g in uf.all_group_members().items():
-        if r in d:
-            for gg in g:
-                ans[gg - 1] = d[r]
-        # print(g)
-    # print(d)
-    print(*ans, sep="\n")
-    
-    # for i in range(N):
-    #     turn = i + 1
-    #     bisect.bi
-    #     P[i]
+                # copy
+                d[pp] = d[num]
+                tree.insert(pp)
+            # delete
+            del d[num]
+            tree.delete(num)
+                
 
-        
-    return
+    print(*ans, sep="\n")
+
+
+
+    
 
 
 # Generated by 2.12.0 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)

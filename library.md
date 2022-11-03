@@ -12,6 +12,12 @@ for i in range(M):
 print(G)
 ```
 
+## インタラクティブな問題のバッファのフラッシュ
+
+```python
+sys.stdout.flush()
+```
+
 ## 辞書のソート
 
 sorted(d.items(), key=lambda x:x[0])
@@ -61,34 +67,8 @@ print(ans)
 return
 ```
 
-## 探索
-
-### 二分探索
-→ BinarySearch.py
-
 ### ビット全探索
-
-```python
-# 2^N 通りのビット全探索。
-for n in range(2 ** N):
-    for i in range(N):
-        if (n >> i) & 1:
-            # i桁目のビットが立っている場合の処理
-            pass
-
-# 3進数などの場合
-for i in range(3 ** N):
-    p = i
-    for b in range(N):
-        p, q = divmod(p, 3)
-        if q == 0: # b桁目が0の場合の処理
-           pass
-        elif q == 1: # b桁目が1の場合の処理
-            pass
-        else:
-            pass
-# → 仕組みN進数変換のコード参照
-```
+-> BitFullSearch.py
 
 ### 累積和(DP算出)
 
@@ -478,128 +458,7 @@ cmp = d.scc() # 強連結成分分解
 # トポロジカルソート済みのリストが欲しい場合はd.topologicalSortedListを利用する。
 ```
 
-### BFS
-→ BFS.py
-
 ## 動的計画法
-
-### dijkstra / ダイクストラ
-
-```python
-# = dijkstra ===========================================================================
-# ----------------------------------------------------------------
-# Input
-#   1. タプル(重み, 行先)の二次元配列(隣接リスト)
-#   2. 探索開始ノード(番号)
-# Output
-#   スタートから各ノードへの最小コスト
-# Order
-#   O((V + E) * logV)
-# Note
-#   *1 https://atcoder.jp/contests/abc191/tasks/abc191_e
-#       - 多始点ダイクストラの場合の注意。
-#       - コストの異なる並行な辺がある場合、小さい方を選択する必要あり。
-#       - dist[start_node] = min(cost, dist[start_node])
-#   *2 https://atcoder.jp/contests/tkppc4-1/tasks/tkppc4_1_h
-#       - INFの値は毎回吟味すること。
-# ----------------------------------------------------------------
-
-# ---------------------
-# グリッド (作成中)
-# ---------------------
-import heapq
-INF = 10 ** 9       # *2
-def dijkstra(G: "List[str]", H: int, W: int, startY: int, startX: int) -> list:
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    dist = [[INF] * W for _ in range(H)]
-    heapq.heappush(hq, (0, startY, startX))
-    dist[startY][startX] = 0            # *1
-    # dijkstra
-    while hq:
-        min_cost, nowY, nowX = heapq.heappop(hq)
-        if min_cost > dist[nowY][nowX]:
-            continue
-        for dy, dx in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-            nextY = nowY + dy
-            nextX = nowX + dx
-            if nextY < 0 or nextX < 0 or nextY >= H or nextX >= W:
-                continue
-            cost = 1 if G[nextY][nextX] == "#" else 0
-            if dist[nextY][nextX] > dist[nowY][nowX] + cost:
-                dist[nextY][nextX] = dist[nowY][nowX] + cost
-                heapq.heappush(hq, (dist[nextY][nextX], nextY, nextX))
-    return dist
-
-# ---------------------
-# 拡張ダイクストラ
-# ---------------------
-# どの駅にいるかの他、銀貨を何枚持っているかの情報が必要。
-# 全ての辺で銀貨を最大量求められたとしても2500枚あれば足りるので、それを上限として頂点倍加。
-import heapq
-INF = 10 ** 13
-SILVER_MAX = 2500
-
-def dijkstra(edges: "List[List[(cost, to, silver)]]", C: "List[int]", D: "List[int]", start_node: int, init_silver: int):
-    hq = []
-    heapq.heapify(hq)
-    # Set start info
-    # dist[i][s] := 銀貨をs枚持った状態で頂点iに到達する時のコスト
-    dist = [[INF] * (SILVER_MAX + 1) for _ in range(len(edges))]
-    heapq.heappush(hq, (0, start_node, init_silver))
-    dist[start_node][init_silver] = 0
-
-    # dijkstra
-    while hq:
-        min_cost, node_now, silver_now = heapq.heappop(hq)
-        # いつも通り、既に最短コストのパスが発見されているならスキップ
-        if min_cost > dist[node_now][silver_now]:
-            continue
-
-        # 補充(状態変化)
-        # 2500枚を超えて銀貨に換える必要がないためフィルタ
-        if silver_now + C[node_now] <= SILVER_MAX:
-            # 交換後の銀貨の枚数
-            silver_next = silver_now + C[node_now]
-            if dist[node_now][silver_next] > min_cost + D[node_now]:    # 交換にかかる時間を加味して比較。そこで交換する方がいいか判定。
-                dist[node_now][silver_next] = min_cost + D[node_now]
-                heapq.heappush(hq, (dist[node_now][silver_next], node_now, silver_next))
-
-        # 辺の通過
-        # 駅を移動するのに銀貨を消費する。
-        for cost, next, silver in edges[node_now]: 
-            remain_silver = min(silver_now - silver, SILVER_MAX)
-            if remain_silver < 0:                                       # 手持ちの銀貨で移動不可ならスキップ
-                continue
-
-            if dist[next][remain_silver] > min_cost + cost:             # いつも通り
-                dist[next][remain_silver] = min_cost + cost
-                heapq.heappush(hq, (dist[next][remain_silver], next, remain_silver))
-    return dist
-
-def main():
-    N, M, S = map(int, input().split())
-    init_silver = min(S, SILVER_MAX)
-
-    edges = [[] for _ in range(N)]
-    for _ in range(M):
-        u, v, a, b = map(int, input().split())
-        edges[u - 1].append((b, v - 1, a))
-        edges[v - 1].append((b, u - 1, a))
-    C, D = [], []
-    for i in range(N):
-        c, d = map(int, input().split())
-        C.append(c)
-        D.append(d)
-
-    dist = dijkstra(edges, C, D, 0, init_silver)
-    print(*[min(d) for d in dist[1:]], sep="\n")
-
-if __name__ == '__main__':
-    main()
-```
-
 
 ### bellmanFord
 
@@ -910,38 +769,6 @@ def primeFactrization(n: int) -> dict:
 
 ### 組み合わせ -> 移植済み
 
-```python
-# ----------------------------------------------------------------
-# Input
-#   1,2: nCr
-# Output
-#   組み合わせの数
-# Order
-#   ??
-# ----------------------------------------------------------------
-# 階乗の逆元の前処理をしてMODとる場合は->modinvへ
-def cmb(n, r):
-    if n - r < r: r = n - r
-    if r == 0: return 1
-    if r == 1: return n
- 
-    numerator = [n - r + k + 1 for k in range(r)]
-    denominator = [k + 1 for k in range(r)]
-    for p in range(2,r + 1):                    # p番目について、
-        pivot = denominator[p - 1]              # pivotで約分を試みる。
-        if pivot > 1:                           # ただし、pivotが1、すなわちすでに割り尽くされているならp番目は飛ばす。
-            offset = (n - r) % p
-            for k in range(p-1,r,p):            # p番目を約分できるということはp番目からpの倍数番目も約分可能なので実施する。
-                numerator[k - offset] //= pivot
-                denominator[k] //= pivot
- 
-    result = 1
-    for k in range(r):
-        if numerator[k] > 1:
-            result *= int(numerator[k])
-    return result
-```
-
 ### modpow
 
 ```python
@@ -1044,41 +871,6 @@ def solve(N: int, K: int, a: "List[int]"):
 ```python
 def findSome(l: "List", val: any):
     return [i for i, x in enumerate(l) if x == val]
-```
-
-
-```python
-# 遅い deprecated
-# import queue
-# def bfs(edges: "List[to]", start_node: int) -> list:
-#     # deprecated
-#     q = queue.Queue()
-#     dist = [INF] * len(edges)
-#     q.put(start_node)
-#     dist[start_node] = 0
-#     while not q.empty():
-#         now = q.get()
-#         for next in edges[now]:
-#             if dist[next] != INF:
-#                 continue
-#             q.put(next)
-#             dist[next] = dist[now] + 1
-#     return dist
-
-# def multiStartBfs(edges: "List[to]", start_nodes: "List[int]") -> list:
-#     q = queue.Queue()
-#     dist = [INF] * len(edges)
-#     for start_node in start_nodes:
-#         q.put(start_node)
-#         dist[start_node] = 0
-#     while not q.empty():
-#         now = q.get()
-#         for next in edges[now]:
-#             if dist[next] != INF:
-#                 continue
-#             q.put(next)
-#             dist[next] = dist[now] + 1
-#     return dist
 ```
 
 ### 尺取り法

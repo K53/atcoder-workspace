@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import sys
 
+MOD = 5  # type: int
 
-def solve(S: str):
+
+def solve(m: int):
     return
 
 
@@ -13,8 +15,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    m = int(next(tokens))  # type: int
+    solve(m)
 
 if __name__ == '__main__':
     main()

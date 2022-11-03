@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 import sys
-from functools import lru_cache
 
 
-def solve(N: int):
-    @lru_cache(maxsize=10**7)
-    def f(n: int):
-        if n == 0:
-            return 1
-        return f(n // 2) + f(n // 3)
-
-    print(f(N))
-    
+def solve(N: int, A: int, W: "List[int]", X: "List[int]", V: "List[int]"):
     return
 
 
@@ -23,7 +14,15 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    solve(N)
+    A = int(next(tokens))  # type: int
+    W = [int()] * (N)  # type: "List[int]"
+    X = [int()] * (N)  # type: "List[int]"
+    V = [int()] * (N)  # type: "List[int]"
+    for i in range(N):
+        W[i] = int(next(tokens))
+        X[i] = int(next(tokens))
+        V[i] = int(next(tokens))
+    solve(N, A, W, X, V)
 
 if __name__ == '__main__':
     main()

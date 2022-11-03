@@ -2,7 +2,17 @@
 import sys
 
 
-def solve(S: str):
+def solve(S: "List[str]"):
+    start = (-1, -1)
+    end = (-1, -1)
+    for i in range(10):
+        for j in range(10):
+            if S[i][j] == "#":
+                if start == (-1, -1):
+                    start = (i, j)
+                end = (i, j)
+    print(start[0] + 1, end[0] + 1)
+    print(start[1] + 1, end[1] + 1)
     return
 
 
@@ -13,7 +23,7 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
+    S = [next(tokens) for _ in range(10)]  # type: "List[str]"
     solve(S)
 
 if __name__ == '__main__':

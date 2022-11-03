@@ -2,7 +2,15 @@
 import sys
 
 
-def solve(S: str):
+def solve(N: int, A: "List[int]"):
+    am = [0] * (2 * N + 2)
+    for i in range(1, N + 1):
+        now = am[A[i - 1]]
+        am[2 * i] = now + 1
+        am[2 * i + 1] = now + 1
+        # print(am)
+    print(*am[1:], sep="\n")
+
     return
 
 
@@ -13,8 +21,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    S = next(tokens)  # type: str
-    solve(S)
+    N = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, A)
 
 if __name__ == '__main__':
     main()
