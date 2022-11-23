@@ -66,8 +66,8 @@ class Dijkstra():
 N = 4
 dk = Dijkstra(N)
 for a, b, c in [(0, 3, 10), (1, 2, 10), (2, 3, 20), (1, 3, 15)]:
-    dk.addEdge(a, b, c)
-    dk.addEdge(b, a, c)
+    dk.addEdge(fromNode=a, toNode=b, cost=c)
+    dk.addEdge(fromNode=b, toNode=a, cost=c)
 d = dk.build(startNode=0)
 print(d)
 "-> [0, 25, 30, 10]"

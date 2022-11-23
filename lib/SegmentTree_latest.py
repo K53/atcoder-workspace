@@ -19,10 +19,12 @@
 # - https://yukicoder.me/submissions/757820 # セグ木上の二分探索 (yuki 833) 上より100~200ms高速
 # - https://yukicoder.me/submissions/757554 # インデックス付きのセグ木
 # - https://yukicoder.me/submissions/632551 # セグ木上の二分探索
+# - https://yukicoder.me/submissions/817123 # 複数要素のセグ木
 # ------------------------------------------------------------------------------
 
 class SegTree:
     def __init__(self, monoid, bottomList, func, convertLengthToThePowerOf2: bool = False):
+        print("index0 は使用されない。常にdefault値")
         self.monoid = monoid
         self.func = func
         if convertLengthToThePowerOf2:
@@ -183,11 +185,21 @@ print(seg.tree) # [0, 25, 14, 11, 1, 13, 7, 4, 0, 1, 4, 9, 2, 5, 3, 1]
 # | 0 | 1 | 4 | 9 | 2 | 5 | 3 | 1 | <- 0~7に対応
 
 seg.pointAdd(3 - 1, 10) # 3番目に10を加える。
+print(seg.tree) # [0, 35, 24, 11, 1, 23, 7, 4, 0, 1, 14, 9, 2, 5, 3, 1]
+
+# |              35               |
+# |      24       |      11       |
+# |   1   |  23   |   7   |   4   |
+# | 0 | 1 | 14| 9 | 2 | 5 | 3 | 1 |
+
 seg.pointUpdate(7 - 1, 1) # 7番目を1に変更する。
+print(seg.tree) # [0, 33, 24, 9, 1, 23, 7, 2, 0, 1, 14, 9, 2, 5, 1, 1]
 
 seg.getRange(1, 6 + 1) # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
 
-# === case2
+# =====================================================
+#     case2
+# =====================================================
 print("#---case2---#")
 N = 6
 
@@ -268,3 +280,4 @@ print(seg.min_left(-1, lambda x: x < 1)) # 4
 print(seg.min_left(-1, lambda x: x < 2)) # 4
 print(seg.min_left(-1, lambda x: x < 3)) # 3
 print(seg.min_left(-1, lambda x: x < 4)) # 1
+

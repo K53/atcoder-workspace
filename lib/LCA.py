@@ -28,16 +28,16 @@ class LcaDoubling:
         self.G = [[] for _ in range(N)]
         self.depths = [-1] * N
         self.distances = [-1] * N
-        self.ancestors = []
+        self.ancestors = [] # ダブリングによって求めた祖先の配列の配列 i番目の配列は過去ノードの2^i個祖先のノードを格納する。
         return
     
-    def addEdge(self, a: int, b: int, cost: int):
-        self.G[a].append((cost, b))
-        print("Really directed Graph?")
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
+        self.G[fromNode].append((cost, toNode))
+        # print("Really directed Graph?")
         return
     
     def build(self):
-        prevAncestors = self._dfs()
+        prevAncestors = self._bfs()
         self.ancestors.append(prevAncestors)
         d = 1
         max_depth = max(self.depths)
@@ -48,7 +48,7 @@ class LcaDoubling:
             prevAncestors = nextAncestors
         return
 
-    def _dfs(self):
+    def _bfs(self):
         q = [(self.root, -1, 0, 0)]
         directAncestors = [-1] * (self.N + 1)  # 頂点数より1個長くし、存在しないことを-1で表す。末尾(-1)要素は常に-1
         while q:
@@ -108,9 +108,13 @@ N = 5
 edges = [(1, 2), (1, 3), (1, 4), (4, 5)]
 ld = LcaDoubling(N)
 for a, b in edges:
-    ld.addEdge(a - 1, b - 1, cost=1)
-    ld.addEdge(b - 1, a - 1, cost=1)
+    ld.addEdge(fromNode=a - 1, toNode=b - 1, cost=1)
+    ld.addEdge(fromNode=b - 1, toNode=a - 1, cost=1)
 ld.build()
+print(ld.ancestors)
+"-> [[-1, 0, 0, 0, 3, -1], [-1, -1, -1, -1, 0, -1]]"
+    # ↑                     ↑
+    # 各ノードの2^0個上       各ノードの2^1個上
 print(ld.getLca(1, 2)) # LCAを出力
 "-> 0"
 print(ld.getDistance(1, 2)) # 2つのノード間の距離を出力。
