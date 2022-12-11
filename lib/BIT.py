@@ -54,7 +54,8 @@ class BIT:
         '''Add
             O(logN)
             posは0-index。内部で1-indexedに変換される。
-            A[pos] += val 
+            すでにMultiSetに含まれている個数以上は削除されない。
+            A[pos] -= val 
         '''
         actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
         i = pos + 1 # convert from 0-index to 1-index

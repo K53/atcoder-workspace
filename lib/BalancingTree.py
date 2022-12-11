@@ -158,16 +158,16 @@ class BalancingTree:
         return debug_node(self.root)[:-1]
 
 BT = BalancingTree(5) # 0 ～ 30 までの要素を入れられるピボット木
-# BT.append(3)
-# BT.append(20)
-# BT.append(5)
-# BT.append(10)
+BT.append(3)
+BT.append(20)
+BT.append(5)
+BT.append(10)
 # BT.append(13)
 # BT.append(8)
 # BT.debug()
 # BT.delete(20)
 BT.debug()
-# print(BT.find_l(12)) # 10
+print(BT.find_l(12)) # 10
 # print(BT.find_r(5)) # 8
 # print(BT.min) # 3
 # print(BT.max) # 13

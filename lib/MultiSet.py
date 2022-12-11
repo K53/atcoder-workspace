@@ -26,17 +26,17 @@
 #       - O(log(n))
 #   - delete() : 要素の削除 <- point!
 #       - O(log(n))
-#       - 遅延削除を採用。heapqから任意の要素を削除することはできないため、dictで論理削除する。
-#       - 先頭要素取得に影響しない場合は論理削除。影響する場合は物理削除し、次の先頭要素がすでに論理削除済みであれば遅延させていた物理削除を実行。(繰り返す)
-#   - getKth() : K番目の要素取得。存在しない場合はINFが返る。  <- point!
+#   - getKth() : 小さい方からK番目の要素取得。存在しない場合は-INFが返る。  <- point!
+#       - O(log(n))
+#   - getKthFromLargest() : 大きい方からK番目の要素取得。存在しない場合は-INFが返る。  <- point!
 #       - O(log(n))
 #   - countLessThanOrEqualTo() : val以下(≦ val)の要素数を返す。
 #       - O(log(n))
 #   - countUnder() : val未満(< val)の要素数を返す。
 #       - O(log(n))
-#   - upperBound(val, k) : valより大きい値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合はINFが返る。
+#   - upperBound(val, k) : valより大きい値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合は-INFが返る。
 #       - O(log(n))
-#   - lowerBound(val, k) : val以上の値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合はINFが返る。
+#   - lowerBound(val, k) : val以上の値において、小さい方からk番目(0-indexed)の値を取得。存在しない場合は-INFが返る。
 #       - O(log(n))
 #
 # リンク
@@ -44,6 +44,8 @@
 # 
 # verify
 # - https://atcoder.jp/contests/abc241/tasks/abc241_d
+# - https://atcoder.jp/contests/abc253/tasks/abc253_c
+# - https://atcoder.jp/contests/abc217/tasks/abc217_d
 # ------------------------------------------------------------------------------
 
 from BIT import BIT
@@ -53,7 +55,7 @@ INF = 10 ** 9
 
 class MultiSet:
     def __init__(self, allVals: "list[int]"):
-        # print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
+        print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
         self.arr = sorted(allVals)
         self.bit = BIT(len(allVals))
         self.ammounts = 0
@@ -82,7 +84,14 @@ class MultiSet:
         小さい方からK番目の値を取得。
         '''
         return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
-    
+
+    def getKthFromLargest(self, k: int) -> int:
+        '''getKth
+        k : 0-indexed
+        大きい方からK番目の値を取得。
+        '''
+        return self.arr[self.bit.lowerLeft(self.ammounts - k)] if 0 <= k < self.ammounts else -INF
+        
     def countLessThanOrEqualTo(self, val: int) -> int:
         '''
         val以下(≦ val)の要素数を返す。
@@ -101,7 +110,7 @@ class MultiSet:
                  l u
         valより大きい値において、小さい方からk番目の値を取得
         k: 0-indexed
-        (存在しないindexではINFが返る。)
+        (存在しないindexでは-INFが返る。)
         '''
         return self.getKth(self.countLessThanOrEqualTo(val) + k)
 
@@ -111,7 +120,7 @@ class MultiSet:
                  l  u
         val以上の値において、小さい方からk番目の値を取得
         k: 0-indexed
-        (存在しないindexではINFが返る。)
+        (存在しないindexでは-INFが返る。)
         '''
         return self.getKth(self.countUnder(val) + k)
 

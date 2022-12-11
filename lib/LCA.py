@@ -19,10 +19,13 @@
 #   - https://yukicoder.me/submissions/699828
 # - getDistance()
 #   - https://atcoder.jp/contests/abc014/tasks/abc014_4
+# - 応用
+#   - https://yukicoder.me/submissions/699828 (ノードにコストが与えられた問題 : BFSしてからLCA)
 # ------------------------------------------------------------------------------
 class LcaDoubling:
     # 木であれば任意の点を根と見做せる。
     def __init__(self, N, root=0):
+        print("有向辺でLCAする場合、根rootを明示的に指定すること。出次数0のノードで終了し不整合となる。")
         self.N = N
         self.root = root
         self.G = [[] for _ in range(N)]
@@ -32,8 +35,8 @@ class LcaDoubling:
         return
     
     def addEdge(self, fromNode: int, toNode: int, cost: int):
+        print("Really directed Graph?")
         self.G[fromNode].append((cost, toNode))
-        # print("Really directed Graph?")
         return
     
     def build(self):
@@ -119,3 +122,5 @@ print(ld.getLca(1, 2)) # LCAを出力
 "-> 0"
 print(ld.getDistance(1, 2)) # 2つのノード間の距離を出力。
 "-> 2"
+
+print(ld.isOnPath(nodeA=0, nodeB=4, evalNode=3)) # True
