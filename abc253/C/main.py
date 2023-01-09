@@ -22,7 +22,8 @@ class BIT:
         '''Add
             O(logN)
             posは0-index。内部で1-indexedに変換される。
-            A[pos] += val 
+            すでにMultiSetに含まれている個数以上は削除されない。
+            A[pos] -= val 
         '''
         actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
         i = pos + 1 # convert from 0-index to 1-index
@@ -100,6 +101,13 @@ class MultiSet:
         '''
         return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
     
+    def getKthFromLargest(self, k: int) -> int:
+        '''getKth
+        k : 0-indexed
+        大きい方からK番目の値を取得。
+        '''
+        return self.arr[self.bit.lowerLeft(self.ammounts - k)] if 0 <= k < self.ammounts else -INF
+    
     def countLessThanOrEqualTo(self, val: int) -> int:
         '''
         val以下(≦ val)の要素数を返す。
@@ -143,28 +151,23 @@ class MultiSet:
 def main():
     queries = []
     kinds = set()
-    revkinds = set()
     Q = int(input())
     for _ in range(Q):
         query = list(map(int, input().split()))
         queries.append(query)
         if query[0] == 1 or  query[0] == 2:
             kinds.add(query[1])
-            revkinds.add(-query[1])
     ms = MultiSet(kinds, False)
-    revms = MultiSet(revkinds, False)
     for i in range(Q):
         query = queries[i]
         if query[0] == 1:
             x = query[1]
             ms.insert(x)
-            revms.insert(-x)
         elif query[0] == 2:
             x, c = query[1], query[2]
             ms.deleteNonNegative(x, c)
-            revms.deleteNonNegative(-x, c)
         else:
-            print(-revms.getKth(0) - ms.getKth(0))
+            print(ms.getKthFromLargest(0) - ms.getKth(0))
     return
 
 

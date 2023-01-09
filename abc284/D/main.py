@@ -68,15 +68,13 @@ def main():
         for i in er.primes:
             p, q = divmod(N, i ** 2)
             if q == 0:
-                if p in s:
-                    print(i, p)
-                    break
+                print(i, p)
+                break
             else:
                 p, q = divmod(N, i)
                 if q == 0:
-                    if int(pow(p, 0.5)) in s:
-                        print(int(pow(p, 0.5)), p)
-                        break
+                    print(int(pow(p, 0.5)), i)
+                    break
             
 
         

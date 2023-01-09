@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 import sys
 
+def isPrime(n: int) -> bool:
+    if n == 0 or n == 1:
+        return False
+    for i in range(2, n + 1):
+        if i * i > n: # √N以下まで見ればいい。i*iとして比較するのは小数を扱いたくないため。
+            return True
+        if n % i == 0:
+            return False
 
 def solve(n: int):
+    s = sum(range(1, n + 1))
+    print("WANWAN" if isPrime(s) else "BOWWOW")
     return
 
 

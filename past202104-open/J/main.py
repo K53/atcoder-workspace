@@ -3,6 +3,34 @@ import sys
 
 
 def solve(N: int, C: int, X: "List[int]", Y: "List[int]"):
+    # 最小にしたい関数f (例: 10/√(k + 1) + k)
+    def f(k: float or int) -> float:
+        res = 0
+        for i in range(N):
+            res += pow(k - X[i], 2) + pow(C - Y[i], 2)
+        return res
+        
+    def ternarySearch(l: float, r: float, accept_range: int = 2) -> tuple:
+        """
+        - l : 定義域(l ≦ x ≦ r)の左端
+        - r : 定義域(l ≦ x ≦ r)の右端
+        - accept_range : 探索で絞った後の範囲
+        三分探索を行い、最小値を取る値の範囲l ~ rを返却する。
+        """
+        # 範囲が accept_range 以下に絞られるまで回す。
+        while r - l > accept_range:
+            # オーバーフローしないための三等分点を置く
+            mid1 = l + (r - l) / 3
+            mid2 = r - (r - l) / 3
+            if f(mid1) < f(mid2):
+                r = mid2
+            else:
+                l = mid1
+        return (l, r)
+
+    l, r = ternarySearch(l=-(10 ** 18), r=10 ** 18, accept_range=pow(10, -9))
+    print(f(l))
+
     return
 
 

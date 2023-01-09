@@ -4,11 +4,14 @@ import sys
 
 def solve(N: int):
     ans = 0
-    for a in range(1, 4650):
-        for b in range(a, N // a + 1):
-            # print(a,b, N // (a * b))
-            k = N // (a * b) - b + 1
-            ans += max(0, k)
+    for a in range(1, int(pow(N, 0.34) + 1)):
+        for b in range(a, int(pow(N, 0.5) + 1)):
+            if a * b > N:
+                break
+            c, q = divmod(N, a * b)
+            if c >= b:
+                # print(a, b, c)
+                ans += c - b + 1
     print(ans)
     return
 
