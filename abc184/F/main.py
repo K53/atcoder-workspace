@@ -1,8 +1,41 @@
 #!/usr/bin/env python3
 import sys
-
+import bisect
 
 def solve(N: int, T: int, A: "List[int]"):
+    h = N // 2
+    preA = A[:h]
+    sufA = A[h:]
+
+    preAsums = set()
+    for i in range(2 ** len(preA)):
+        s = 0
+        for b in range(len(preA)):
+            if (i >> b) & 1:
+                s += preA[b]
+        preAsums.add(s)
+    sufAsums = set()
+    for i in range(2 ** len(sufA)):
+        s = 0
+        for b in range(len(sufA)):
+            if (i >> b) & 1:
+                s += sufA[b]
+        sufAsums.add(s)
+    
+    preAsums = sorted(list(preAsums))
+    sufAsums = sorted(list(sufAsums))
+
+    ans = 0
+    for i in preAsums:
+        rest = T - i
+        if rest < 0:
+            continue
+        idx = bisect.bisect_right(sufAsums, rest)
+        if idx == 0:
+            ans = max(ans, i)
+        else:
+            ans = max(ans, i + sufAsums[idx - 1])
+    print(ans)        
     return
 
 
