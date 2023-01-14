@@ -4,22 +4,31 @@ import sys
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
+def convertCordinate(N: int, L: "list[list[str]]"):
+    for hh in range(N):
+        if "#" in L[hh]:
+            break
+    transposedS = list(zip(*L))
+    for ww in range(N):
+        if "#" in transposedS[ww]:
+            break
+    toph = hh
+    topw = ww
+
+    ss = set() # y, x
+    for hh in range(N):
+        for ww in range(N):
+            if L[hh][ww] == "#":
+                ss.add((hh - toph, ww - topw))
+    return ss
+
+
 def solve(N: int, S: "List[str]", T: "List[str]"):
-    ss = set()
-    tt = set()
-    for i in range(N):
-        for j in range(N):
-            if S[i][j] == "#":
-                ss.add((i, j))
-            if T[i][j] == "#":
-                tt.add((i, j))
-    for _ in range(4):
-        minXs, minYs = min(ss)
-        minXt, minYt = min(tt)
-        if set((x - minXs, y - minYs) for x, y in ss) == set((x - minXt, y - minYt) for x, y in tt):
+    for i in range(4):
+        if convertCordinate(N, S) == convertCordinate(N, T):
             print(YES)
             return
-        tt = set((y, -x) for x, y in tt)
+        T = list(zip(*T[::-1]))
     print(NO)
     return
 

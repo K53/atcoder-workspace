@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
 
-
-def solve(V: int, T: int, S: int, D: int):
+def solve(X: int, Y: int, Z: int):
+    if 0 < Y < X or X < Y < 0:
+        # 0 - Z - X
+        if 0 < Y < Z or Z < Y < 0:
+            print(-1)
+        else:
+            print(abs(Z) + abs(Z - X))
+    else:
+        print(abs(X))
     return
 
 
@@ -16,11 +21,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    V = int(next(tokens))  # type: int
-    T = int(next(tokens))  # type: int
-    S = int(next(tokens))  # type: int
-    D = int(next(tokens))  # type: int
-    solve(V, T, S, D)
+    X = int(next(tokens))  # type: int
+    Y = int(next(tokens))  # type: int
+    Z = int(next(tokens))  # type: int
+    solve(X, Y, Z)
 
 if __name__ == '__main__':
     main()

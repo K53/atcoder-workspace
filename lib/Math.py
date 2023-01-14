@@ -6,6 +6,7 @@
 # - N進数変換
 # - 外積 (2つのベクトルABとCDが交差するかの判定)
 # - 数列の和の公式
+# - 順列
 
 # ------------------------------------------------------------------------------
 #     直交座標の回転
@@ -227,3 +228,63 @@ def getAria(
     x_O: int = 0, y_O: int = 0,
     ) -> int:
     return abs((x_1 - x_O) * (y_2 - y_O) - (x_2 - x_O) * (y_1 - y_O)) / 2
+
+# ------------------------------------------------------------------------------
+#     任意の順列 ⇆ 全順列の昇順K番目 変換
+# ------------------------------------------------------------------------------
+# - 参考
+#   https://atcoder.jp/contests/abc276/editorial/5189
+# ------------------------------------------------------------------------------
+
+class PermutationFactory():
+    def __init__(self, N: int) -> None:
+        """
+        階乗算出
+        O(N)
+        """
+        self.N = N
+        self.fac = [1, 1] # 階乗リスト
+        for i in range(2, N + 1):
+            self.fac.append(self.fac[i - 1] * i)
+        return
+    
+    def kth_permutation(self, k: int) -> list:
+        """
+        k番目の順列を返す。O(N)
+        先頭要素から固定していく。その要素を固定したときの順列の場合の和をkから引いていく。
+        args:
+            k: 0〜(N-1)の順列の昇順k番目 (0-index)
+        return:
+            res: k番目のリスト
+        """
+        candidates = list(range(self.N)) # 任意の配列でもいいが重複がないこと
+        res = []
+        for i in reversed(range(self.N)):
+            a = self.fac[i]
+            # print(a)
+            j, k = divmod(k, a)
+            res.append(candidates[j])
+            del candidates[j]
+        return res
+
+    def get_kth_of_permutation(self, L: list) -> int:
+        """
+        args:
+            L: 0〜(N-1)までの順列で昇順何番目かを求めたい順列
+        return:
+            k: 昇順何番目か (0-index)
+        """
+        k = 0
+        while len(L) > 1:
+            a = len([ll for ll in L if ll < L[0]])
+            k += a * self.fac[len(L) - 1]
+            L = L[1:]
+        return k
+
+# usage
+P = [0, 1, 3, 2]
+pf = PermutationFactory(len(P))
+print(pf.get_kth_of_permutation(P)) # 1
+print(pf.kth_permutation(0)) # [0, 1, 2, 3]
+print(pf.kth_permutation(1)) # [0, 1, 3, 2]
+print(pf.kth_permutation(2)) # [0, 2, 1, 3]

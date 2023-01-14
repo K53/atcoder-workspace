@@ -5,7 +5,7 @@ YES = "Yes"  # type: str
 NO = "No"  # type: str
 
 
-def solve(V: int, T: int, S: int, D: int):
+def solve(T: int, A: "List[int]", B: "List[int]", C: "List[int]", D: "List[int]"):
     return
 
 
@@ -16,11 +16,17 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    V = int(next(tokens))  # type: int
     T = int(next(tokens))  # type: int
-    S = int(next(tokens))  # type: int
-    D = int(next(tokens))  # type: int
-    solve(V, T, S, D)
+    A = [int()] * (T)  # type: "List[int]"
+    B = [int()] * (T)  # type: "List[int]"
+    C = [int()] * (T)  # type: "List[int]"
+    D = [int()] * (T)  # type: "List[int]"
+    for i in range(T):
+        A[i] = int(next(tokens))
+        B[i] = int(next(tokens))
+        C[i] = int(next(tokens))
+        D[i] = int(next(tokens))
+    solve(T, A, B, C, D)
 
 if __name__ == '__main__':
     main()

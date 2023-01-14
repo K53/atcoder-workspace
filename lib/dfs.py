@@ -110,3 +110,7 @@ def main():
 
     dfs(0, 1)
     print(ans)
+
+
+# from functools import lru_cache
+# @lru_cache(maxsize=7000)

@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 import sys
+import bisect
 
-
-def solve(N: int, X: int, A: "List[int]"):
+def solve(N: int, K: int, A: "List[int]"):
+    A = sorted(A)
+    m = min(A)
+    l = []
+    while N >= m:
+        idx = bisect.bisect_right(A, N)
+        N -= A[idx - 1]
+        l.append(A[idx - 1])
+    ans = 0
+    for i in range(len(l)):
+        if i % 2 == 0:
+            ans += l[i]
+    print(ans)
     return
 
 
@@ -14,9 +26,9 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    X = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, X, A)
+    K = int(next(tokens))  # type: int
+    A = [int(next(tokens)) for _ in range(K)]  # type: "List[int]"
+    solve(N, K, A)
 
 if __name__ == '__main__':
     main()

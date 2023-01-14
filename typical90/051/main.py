@@ -1,8 +1,57 @@
 #!/usr/bin/env python3
 import sys
-
+import bisect
+from collections import defaultdict
 
 def solve(N: int, K: int, P: int, A: "List[int]"):
+    h = N // 2
+    pre = A[:h]
+    suf = A[h:]
+
+    ps = defaultdict(list)
+    for i in range(2 ** len(pre)):
+        kk = 0
+        ss = 0
+        for b in range(len(pre)):
+            if (i >> b) & 1:
+                kk += 1
+                ss += pre[b]
+        if kk > K:
+            continue
+        ps[kk].append(ss)
+    
+    qs = defaultdict(list)
+    for i in range(2 ** len(suf)):
+        kk = 0
+        ss = 0
+        for b in range(len(suf)):
+            if (i >> b) & 1:
+                kk += 1
+                ss += suf[b]
+        if kk > K:
+            continue
+        qs[kk].append(ss)
+    for kk in ps.keys():
+        ps[kk].sort()
+    for kk in ps.keys():
+        qs[kk].sort()
+    # print(ps)
+    # print(qs)
+    ans = 0
+    for kk, vals in ps.items():
+        restK = K - kk
+        target = qs[restK]
+        if len(target) == 0:
+            continue
+        for v in vals:
+            restV = P - v
+            if restV < 0:
+                continue
+            # print(restV, "in", target)
+            idx = bisect.bisect_right(target, restV)
+            # print(idx)
+            ans += idx
+    print(ans)    
     return
 
 

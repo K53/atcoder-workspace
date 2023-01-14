@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
 
-
-def solve(V: int, T: int, S: int, D: int):
+def solve(A: int, B: int):
+    print(A | B)
     return
 
 
@@ -16,11 +14,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    V = int(next(tokens))  # type: int
-    T = int(next(tokens))  # type: int
-    S = int(next(tokens))  # type: int
-    D = int(next(tokens))  # type: int
-    solve(V, T, S, D)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    solve(A, B)
 
 if __name__ == '__main__':
     main()

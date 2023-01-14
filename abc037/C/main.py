@@ -3,10 +3,10 @@ import sys
 from itertools import accumulate
 
 def solve(N: int, K: int, a: "List[int]"):
-    l = [0] + list(accumulate(a))
+    s = [0] + list(accumulate(a))
     ans = 0
     for i in range(N - K + 1):
-        ans += l[K + i] - l[i]
+        ans += s[i + K] - s[i]
     print(ans)
     return
 

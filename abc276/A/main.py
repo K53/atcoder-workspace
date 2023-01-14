@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
 
-
-def solve(V: int, T: int, S: int, D: int):
+def solve(S: str):
+    ans = -1
+    for i in range(len(S)):
+        if S[i] == "a":
+            ans = i + 1
+    print(ans)
     return
 
 
@@ -16,11 +18,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    V = int(next(tokens))  # type: int
-    T = int(next(tokens))  # type: int
-    S = int(next(tokens))  # type: int
-    D = int(next(tokens))  # type: int
-    solve(V, T, S, D)
+    S = next(tokens)  # type: str
+    solve(S)
 
 if __name__ == '__main__':
     main()
