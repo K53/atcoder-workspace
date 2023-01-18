@@ -4,7 +4,8 @@
 # - 直交座標の回転
 # - 二次元配列の回転と反転
 # - N進数変換
-# - 外積 (2つのベクトルABとCDが交差するかの判定)
+# - 外積 (2つのベクトル(線分)ABとCDが交差するかの判定)
+#   - 線分の交差判定
 # - 数列の和の公式
 # - 順列
 
@@ -181,13 +182,30 @@ print(base10toKint(base10value=val, toBase=K)) # -> 15
 # ------------------------------------------------------------------------------
 # 2つのベクトルABとCDが交差するかの判定
 #
-# 解説 -> https://qiita.com/zu_rin/items/e04fdec4e3dec6072104
+# 解説 
+#   - https://yttm-work.jp/collision/collision_0011.html
+#   - https://qiita.com/zu_rin/items/e04fdec4e3dec6072104
 # ------------------------------------------------------------------------------
 
 def outerProduct(A_x: int, A_y: int, B_x: int, B_y: int, C_x: int, C_y: int, D_x: int, D_y: int):
+    """
+    交差判定は2回行うこと
+          .C                                .C
+    A・--------・B    OR    A・--------・B
+          .D                                .D
+    """
     s = (B_x-A_x) * (C_y-A_y) - (C_x-A_x) * (B_y-A_y)
     t = (B_x-A_x) * (D_y-A_y) - (D_x-A_x) * (B_y-A_y) 
-    return s * t # < 0 であれば2つのベクトルABとCDは交差する。
+    return s * t # < 0 であれば線分ABに対して点Cと点Dは異なる方向にある。
+    
+
+# 線分の交差判定
+def isCrossing(A_x: int, A_y: int, B_x: int, B_y: int, C_x: int, C_y: int, D_x: int, D_y: int):
+    """
+    線分ABとCDの交差判定
+    """
+    return outerProduct(A_x, A_y, B_x, B_y, C_x, C_y, D_x, D_y) < 0 and \
+        outerProduct(C_x, C_y, D_x, D_y, A_x, A_y, B_x, B_y) < 0
 
 
 # ------------------------------------------------------------------------------

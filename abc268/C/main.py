@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 import sys
 
-def solve(N: int, A: "List[int]"):
-    
-
+def solve(N: int, p: "List[int]"):
+    c = [0] * N
+    for i in range(N):
+        c[(p[i] - 1 - i) % N] += 1
+        c[(p[i] - i) % N] += 1
+        c[(p[i] + 1 - i) % N] += 1
+        # print((p[i] - 1 - i) % N)
+        # print((p[i] - i) % N)
+        # print((p[i] + 1 - i) % N)
+    print(max(c))
     return
 
 
@@ -15,8 +22,8 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, A)
+    p = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, p)
 
 if __name__ == '__main__':
     main()

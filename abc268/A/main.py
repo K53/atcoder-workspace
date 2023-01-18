@@ -2,7 +2,8 @@
 import sys
 
 
-def solve(X: int, K: int):
+def solve(A: int, B: int, C: int, D: int, E: int):
+    print(len({i for i in [A, B, C, D, E]}))
     return
 
 
@@ -13,9 +14,12 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    X = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(X, K)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    C = int(next(tokens))  # type: int
+    D = int(next(tokens))  # type: int
+    E = int(next(tokens))  # type: int
+    solve(A, B, C, D, E)
 
 if __name__ == '__main__':
     main()

@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 import sys
 
+YES = "Yes"  # type: str
+NO = "No"  # type: str
 
-def solve(X: int, K: int):
+
+def solve(S: str, T: str):
+    if len(S) > len(T):
+        print(NO)
+        return
+    for i in range(len(S)):
+        if S[i] != T[i]:
+            print(NO)
+            return
+    print(YES)
     return
 
 
@@ -13,9 +24,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    X = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(X, K)
+    S = next(tokens)  # type: str
+    T = next(tokens)  # type: str
+    solve(S, T)
 
 if __name__ == '__main__':
     main()

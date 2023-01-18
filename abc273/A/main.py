@@ -3,11 +3,6 @@ import sys
 
 
 def solve(N: int):
-    def f(k):
-        if k == 0:
-            return 1
-        return f(k - 1) * k
-    print(f(N))
     return
 
 

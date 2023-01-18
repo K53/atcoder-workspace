@@ -2,7 +2,12 @@
 import sys
 
 
-def solve(X: int, K: int):
+def solve(N: int):
+    def f(k):
+        if k == 0:
+            return 1
+        return f(k - 1) * k
+    print(f(N))
     return
 
 
@@ -13,9 +18,8 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    X = int(next(tokens))  # type: int
-    K = int(next(tokens))  # type: int
-    solve(X, K)
+    N = int(next(tokens))  # type: int
+    solve(N)
 
 if __name__ == '__main__':
     main()

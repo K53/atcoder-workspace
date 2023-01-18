@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 import sys
+from itertools import permutations
 
-def solve(N: int, A: "List[int]"):
-    
-
+def solve(N: int, M: int, S: "List[str]", T: "List[str]"):
+    p = permutations(S)
+    ls = 0
+    for ss in S:
+        ls += len(ss)
+    num_ = 16 - (ls + N - 1)
+    for pp in p:
+        print(pp)
+        
     return
 
 
@@ -15,8 +22,10 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, A)
+    M = int(next(tokens))  # type: int
+    S = [next(tokens) for _ in range(N)]  # type: "List[str]"
+    T = [next(tokens) for _ in range(M)]  # type: "List[str]"
+    solve(N, M, S, T)
 
 if __name__ == '__main__':
     main()

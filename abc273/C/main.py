@@ -1,19 +1,8 @@
 #!/usr/bin/env python3
-from bisect import bisect_right
-from collections import Counter
 import sys
 
 
 def solve(N: int, A: "List[int]"):
-    ans = []
-    L = sorted(list(set(A)))
-    for i in range(N):
-        # print(len(L) - bisect_right(L, A[i]))
-        ans.append(len(L) - bisect_right(L, A[i]))
-    c = Counter(ans)
-    # print(c)
-    for i in range(N):
-        print(c[i])
     return
 
 
