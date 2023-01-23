@@ -4,6 +4,7 @@
 # 
 # verify
 # - https://atcoder.jp/contests/abc183/tasks/abc183_d
+# - https://atcoder.jp/contests/abc221/tasks/abc221_d (座圧いもす)
 # ------------------------------------------------------------------------------
 
 N = 5
