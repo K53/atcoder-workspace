@@ -3,8 +3,92 @@ import sys
 
 MOD = 998244353  # type: int
 
+class BIT:
+    def __init__(self, N):
+        self.N = N
+        self.bit = [0] * (self.N + 1) # 1-indexedのため
+        
+    def add(self, pos, val):
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            A[pos] += val 
+        '''
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] += val
+            i += i & -i
+
+    def deleteNonNegative(self, pos, val) -> int:
+        '''Add
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            すでにMultiSetに含まれている個数以上は削除されない。
+            A[pos] -= val 
+        '''
+        actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
+        i = pos + 1 # convert from 0-index to 1-index
+        while i <= self.N:
+            self.bit[i] -= actualSubstractVal
+            i += i & -i
+        return actualSubstractVal
+
+    def sum(self, pos):
+        ''' Sum
+            O(logN)
+            posは0-index。内部で1-indexedに変換される。
+            Return Sum(A[0], ... , A[pos])
+            posに負の値を指定されるとSum()すなわち0を返すのでマイナスの特段の考慮不要。
+        '''
+        res = 0
+        i = pos + 1 # convert from 0-index to 1-index
+        while i > 0:
+            res += self.bit[i]
+            i -= i & -i    
+        return res
+    
+    def lowerLeft(self, w):
+        '''
+        O(logN)
+        A0 ~ Aiの和がw以上となる最小のindex(値)を返す。
+        Ai ≧ 0であること。
+        '''
+        if (w < 0):
+            return 0
+        total = self.sum(self.N - 1)
+        if w > total:
+            return -1
+        x = 0
+        k = 1 << (self.N.bit_length() - 1)
+        while k > 0:
+            if x + k < self.N and self.bit[x + k] < w:
+                w -= self.bit[x + k]
+                x += k
+            k //= 2
+        return x
+        
+    def __str__(self):
+        '''
+        index0は不使用なので表示しない。
+        '''
+        return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
 
 def solve(N: int, A: "List[int]"):
+    invTwo = [pow(2, MOD - i - 1, MOD) for i in range(1, N + 1)]
+    seg = BIT(N)
+    # print(seg.tree)
+    l = sorted([(A[i], i) for i in range(N)])
+    ans = 0
+    for ll in l:
+        num, idx = ll
+        # print(ll)
+        seg.add(idx, invTwo[idx])
+        # print(seg.tree)
+        if idx == 0:
+            continue
+        ans += pow(2, idx, MOD) * seg.sum(idx - 1)
+        ans %= MOD
+    print(ans)
     return
 
 

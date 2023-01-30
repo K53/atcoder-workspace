@@ -808,7 +808,7 @@ MOD = 1000000007  # type: int
 fac, finv, inv = [1, 1], [1, 1], [0, 1]
 # fac : 階乗(1,2,6,...)
 # inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
-# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
+# finv: 逆元(階乗の逆元 = 1!の逆元, 2!の逆元, 3!の逆元)
 def cmbInit():
     for i in range(2, MAX):
         fac.append(fac[i - 1] * i % MOD)

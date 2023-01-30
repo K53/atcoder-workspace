@@ -5,29 +5,18 @@ from itertools import accumulate
 MOD = 998244353  # type: int
 
 def solve(N: int, K: int, L: "List[int]", R: "List[int]"):
-    # dp = [0] * N
-    # dp[0] = 1
-    # for i in range(1, N):
-    #     for kk in range(K):
-    #         for j in range(L[kk], R[kk] + 1):
-    #             if i - j >= 0:
-    #                 dp[i] += dp[i - j]
-    #                 dp[i] %= MOD
-    # print(dp[-1] % MOD)
+    dp = [0 for _ in range(N)] # DPテーブルの作成
+    dp[0] = 1                               # DPテーブルの初期化
+    sdp = [0] + list(accumulate(dp))              # 累積和テーブルの初期化
 
-
-    dp = [0] * N
-    dp[0] = 1
-    sdp = [0] + list(accumulate(dp)) 
-    for i in range(N):
-        for kk in range(K):
-            l, r = L[kk], R[kk] + 1
-            dx = sdp[max(i - l + 1, 0)] - sdp[max(i - r + 1, 0)]
-            # print(i, l, r, dx)
-            dp[i] += dx
+    # print(sdp)
+    for i in range(1, N):
+        for num in range(K):               # 列のDPテーブル更新
+            dp[i] += sdp[max(0, i - (L[num] - 1))] - sdp[max(0, i - R[num])]
             dp[i] %= MOD
-        # sdp = [0] + list(accumulate(dp)) # こうしたいけどTLE。考えてみるとそもそもi番目より後の累積和は必要ないので更新不要。
-        sdp[i + 1] = sdp[i] + dp[i]
+            sdp[i + 1] = sdp[i] + dp[i]
+        # print(dp)
+        # print(sdp)
     print(dp[-1] % MOD)
     return
 
