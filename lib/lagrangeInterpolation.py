@@ -115,10 +115,10 @@ def lagrangeInterpolation(points: "list[tuple(int, int)]", MOD: int) -> "list[in
         # (x - x[i])の項 すなわち (x - x[i]) で割る。
         # Rの最大の次数の項を(x - x[i])のxの係数1で割る。次の項の次数からその分引き算してから次の項を1で割る。
         # これを繰り返す。先頭から割り算していく多項式同士の割り算の筆算のイメージ. 
-        # なお、ここでは使わないので上書きしているがprevを繋ぎ合わせたらR / (x - x[i])の商になる。
+        # なお、ここでは使わないので上書きしているがprev_carriedを繋ぎ合わせたらR / (x - x[i])の商になる。
         prev_carried = 0
         for j in range(N):
-            j = N - j 
+            j = N - j # reversed(range(N))で回してもいいがやや遅い印象
             next_carry = ((R[j] - prev_carried * -x_i) % MOD) * modinv(1) % MOD
             coef[j - 1] += next_carry * Q[i] % MOD
             coef[j - 1] %= MOD
