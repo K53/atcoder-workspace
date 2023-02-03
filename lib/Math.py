@@ -8,6 +8,7 @@
 #   - 線分の交差判定
 # - 数列の和の公式
 # - 順列
+# - 偏角ソート
 
 # ------------------------------------------------------------------------------
 #     直交座標の回転
@@ -250,6 +251,15 @@ def getAria(
 # ------------------------------------------------------------------------------
 #     任意の順列 ⇆ 全順列の昇順K番目 変換
 # ------------------------------------------------------------------------------
+# * kth_permutation()
+#   要素数Nの全順列のうち、昇順でK番目の順列Pを取得する。
+# * get_kth_of_permutation()
+#   N個の要素からなる順列Pが、全順列のうち昇順で何番目のものかを取得する。
+#
+#  - 解説
+#
+#
+#
 # - 参考
 #   https://atcoder.jp/contests/abc276/editorial/5189
 # ------------------------------------------------------------------------------
@@ -279,7 +289,6 @@ class PermutationFactory():
         res = []
         for i in reversed(range(self.N)):
             a = self.fac[i]
-            # print(a)
             j, k = divmod(k, a)
             res.append(candidates[j])
             del candidates[j]
@@ -306,3 +315,48 @@ print(pf.get_kth_of_permutation(P)) # 1
 print(pf.kth_permutation(0)) # [0, 1, 2, 3]
 print(pf.kth_permutation(1)) # [0, 1, 3, 2]
 print(pf.kth_permutation(2)) # [0, 2, 1, 3]
+
+
+# ------------------------------------------------------------------------------
+#     偏角ソート
+# ------------------------------------------------------------------------------
+# - 参考
+#   https://atcoder.jp/contests/abc139/submissions/37318430
+# ------------------------------------------------------------------------------
+
+from functools import cmp_to_key
+def sortedByDegree(points: "list[tuple(int, int)]"):
+    """
+    input : [(x_0, y_0), (x_1, y_1), ...]
+    (0, 0)を含まないこと。
+    """
+    print("contaminated by (0, 0)?")
+    def _getQuadrant(x, y):
+        if y >= 0:
+            if x >= 0: return 1
+            else: return 2
+        else:
+            if x <= 0: return 3
+            else: return 4
+ 
+    def _comparePointsFunc(p, q):
+        p_quadrant = _getQuadrant(*p)
+        q_quadrant = _getQuadrant(*q)
+        if p_quadrant == q_quadrant:
+            px, py = p
+            qx, qy = q
+            op = px * qy - py * qx # 外積
+            if op > 0:
+                return -1 
+            if op < 0:
+                return 1
+            else:
+                return 0
+        else:
+            return -1 if p_quadrant < q_quadrant else 1
+             
+    return sorted(points, key = cmp_to_key(_comparePointsFunc))
+
+# Usage
+L = [(0, 1), (3, -8), (-1, 4), (13, 7), (-9, 4)]
+print(sortedByDegree(L)) # [(13, 7), (0, 1), (-1, 4), (-9, 4), (3, -8)]

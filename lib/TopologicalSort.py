@@ -23,6 +23,7 @@
 # - http://www.thothchildren.com/chapter/5bcc8bc051d9305189030f9f
 # - https://tjkendev.github.io/procon-library/python/graph/topological_sort.html
 # - https://drken1215.hatenablog.com/entry/2021/01/02/164800
+# - https://o-treetree.hatenablog.com/entry/2020/05/20/222333
 # 
 # 計算量
 # - O(E + V) : 各ノードについて全ての頂点を1回ずつ見るため。
@@ -34,6 +35,7 @@
 # - https://atcoder.jp/contests/joi2007ho/tasks/joi2007ho_d (単一のトポロジカル順序かの判定)
 # - https://atcoder.jp/contests/abc216/tasks/abc216_d 
 # - https://atcoder.jp/contests/past202107-open/tasks/past202107_j (DAG判定)
+# - https://atcoder.jp/contests/abc139/tasks/abc139_e (トポソ後の深さ)
 # ------------------------------------------------------------------------------
 from collections import deque
 import heapq
@@ -45,6 +47,7 @@ class TopologicalTree:
         self.seen = [0] * N
         self.G = [[] for _ in range(N)]
         self.degree = [0] * N # 各ノードの入次数
+        self.sorted_longest_depth = [0] * N # トポソ後の各ノードの最長の深さ。
         return
     
     # 辺の追加
@@ -55,16 +58,19 @@ class TopologicalTree:
         return
         
     def topologicalSort(self):
+        """
+        入次数0を開始点としたBFS。
+        """
         deq = deque([node for node in range(self.N) if self.degree[node] == 0]) # 入次数0のものがスタート
-
         # 片っ端から入次数0のものを取り出していく。取り出すとそのノードから遷移するノードの入次数をデクリメントする。
         while deq:
-            node = deq.popleft()
-            self.topologicalOrder.append(node)
-            for t in self.G[node]:
-                self.degree[t] -= 1
-                if self.degree[t] == 0:
-                    deq.append(t)
+            cur = deq.popleft()
+            self.topologicalOrder.append(cur)
+            for next in self.G[cur]:
+                self.degree[next] -= 1
+                self.sorted_longest_depth[next] = max(self.sorted_longest_depth[next], self.sorted_longest_depth[cur] + 1)
+                if self.degree[next] == 0:
+                    deq.append(next)
         if [i for i in range(self.N) if self.degree[i]]: # 最終的な入次数が0じゃないものが残る場合循環がある。
             return None
         return self.topologicalOrder
@@ -78,12 +84,13 @@ class TopologicalTree:
         heapq.heapify(hq)
         # 片っ端から入次数0のものを取り出していく。取り出すとそのノードから遷移するノードの入次数をデクリメントする。
         while hq:
-            node = heapq.heappop(hq)
-            self.topologicalOrder.append(node)
-            for t in self.G[node]:
-                self.degree[t] -= 1
-                if self.degree[t] == 0:
-                    heapq.heappush(hq, t)
+            cur = heapq.heappop(hq)
+            self.topologicalOrder.append(cur)
+            for next in self.G[cur]:
+                self.degree[next] -= 1
+                self.sorted_longest_depth[next] = max(self.sorted_longest_depth[next], self.sorted_longest_depth[cur] + 1)
+                if self.degree[next] == 0:
+                    heapq.heappush(hq, next)
         if [i for i in range(self.N) if self.degree[i]]: # 最終的な入次数が0じゃないものが残る場合循環がある。
             return None
         return self.topologicalOrder
