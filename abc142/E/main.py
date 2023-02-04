@@ -4,27 +4,29 @@
 def main():
     INF = 10 ** 16
     N, M = map(int, input().split())
-    cost = []
-    keys = []
+    A = []
+    C = []
     for _ in range(M):
         a, b = map(int, input().split())
-        cost.append(a)
-        cc = 0
-        for i in list(map(int, input().split())):
-            cc += 2 ** (i - 1)
-        keys.append(cc)
-    # print(cost)
-    # print(keys)
-    dp = [[INF] * (2 ** N) for _ in range(M + 1)]
+        c = list(map(int, input().split()))
+        A.append(a)
+        tmp = 0
+        for i in c:
+            tmp += 2 ** (i - 1)
+        C.append(tmp)
+    pattern = 2 ** N
+    dp = [[INF] * pattern for _ in range(M + 1)]
     dp[0][0] = 0
-    for mm in range(M):
-        for nn in range(2 ** N):
-            if dp[mm][nn] == INF:
+    for i in range(M):
+        for j in range(pattern):
+            if dp[i][j] == INF:
                 continue
-            dp[mm + 1][nn | keys[mm]] = min(dp[mm + 1][nn | keys[mm]], dp[mm][nn] + cost[mm])
-            dp[mm + 1][nn] = min(dp[mm + 1][nn], dp[mm][nn])
+            # 使わない
+            dp[i + 1][j] = min(dp[i][j], dp[i + 1][j])
+            # 使う
+            dp[i + 1][j | C[i]] = min(dp[i][j] + A[i], dp[i + 1][j | C[i]])
+
     print(-1 if dp[-1][-1] == INF else dp[-1][-1])
-    return
 
 if __name__ == '__main__':
     main()
