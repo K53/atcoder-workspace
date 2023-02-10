@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 import sys
-
+import bisect
 MOD = 998244353  # type: int
 
-# 0 -> number 1
-
 def solve(N: int):
-    nums = [1] * 9
-    for _ in range(N - 1):
-        # print(nums)
-        new = [(nums[0] + nums[1]) % MOD]
-        for i in range(0,7):
-            new.append((nums[i] + nums[i + 1] + nums[i + 2]) % MOD)
-        new.append((nums[7] + nums[8]) % MOD)
-        nums = new
-    print(sum(nums) % MOD)
+    # dp[i][j] := i桁の末尾j
+    dp = [[0] * 10 for _ in range(N)]
+    for i in range(1, 10):
+        dp[0][i] = 1
+    for i in range(N - 1):
+        for j in range(1, 10):
+            if j == 1:
+                dp[i + 1][j] = dp[i][j] + dp[i][j + 1]
+            elif j == 9:
+                dp[i + 1][j] = dp[i][j - 1] + dp[i][j]
+            else:
+                dp[i + 1][j] = dp[i][j - 1] + dp[i][j] + dp[i][j + 1]
+            dp[i + 1][j] %= MOD
+        
+    print(sum(dp[N - 1]) % MOD)
+
     return
 
 

@@ -3,14 +3,6 @@ import sys
 
 
 def solve(N: int, L: int):
-    s = sum([L + i for i in range(N)])
-    diff = 10 ** 6
-    ans = 0
-    for i in range(N):
-        if abs(L + i) < diff:
-            diff = abs(L + i)
-            ans = s - (L + i)
-    print(ans)
     return
 
 

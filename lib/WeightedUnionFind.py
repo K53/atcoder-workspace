@@ -40,7 +40,7 @@ class WeightedUnionFind():
     """ 2つの要素の併合。
     すでに同じ集合に属する場合はFalseを返す。
     """
-    def union(self, x, y, w):
+    def union(self, x, y, w) -> bool:
         w += self.weight(x)
         w -= self.weight(y)
         x = self.find(x)

@@ -1,18 +1,8 @@
 #!/usr/bin/env python3
 import sys
-import math
+
 
 def solve(A: int, B: int, C: int, D: int):
-    num_C = (A - 1) // C
-    num_D = (A - 1) // D
-    num_C_D = (A - 1) // (C * D // math.gcd(C, D))
-    p = (A - 1) - num_C - num_D + num_C_D
-    # print((A - 1), num_C, num_D, num_C_D)
-    num_C = B // C
-    num_D = B // D
-    num_C_D = B // (C * D // math.gcd(C, D))
-    q = B - num_C - num_D + num_C_D
-    print(q - p)
     return
 
 

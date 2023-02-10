@@ -23,7 +23,7 @@
 # ------------------------------------------------------------------------------
 
 class SegTree:
-    def __init__(self, monoid, bottomList, func, convertLengthToThePowerOf2: bool = False):
+    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", convertLengthToThePowerOf2: bool = False):
         print("index0 は使用されない。常にdefault値")
         self.monoid = monoid
         self.func = func
@@ -39,13 +39,13 @@ class SegTree:
             self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
             self.segLen = self.bottomLen * 2
             self.tree = [monoid] * self.segLen
-        self.build(bottomList)
+        self._build(bottomList)
 
     """
     初期化
     O(self.segLen)
     """
-    def build(self, seq):
+    def _build(self, seq):
         # 最下段の初期化
         for i, x in enumerate(seq, self.offset):
             self.tree[i] = x
@@ -89,6 +89,7 @@ class SegTree:
 
     """
     区間取得
+    l ~ r-1までの区間 (0-indexed)。※右端を含まない。
     O(log(self.bottomLen))
     """
     def getRange(self, l: int, r: int):

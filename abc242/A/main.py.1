@@ -2,8 +2,14 @@
 import sys
 
 
-def solve(r: int):
-    print(r * r)
+def solve(A: int, B: int, C: int, X: int):
+    if X <= A:
+        print(1)
+        return
+    if B < X:
+        print(0)
+        return
+    print(C / (B - A))
     return
 
 
@@ -14,8 +20,11 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    r = int(next(tokens))  # type: int
-    solve(r)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    C = int(next(tokens))  # type: int
+    X = int(next(tokens))  # type: int
+    solve(A, B, C, X)
 
 if __name__ == '__main__':
     main()

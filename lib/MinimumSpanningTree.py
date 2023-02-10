@@ -1,3 +1,11 @@
+# 最小全域木自体(具体的にどのノードとどのノードが繋がれてるか)を生成する必要がある場合
+#   -> クラスカル法
+#
+# それいがいはどちらも一緒。
+#
+# ### NOTE: 2023/02時点でのライブラリ間の相違
+
+
 # ------------------------------------------------------------------------------
 #     最小全域木(クラスカル法)
 # ------------------------------------------------------------------------------
@@ -16,6 +24,7 @@
 # verify
 # - https://atcoder.jp/contests/typical-algorithm/tasks/typical_algorithm_f?lang=ja
 # - https://atcoder.jp/contests/abc218/tasks/abc218_e
+# - https://atcoder.jp/contests/abc228/tasks/abc228_c
 # ------------------------------------------------------------------------------
 from UnionFind import UnionFind
 
@@ -24,7 +33,7 @@ class Kruskal():
         # self.minimumG = [[] for _ in range(N)] # 全域最小木自体が欲しい場合にはこれを有効にする。
         self.edges = []
         self.uf =  UnionFind(N)
-        self.minimunCost = 0
+        self.minimunCost = 0 # 最小全域木を構成する全体のコストの総和の最小。
         return
     
     def addEdge(self, a: int, b: int, cost: int):
@@ -58,17 +67,16 @@ class Kruskal():
 # 計算量
 # - O(ElogV)
 # 
-# Modify
+# vodify
 # - https://atcoder.jp/contests/typical-algorithm/tasks/typical_algorithm_f?lang=ja
+# - https://atcoder.jp/contests/abc065/tasks/arc076_b
 # ------------------------------------------------------------------------------
 import heapq
-INF = 10 ** 9
 class Prim():
     def __init__(self, N: int) -> None:
-        # self.minimumG = [[] for _ in range(N)] # 全域最小木自体が欲しい場合にはこれを有効にする。(未実装 -> クラスカル法推奨)
         self.G = [[] for _ in range(N)]
         self.seen = [[] for _ in range(N)]
-        self.minimunCost = 0
+        self.minimunCost = 0 # 最小全域木を構成する全体のコストの総和の最小。
         return
     
     def addEdge(self, a: int, b: int, cost: int):

@@ -12,9 +12,8 @@
 #  - https://atcoder.jp/contests/past202104-open/tasks/past202104_j
 #  - https://atcoder.jp/contests/abc279/tasks/abc279_d (定義域が整数なので割り切って使う問題)
 #  - https://atcoder.jp/contests/abc102/tasks/arc100_a (定義域が整数なので割り切って使う問題)
+#  - https://atcoder.jp/contests/abc151/tasks/abc151_f (二重三分探索/二次元の座標空間で三分探索)
 # ------------------------------------------------------------------------------
-import math
-
 # 最小にしたい関数f (例: 10/√(k + 1) + k)
 def f(k: float or int) -> float:
     return 10 / pow(k + 1, 1/2) + k
@@ -37,6 +36,7 @@ def ternarySearch(l: float, r: float, accept_range: int = 2) -> tuple:
             l = mid1
     return (l, r)
 
+import math
 l, r = ternarySearch(l=0, r=10 ** 18, accept_range=pow(10, -8)) # pow(10, -8)の誤差を許容。
 print(f(l)) # -> 7.772053214638598 : 関数fの値が小数(誤差10^-8を許容)を含む場合の最小値。
 

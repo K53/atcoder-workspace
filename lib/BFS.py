@@ -27,6 +27,20 @@ def bfs(G: "List[to]", start_node: int) -> list:
             dist[next] = dist[now] + 1
     return dist
 
+# Note :
+#
+# distの次元を拡張する場合、dp的にfor hop for nextの2重で回してもいいがqueueに入れた方が早くてバグらないかも
+# dist[start_node][0] = 0
+# q.append((start_node, 0))
+# while q:
+#     now, now_step = q.popleft()
+#     for next in G[now]:
+#         if dist[next][(now_step + 1) % 3] != INF:
+#             continue
+#         q.append((next, (now_step + 1) % 3))
+#         dist[next][(now_step + 1) % 3] = dist[now][now_step] + 1
+# return dist
+
 # ------------------------------------------------------------------------------
 #     BFS (グリッド)
 # ------------------------------------------------------------------------------
@@ -47,6 +61,7 @@ def bfs(G: "List[to]", start_node: int) -> list:
 # ------------------------------------------------------------------------------
 from collections import deque
 def bfs(G, H, W, startY, startX) -> list:
+    # ゴールやスタートを任意に設定できる問題では開始点が壁であるケースに注意!!!!
     INF = 10 ** 16
     q = deque()
     dist = [[INF] * W for _ in range(H)]

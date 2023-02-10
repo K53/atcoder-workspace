@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 import sys
+import math
 
-
-def solve(r: int):
-    print(r)
+def solve(N: int, M: int, a: "List[int]"):
+    ans = set(list(range(1, M + 1)))
+    for i in range(N):
+        tmp = set()
+        # print(i)
+        for j in range(M):
+            t = int(a[i] * (j + 0.5))
+            if t > M:
+                break
+            tmp.add(t)
+        ans &= tmp
+    print(len(ans))
     return
 
 
@@ -14,8 +24,10 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    r = int(next(tokens))  # type: int
-    solve(r)
+    N = int(next(tokens))  # type: int
+    M = int(next(tokens))  # type: int
+    a = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
+    solve(N, M, a)
 
 if __name__ == '__main__':
     main()

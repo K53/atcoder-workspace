@@ -101,10 +101,5 @@ def getNumOfDividors(n: int) -> int:
 "-> BaseConversion.py"
 
 
-# 最小公倍数
-import functools 
-import math
-def lcm(x, y):
-    return x * y // math.gcd(x, y)
-
-print(functools.reduce(lcm, [1, 2, 4, 8, 16]))
+# 最小公倍数 LCM lcm
+"-> Math.py"

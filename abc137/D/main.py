@@ -1,41 +1,21 @@
 #!/usr/bin/env python3
 import sys
-from collections import deque
+from collections import defaultdict
 import heapq
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]"):
-    # 前からやると q = [(100 4) (50, 1) (1, 3)] みたいな時に(50, 1)が捨て去られる。
-    # l = [(bb, aa) for aa, bb in zip(A, B)]
-    # l.sort(reverse=True)
-    # q = deque(l)
-    # # print(q)
-    # ans = 0
-    # for i in range(M):
-    #     while len(q) != 0:
-    #         val, day = q.popleft()
-    #         if day + i <= M:
-    #             ans += val
-    #             break
-    # print(ans)    
-    l = [(aa, -bb) for aa, bb in zip(A, B)]
-    l.sort()
-    q = deque(l)
+    d = defaultdict(list)
+    for aa, bb in zip(A, B):
+        d[aa].append(-bb)
     hq = []
-    heapq.heapify(hq)
     ans = 0
-    for i in range(1, M + 1):
-        while len(q) != 0:
-            if q[0][0] == i:
-                day, val = q.popleft()
-                heapq.heappush(hq, val)
-            else:
-                break
-        # print(i, hq)
-        if len(hq) == 0:
-            continue
-        ans += -heapq.heappop(hq)
-        # print(ans)
-    print(ans)    
+    heapq.heapify(hq)
+    for last_day in range(M + 1):
+        for score in d[last_day]:
+            heapq.heappush(hq, score)
+        if len(hq) > 0:
+            ans += heapq.heappop(hq)
+    print(-ans)
     return
 
 

@@ -4,12 +4,19 @@ import sys
 
 def solve(H: int, N: int, A: "List[int]", B: "List[int]"):
     INF = 10 ** 16
+    # dp = [[INF] * (N + 1) for _ in range(H + 1)]
+    # dp[0][0] = 0
     dp = [INF] * (H + 1)
     dp[0] = 0
-    for i in range(N):
-        for k in range(10 ** 4 + 1):
-            if dp[i]
-            A[i]
+    for hh in range(H):
+        if [hh] == INF:
+            continue
+        for i in range(N):
+            next = hh + A[i]
+            if next > H:
+                next = H
+            dp[next] = min(dp[next], dp[hh] + B[i])
+    print(dp[-1])
     return
 
 

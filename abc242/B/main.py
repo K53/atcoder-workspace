@@ -3,7 +3,7 @@ import sys
 
 
 def solve(S: str):
-    print("".join(sorted(S)))
+    print(*sorted(S), sep="")
     return
 
 

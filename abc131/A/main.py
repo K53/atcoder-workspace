@@ -4,7 +4,7 @@ import sys
 
 def solve(S: str):
     for i in range(len(S) - 1):
-        if S[i + 1] == S[i]:
+        if S[i] == S[i + 1]:
             print("Bad")
             return
     print("Good")

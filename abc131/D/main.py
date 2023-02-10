@@ -6,15 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
-    l = [(B[i], A[i]) for i in range(N)]
-    l.sort()
-    now = 0
-    for ll in l:
-        now += ll[1]
-        if now > ll[0]:
-            print(NO)
-            return
-    print(YES)
     return
 
 
