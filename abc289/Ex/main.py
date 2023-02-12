@@ -2,19 +2,7 @@
 import sys
 
 
-def solve(K: int):
-    now = 7
-    l = [0] * (10 ** 6 + 1)
-    for i in range(10 ** 6 + 1):
-        q = now % K
-        if l[q] == 1:
-            print(-1)
-            return
-        if q == 0:
-            print(i + 1)
-            return
-        l[q] = 1
-        now = q * 10 + 7
+def solve(A: int, B: int, C: int, T: int):
     return
 
 
@@ -25,8 +13,11 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    K = int(next(tokens))  # type: int
-    solve(K)
+    A = int(next(tokens))  # type: int
+    B = int(next(tokens))  # type: int
+    C = int(next(tokens))  # type: int
+    T = int(next(tokens))  # type: int
+    solve(A, B, C, T)
 
 if __name__ == '__main__':
     main()

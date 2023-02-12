@@ -123,3 +123,39 @@ for _ in range(N):
         r += 1 # rは1歩進めてあげる。
 print(ans)
 
+
+
+## 検証中
+# こっちの方がわかりやすいかもしれない。
+
+l = 0 # 含む → 区間短縮時、移動元を引く
+r = 0 # 含まない → 区間拡張時、移動元を足す
+ans = 0
+count = 0
+for _ in range(N):
+    while r < N:
+        # print("#", l, r, count)
+        if S[r][0] == "0":
+            if K == 0: 
+                break
+            count += S[r][1]
+            r += 1
+            K -= 1
+        else:
+            count += S[r][1]
+            r += 1
+    if l == r: # rが一歩も進まなかったらその要素は無視してlもrも先に進まませる。
+        l += 1
+        r += 1
+        continue
+    ans = max(ans, count)
+    if S[l][0] == "0":
+        count -= S[l][1]
+        l += 1
+        K += 1
+    else:
+        count -= S[l][1]
+        l += 1
+    # print(">", l, r, count)
+ans = max(ans, count) # 一度もlを縮めることがないケースではansに到達しないため最後にansの更新を入れる必要あり。 ansがlに依存する問題では入れること。
+print(ans)

@@ -5,19 +5,25 @@ from itertools import accumulate
 MOD = 998244353  # type: int
 
 def solve(N: int, K: int, L: "List[int]", R: "List[int]"):
-    dp = [0 for _ in range(N)] # DPテーブルの作成
-    dp[0] = 1                               # DPテーブルの初期化
-    sdp = [0] + list(accumulate(dp))              # 累積和テーブルの初期化
-
-    # print(sdp)
+    dp = [0] * N
+    dp[0] = 1
+    sdp = [0] + [1] * N
     for i in range(1, N):
-        for num in range(K):               # 列のDPテーブル更新
-            dp[i] += sdp[max(0, i - (L[num] - 1))] - sdp[max(0, i - R[num])]
+        for ll, rr in zip(L, R):
+            dp[i] += sdp[max(0, i - ll + 1)] - sdp[max(0, i - rr)]
             dp[i] %= MOD
             sdp[i + 1] = sdp[i] + dp[i]
-        # print(dp)
-        # print(sdp)
     print(dp[-1] % MOD)
+    # dp = [0] * N
+    # dp[0] = 1
+    # for i in range(N):
+    #     for ll, rr in zip(L, R):
+    #         for d in range(ll, rr + 1):
+    #             if i - d < 0:
+    #                 continue
+    #             dp[i] += dp[i - d]
+    #             dp[i] %= MOD
+    # print(dp)
     return
 
 

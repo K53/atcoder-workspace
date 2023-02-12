@@ -3,90 +3,155 @@ import sys
 
 MOD = 998244353  # type: int
 
-class BIT:
-    def __init__(self, N):
-        self.N = N
-        self.bit = [0] * (self.N + 1) # 1-indexedのため
-        
-    def add(self, pos, val):
-        '''Add
-            O(logN)
-            posは0-index。内部で1-indexedに変換される。
-            A[pos] += val 
-        '''
-        i = pos + 1 # convert from 0-index to 1-index
-        while i <= self.N:
-            self.bit[i] += val
-            i += i & -i
+class SegTree:
+    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", convertLengthToThePowerOf2: bool = False):
+        self.monoid = monoid
+        self.func = func
+        if convertLengthToThePowerOf2:
+            self.actualLen = len(bottomList)
+            self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        else:
+            self.actualLen = len(bottomList)
+            self.bottomLen = len(bottomList)
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        self._build(bottomList)
 
-    def deleteNonNegative(self, pos, val) -> int:
-        '''Add
-            O(logN)
-            posは0-index。内部で1-indexedに変換される。
-            すでにMultiSetに含まれている個数以上は削除されない。
-            A[pos] -= val 
-        '''
-        actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
-        i = pos + 1 # convert from 0-index to 1-index
-        while i <= self.N:
-            self.bit[i] -= actualSubstractVal
-            i += i & -i
-        return actualSubstractVal
+    """
+    初期化
+    O(self.segLen)
+    """
+    def _build(self, seq):
+        # 最下段の初期化
+        for i, x in enumerate(seq, self.offset):
+            self.tree[i] = x
+        # ビルド
+        for i in range(self.offset - 1, 0, -1):
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
 
-    def sum(self, pos):
-        ''' Sum
-            O(logN)
-            posは0-index。内部で1-indexedに変換される。
-            Return Sum(A[0], ... , A[pos])
-            posに負の値を指定されるとSum()すなわち0を返すのでマイナスの特段の考慮不要。
-        '''
-        res = 0
-        i = pos + 1 # convert from 0-index to 1-index
-        while i > 0:
-            res += self.bit[i]
-            i -= i & -i    
-        return res
-    
-    def lowerLeft(self, w):
-        '''
-        O(logN)
-        A0 ~ Aiの和がw以上となる最小のindex(値)を返す。
-        Ai ≧ 0であること。
-        '''
-        if (w < 0):
-            return 0
-        total = self.sum(self.N - 1)
-        if w > total:
-            return -1
-        x = 0
-        k = 1 << (self.N.bit_length() - 1)
-        while k > 0:
-            if x + k < self.N and self.bit[x + k] < w:
-                w -= self.bit[x + k]
-                x += k
-            k //= 2
-        return x
-        
-    def __str__(self):
-        '''
-        index0は不使用なので表示しない。
-        '''
-        return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
+    """
+    直近の2べきの長さを算出
+    """
+    def getSegLenOfThePowerOf2(self, ln: int):
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + 1)
+
+    """
+    一点加算 他演算
+    O(log(self.bottomLen))
+    """
+    def pointAdd(self, i: int, val: int):
+        i += self.offset
+        self.tree[i] += val
+        # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+
+    """
+    一点更新
+    O(log(self.bottomLen))
+    """
+    def pointUpdate(self, i: int, val: int):
+        i += self.offset
+        self.tree[i] = val
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+
+    """
+    区間取得
+    l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+    O(log(self.bottomLen))
+    """
+    def getRange(self, l: int, r: int):
+        l += self.offset
+        r += self.offset
+        vL = self.monoid
+        vR = self.monoid
+        while l < r:
+            if l & 1:
+                vL = self.func(vL, self.tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                vR = self.func(self.tree[r], vR)
+            l >>= 1
+            r >>= 1
+        return self.func(vL, vR)
+
+    """
+    一点取得
+    O(log(self.bottomLen))
+    """
+    def getPoint(self, i: int):
+        i += self.offset
+        return self.tree[i]
+
+    """
+    二分探索
+    O(log(self.bottomLen))
+    ※ セグ木上の二分探索をする場合は2べきにすること。
+    # !!!! ng側が返却される !!!!!
+    """
+    def max_right(self, l, is_ok: "function"):
+        print("セグ木上の二分探索をする場合は2べきにすること。")
+        l += self.offset
+        ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+        ans = self.monoid
+        while is_ok(self.func(ans, self.tree[ll])): # そのセグメントが条件を満たすかどうかの判定
+            ans = self.func(ans, self.tree[ll])
+            ll += 1
+            while ~ll & 1: # llの反転 ~ll = -(ll+1)
+                ll >>= 1 # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+            if ll == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+                return self.actualLen
+        while ll < self.offset:
+            ll <<= 1 # 一階層下のセグメントへ移動 (=2倍)
+            if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
+                ans = self.func(ans, self.tree[ll])
+                ll += 1
+        return ll - self.offset # ng側が返る
+
+    # 未検証
+    def min_left(self, r, is_ok):
+        r += self.offset
+        rr = max(r // (~r & -~r), 1)
+        ans = self.monoid
+        while is_ok(self.func(self.tree[rr], ans)):
+            ans = self.func(self.tree[rr], ans)
+            rr -= 1
+            while rr & 1:
+                rr >>= 1
+            if rr == 0:
+                return -1
+        while rr < self.offset:
+            rr <<= 1
+            if is_ok(self.func(self.tree[rr+1], ans)):
+                ans = self.func(self.tree[rr+1], ans)
+            else:
+                rr += 1
+        return rr - self.offset
+
+def add(a, b):
+    return (a + b) % MOD
 
 def solve(N: int, A: "List[int]"):
-    invTwo = [pow(2, MOD - i - 1, MOD) for i in range(1, N + 1)]
-    seg = BIT(N)
-    # print(seg.tree)
-    l = sorted([(A[i], i) for i in range(N)])
     ans = 0
-    for ll in l:
-        num, idx = ll
-        # print(ll)
-        seg.add(idx, invTwo[idx])
-        # print(seg.tree)
-        if idx == 0:
-            continue
-        ans += pow(2, idx, MOD) * seg.sum(idx - 1)
+    seg = SegTree(0,[0] * N, add)
+    l = [(aa, idx) for idx, aa in enumerate(A)]
+    l.sort()
+    for aa, idx in l:
+        seg.pointUpdate(idx, pow(2, MOD - 2 - idx, MOD))
+        ans += seg.getRange(0, idx) * pow(2, idx, MOD)
         ans %= MOD
     print(ans)
     return
