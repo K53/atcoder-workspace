@@ -2,29 +2,29 @@
 
 MOD = 2  # type: int
 
-def main():
-    ans = 0
-    N, M = map(int, input().split())
-    S = []
-    for _ in range(M):
-        l = list(map(lambda i : int(i) - 1, input().split()))
-        S.append(l[1:])
-    P = list(map(int, input().split()))
 
+def main():
+    N, M = map(int, input().split())
+    k = []
+    s = []
+    for _ in range(M):
+        ks = list(map(int, input().split()))
+        k.append(ks[0])
+        s.append(set(ks[1:]))
+    p = list(map(int, input().split()))
     ans = 0
-    for state in range(2 ** N):
-        for i in range(M):
-            cnt = 0
-            for b in S[i]:
-                if state >> b & 1:
-                    cnt += 1
-            if cnt % 2 != P[i]:
-                break
-        else:
+    for i in range(2 ** N):
+        ons = [0] * M
+        for b in range(N):
+            if (i >> b) & 1:
+                for d in range(M):
+                    if b + 1 in s[d]:
+                        ons[d] += 1
+                        ons[d] %= 2
+        if p == ons:
             ans += 1
     print(ans)
     return
-
 
 if __name__ == '__main__':
     main()

@@ -53,6 +53,9 @@ print(getDivisors(120))
 # - https://atcoder.jp/contests/abc052/tasks/arc067_a
 # ------------------------------------------------------------------------------
 def primeFactorise(n: int) -> list:
+    """
+    O(√N)
+    """
     primeFactors = []
     i = 2
     while i * i <= n: # sqrt(N)まで試し割りする。

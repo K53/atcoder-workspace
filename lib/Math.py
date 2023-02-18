@@ -377,7 +377,7 @@ def _lcm(a, b):
     return a * b // math.gcd(a, b)
 
 def lcm(*vals):
-    return functools.reduce(_lcm, vals)
+    return functools.reduce(_lcm, *vals)
 
 # Usage
 T = [2,3,5]

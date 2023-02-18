@@ -12,7 +12,7 @@ for i in range(3 ** N):
     for b in range(N):
         p, q = divmod(p, 3)
         if q == 0: # b桁目が0の場合の処理
-           pass
+            pass
         elif q == 1: # b桁目が1の場合の処理
             pass
         else:

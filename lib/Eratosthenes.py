@@ -8,6 +8,8 @@
 # Nまでの素数と判定されている数pでその倍数を排除していき、残った数を素数とする。
 # 
 # - 2. 高速素因数分解 (1 ~ N の全ての数を素因数分解するアルゴリズム)
+# 通常、素因数分解をO(√N)の試し割り法を1~Nまでの全ての数に対して行うとO(N√N)となり、
+# N=10**6などのケースでTLEする。
 # 1で素数リストの生成を応用して要素iの最小素因数を配列minfactorに格納する。
 # minfactor[i]はiの最小の素因数であることから、iを割れるだけ割る。
 # 余りをjとする時、同様にminfactor[j]はjの最小の素因数であることから、割れるだけ割る・・・
@@ -29,7 +31,8 @@
 #  - 注) σ(N) : 数Nの約数の数
 # 
 # verify
-# - https://yukicoder.me/problems/no/1665
+# - https://yukicoder.me/problems/no/1665 (高速素因数分解)
+# - https://atcoder.jp/contests/abc152/tasks/abc152_e (高速素因数分解)
 # - https://atcoder.jp/contests/abc179/tasks/abc179_c
 # - https://yukicoder.me/problems/no/713
 # ------------------------------------------------------------------------------

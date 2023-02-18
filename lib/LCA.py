@@ -40,6 +40,9 @@ class LcaDoubling:
         return
     
     def build(self):
+        """
+        O(NlogN)
+        """
         prevAncestors = self._bfs()
         self.ancestors.append(prevAncestors)
         d = 1
@@ -65,6 +68,9 @@ class LcaDoubling:
         return directAncestors
  
     def getLca(self, nodeA: int, nodeB: int):
+        """
+        O(logN)
+        """
         depthA, depthB = self.depths[nodeA], self.depths[nodeB]
         if depthA > depthB:
             nodeA, nodeB = nodeB, nodeA
@@ -89,11 +95,17 @@ class LcaDoubling:
  
     # 2つのノードの間の距離を返す。
     def getDistance(self, nodeA, nodeB):
+        """
+        O(logN)
+        """
         lca = self.getLca(nodeA, nodeB)
         return self.distances[nodeA] + self.distances[nodeB] - 2 * self.distances[lca]
 
     # targetNodeが2つのノード間のパス上に存在するかを返す。
     def isOnPath(self, nodeA: int, nodeB: int, evalNode: int):
+        """
+        O(logN)
+        """
         return self.getDistance(nodeA, nodeB) == self.getDistance(nodeA, evalNode) + self.getDistance(evalNode, nodeB) 
 
     # ノードvからk個遡上したノードを返す。

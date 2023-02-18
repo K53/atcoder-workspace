@@ -67,7 +67,7 @@ class Combination():
         O(factorial_max)
         """
         self.fac = [1, 1]  # fac : 階乗(1!,2!,3!,...)
-        self.factorial_max = factorial_max
+        self.factorial_max = factorial_max + 1
         self.finv = [1, 1] # inv : 逆元(1,1/2,...1/N) -> inv[i] = pow(i, MOD - 2, MOD) # フェルマーの小定理より
         self.inv = [0, 1]  # finv: 階乗の逆元(1/1!, 1/2!, 1/3!...)
         self.mod = mod
@@ -88,9 +88,10 @@ class Combination():
         return self.fac[n] * (self.finv[r] * self.finv[n - r] % self.mod) % self.mod
         
     def nHr(self, n: int, r: int):
+        print("[注意] factorial_maxはn + rまで必要!!!")
         """
         ◯◯◯◯|◯◯|◯ ← これ系の問題。
-        * (n - 1) : 仕切り版の数
+        * n : 仕切り版の数 + 1
         * r : 分配する物自体の数
         
         * 区別のない r 個の物を n グループに分配する。
@@ -100,6 +101,7 @@ class Combination():
         
         O(1)
         """
+        print("**** factorial_maxの最大値としてn + rが必要となる! ****")
         return self.nCr(n - 1 + r, r)
 
 # Usage

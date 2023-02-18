@@ -23,7 +23,7 @@ def getRandomValueOnce(min_val: int, max_val: int):
 def getRandomValuesList(min_val: int, max_val: int, length: int):
     if min_val > max_val:
         raise Exception(f"min_val ({min_val}) > max_val ({max_val})")
-    return [2 * random.randint(min_val, max_val) for _ in range(length)]
+    return [random.randint(min_val, max_val) for _ in range(length)]
 
 def testNomalCase1(capfd):
     count = 0
@@ -47,12 +47,10 @@ def testNomalCase1(capfd):
 
     for _ in range(checkTimes):
         count += 1
-        N = getRandomValueOnce(1, 1)
-        M = getRandomValueOnce(1, 100)
-        A = getRandomValuesList(1, 10, N)
-        N = 2
-        M = 82
-        A = [12, 6]
+        l = ["F" if i % 2 == 0 else "T" for i in getRandomValuesList(1, 100, 15)]
+        s = "".join(l)                
+        x = getRandomValueOnce(0, 15)
+        y = getRandomValueOnce(0, 15)
         # K = getRandomValueOnce(0, N)
         # H = getRandomValuesList(1, D9, N)
-        _check(N, M, A)
+        _check(s, x, y)
