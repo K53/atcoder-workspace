@@ -1,8 +1,37 @@
 #!/usr/bin/env python3
 import sys
 
+def getDivisors(n: int):
+    lowerDivisors, upperDivisors = [], []
+    i = 1
+    while i * i <= n:
+        if n % i == 0:
+            lowerDivisors.append(i)
+            if i != n // i:
+                upperDivisors.append(n//i)
+        i += 1
+    return lowerDivisors + upperDivisors[::-1]
 
 def solve(N: int, A: "List[int]"):
+    from collections import defaultdict
+    import math
+    # gcd() <= min() が必ず成立し、min()の最小値はAの最小値。
+    # = gcdで取りうる値は全て選択可能。 ただし、min(A)以上にはなれないので、min(A)以下に限る。
+    #
+    # xを最大公約数となる = Aの中でxを約数に持つものを求め、それらのgcdがxになる。 →xは採用。
+    d = defaultdict(int)
+    for aa in A:
+        dividers = getDivisors(aa)
+        for i in dividers:
+            d[i] = math.gcd(d[i], aa)
+    m = min(A)
+    ans = 0
+    for k, v in d.items():
+        if k > m:
+            continue
+        if k == v:
+            ans += 1
+    print(ans)
     return
 
 

@@ -6,6 +6,10 @@ NO = "No"  # type: str
 
 
 def solve(V: int, T: int, S: int, D: int):
+    if V * T <= D <= V * S:
+        print(NO)
+    else:
+        print(YES)
     return
 
 

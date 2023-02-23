@@ -3,6 +3,12 @@ import sys
 
 
 def solve(N: int, X: int, A: "List[int]"):
+    ans = []
+    for aa in A:
+        if aa == X:
+            continue
+        ans.append(aa)
+    print(*ans, sep=" ")
     return
 
 

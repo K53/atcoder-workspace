@@ -47,7 +47,7 @@
 # verify
 # - https://atcoder.jp/contests/abc137/tasks/abc137_f
 # ------------------------------------------------------------------------------
-from functools import lru_cache
+from functools import lru_cache # PyPyで使用不可！！
 def lagrangeInterpolation(points: "list[tuple(int, int)]", MOD: int) -> "list[int]":
 
     @lru_cache(maxsize=None)

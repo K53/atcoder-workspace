@@ -5,7 +5,7 @@ def solve(N: str):
     # 文字列として扱うので最大の長さを取得。これがDP配列長になる。
     maxDig = len(str(N)) + 1
     S = str(N)
-    # dp[i][isless][K] := i桁目まで決めた時、かつその数が上限[以下|ちょうど]である場合0でない数の個数
+    # dp[i][isless] := i桁目まで決めた時、かつその数が上限[以下|ちょうど]である数の個数
     dp = [[0] * 2 for _ in range(maxDig)]
     dp[0][0] = 1
     for dig in range(maxDig - 1):

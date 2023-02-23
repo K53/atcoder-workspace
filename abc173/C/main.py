@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
-import copy
+
 
 def main():
     H, W, K = map(int, input().split())
-    grid = []
+    c = []
+    tot = 0
     for _ in range(H):
-        grid.append(list(map(lambda i : 0 if i == "." else 1, list(input()))))
-
+        l = input()
+        c.append(l)
+        tot += l.count("#")
     ans = 0
-    for row in range(2 ** H):
-        for col in range(2 ** W):
-            g = copy.deepcopy(grid)
-            for i in range(H):
-                if row >> i & 1:
-                    for ww in range(W):
-                        g[i][ww] = 0
-            for i in range(W):
-                if col >> i & 1:
-                    for hh in range(H):
-                        g[hh][i] = 0
-            a = 0
-            for i in range(H):
-                a += sum(g[i])
-            if a == K:
+    for i in range(2 ** H):
+        for j in range(2 ** W):
+            s = set()
+            for b in range(H):
+                for t in range(W):
+                    if ((i >> b) & 1 or (j >> t) & 1) and c[b][t] == "#":
+                        s.add((b, t))
+            if tot - len(s) == K:
                 ans += 1
     print(ans)
+    return
+                        
+                        
 
 
 if __name__ == '__main__':

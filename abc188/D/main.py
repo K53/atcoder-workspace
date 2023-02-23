@@ -3,27 +3,39 @@ import sys
 from itertools import accumulate
 
 def solve(N: int, C: int, a: "List[int]", b: "List[int]", c: "List[int]"):
-    end = []
-    for bb in b:
-        end.append(bb + 1)
-    compressed = {}
-    compressed_to_row = []
-    for index, val in enumerate(sorted(list(set(a + end)))):
-        compressed[val] = index
-        compressed_to_row.append(val)
-    # print(compressed)
-    l = [0] * len(compressed_to_row)
-    for aa, ee, cc in zip(a, end, c):
-        l[compressed[aa]] += cc
-        l[compressed[ee]] -= cc
-    acc = list(accumulate(l))
-    prime = []
-    for cc in acc:
-        prime.append(min(cc, C))
-    # print(prime)
+    eb = [bb + 1 for bb in b]
+    L = a + eb
+    raw_to_compressed = {}
+    compressed_to_raw = []
+    for index, val in enumerate(sorted(list(set(L)))):
+        raw_to_compressed[val] = index
+        compressed_to_raw.append(val)
+
+    imos = [0] * len(compressed_to_raw)
+    for i in range(N):
+        imos[raw_to_compressed[a[i]]] += c[i]
+        imos[raw_to_compressed[eb[i]]] -= c[i]
+        
+    # ビルド
+    for i in range(1, len(imos)):
+        imos[i] += imos[i - 1]
+    
     ans = 0
-    for i in range(len(prime) - 1):
-        ans += (compressed_to_row[i + 1] - compressed_to_row[i]) * prime[i]
+    # 値の復元
+    # いもす配列上でのi番目を圧縮前の値に復元した時の次の要素までの範囲。
+    # original       3,     9 
+    #       ↓
+    # compressed(i)  0,     1
+    #                ↓
+    #               この0の期間は original[i + 1] - original[i] の期間。
+    #               すなわち、compressed_to_raw[i + 1] - compressed_to_raw[i]
+    for i in range(len(compressed_to_raw) - 1):
+        span = compressed_to_raw[i + 1] - compressed_to_raw[i]
+        cost = imos[i]
+        if cost > C:
+            cost = C
+
+        ans += span * cost
     print(ans)
 
     return

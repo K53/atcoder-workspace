@@ -53,6 +53,7 @@ class BIT:
     def deleteNonNegative(self, pos, val) -> int:
         '''Add
             O(logN)
+            ※ multisetで使用される関数
             posは0-index。内部で1-indexedに変換される。
             すでにMultiSetに含まれている個数以上は削除されない。
             A[pos] -= val 

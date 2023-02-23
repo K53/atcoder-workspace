@@ -1,186 +1,220 @@
 #!/usr/bin/env python3
 import sys
-INF = 10 ** 16
-
-
 import heapq
 from collections import defaultdict
-class HeapDict:
+INF = 10 ** 16
+class HeapDictMax:
     def __init__(self):
         self.q=[]
         self.d=defaultdict(int)
 
     def insert(self, x):
-        """insert x to queue"""
-        heapq.heappush(self.q, x)
-        self.d[x] += 1
+        """要素xの挿入"""
+        heapq.heappush(self.q, -x)
+        self.d[-x] += 1
 
     def erase(self, x):
-        """erase x from queue"""
-        if self.d[x] == 0:
-            print(x, "is not in HeapDict")
+        """要素xの削除"""
+        if self.d[-x] == 0:
+            print(-x, " is not in HeapDict")
             return
         else:
-            self.d[x] -= 1
+            self.d[-x] -= 1
 
+        # 先頭から論理削除済みのものを物理削除する
         while len(self.q) != 0:
             if self.d[self.q[0]] == 0:
                 heapq.heappop(self.q)
             else:
                 break
     
+    def isEmpty(self):
+        """O(1)。キューが空かどうか。"""
+        return len(self.q) != 0
+    
     def size(self):
+        """O(過去に出現した要素の種類n) : キューが空かどうかのみ知りたい場合はisEmpty()使用推奨"""
         return sum(self.d.values())
 
     def exist(self, x):
-        return self.d[x] != 0
+        """O(1)。要素の存在確認"""
+        return self.d[-x] != 0
     
     def getExistList(self):
-        return [i for i in self.q if self.exist(i)]
+        """O(len(self.q))。キュー内の実際に存在する要素のみを返す(遅延削除のため、self.qだと削除済みでも残っている要素が表示される)"""
+        return [-i for i in self.q if self.exist(-i)]
 
     def dryPop(self):
-        return self.q[0] if len(self.q) != 0 else -INF
+        """O(1)。先頭要素(通常は最小値)を返す。キューが空ならNoneを返す"""
+        return -self.q[0] if self.isEmpty() else INF
 
     def __str__(self):
-        return "[" + ", ".join([str(i) if self.exist(i) else "({})".format(i) for i in self.q]) + "]"
+        """O(len(self.q))。先頭要素取得に影響しない要素は遅延削除のため、キュー内に存在しているが事実上削除済みのものは括弧()書きしている"""
+        return "[" + ", ".join([str(-i) if self.exist(-i) else "({})".format(-i) for i in self.q]) + "]"
 
-class SegmentTree:
-    def __init__(self, initList, identityElement, func):
-        assert (func(identityElement, identityElement) == identityElement)
-        self.N = len(initList)
-        self.initList = initList
-        self.identityElement = identityElement
+class SegTree:
+    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", convertLengthToThePowerOf2: bool = False):
+        self.monoid = monoid
         self.func = func
-        self._seg_length_half = 2 ** ((self.N - 1).bit_length())
-        self.tree = [identityElement] * (2 * self._seg_length_half)
-        self._build()
+        if convertLengthToThePowerOf2:
+            self.actualLen = len(bottomList)
+            self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        else:
+            self.actualLen = len(bottomList)
+            self.bottomLen = len(bottomList)
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        self._build(bottomList)
 
-    def _build(self):
-        # Set value at the bottom
-        for i in range(self.N):
-            self.tree[i + self._seg_length_half - 1] = self.initList[i]    
-        # Build value
-        for i in range(self._seg_length_half - 2, -1, -1):
-            self.tree[i] = self.func(self.tree[2 * i + 1], self.tree[2 * i + 2])
-    
-    def pointupdate(self, k, x):
-        '''Update : A[k] = x '''
-        pos = k + self._seg_length_half - 1
-        # Set value at k-th
-        self.tree[pos] = x
-        # Build bottom-up
-        while pos:
-            pos = (pos - 1) // 2
-            self.tree[pos] = self.func(self.tree[pos * 2 + 1], self.tree[pos * 2 + 2])
-    
-    def pointgetval(self, k):
-        ''' Return A[k] '''
-        return self.tree[k + self._seg_length_half - 1]
+    """
+    初期化
+    O(self.segLen)
+    """
+    def _build(self, seq):
+        # 最下段の初期化
+        for i, x in enumerate(seq, self.offset):
+            self.tree[i] = x
+        # ビルド
+        for i in range(self.offset - 1, 0, -1):
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
 
-    def segquery(self, left, right):
-        ''' Return func(A[left], ... , A[right-1]) '''
-        # if not left < right
-        if right <= left:
-            return self.identityElement
-        
-        res = self.identityElement
-        leftpos = left + self._seg_length_half - 1 # leftmost segment
-        rightpos = right - 1 + self._seg_length_half - 1 # rightmost segment
+    """
+    直近の2べきの長さを算出
+    """
+    def getSegLenOfThePowerOf2(self, ln: int):
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + 1)
 
-        while leftpos < rightpos-1:
-            if leftpos & 1 == 0:
-                # if leftpos is right-child
-                res = self.func(res, self.tree[leftpos])
-            if rightpos & 1 == 1:
-                # if rightpos is leftchild
-                res = self.func(res, self.tree[rightpos])
-                rightpos -= 1
-            # move up
-            leftpos = leftpos // 2
-            rightpos = (rightpos-1) // 2
-        
-        res = self.func(res, self.tree[leftpos])
-        if leftpos != rightpos:
-            res = self.func(res, self.tree[rightpos])
-        return res
+    """
+    一点加算 他演算
+    O(log(self.bottomLen))
+    """
+    def pointAdd(self, i: int, val: int):
+        i += self.offset
+        self.tree[i] += val
+        # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
 
-    def segsearch_right(self, condfunc, left = 0):
-        ''' Return min_i satisfying condfunc( func( A[left], ... , A[i])) 
-        if impossible : return -1
-        '''
-        # if impossible (ie. condfunc( func( A[left], ... , A[-1])) is False)
-        if not condfunc(self.segquery(left, self.N)):
-            return -1
-        
-        # possible
-        func_value = self.identityElement
-        rightpos = left + self._seg_length_half - 1
-        while True: 
-            # while rightpos is the left-child, move bottom-up
-            while rightpos & 1 == 1:
-                rightpos //= 2
-            # try
-            up_value_trial = self.func(func_value, self.tree[rightpos])
-            if not condfunc(up_value_trial):
-                # move up and right
-                func_value = up_value_trial
-                rightpos = (rightpos - 1) // 2 + 1
+    """
+    一点更新
+    O(log(self.bottomLen))
+    """
+    def pointUpdate(self, i: int, val: int):
+        i += self.offset
+        self.tree[i] = val
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+
+    """
+    区間取得 (l ≦ X < r)
+    l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+    O(log(self.bottomLen))
+    """
+    def getRange(self, l: int, r: int):
+        l += self.offset
+        r += self.offset
+        vL = self.monoid
+        vR = self.monoid
+        while l < r:
+            if l & 1:
+                vL = self.func(vL, self.tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                vR = self.func(self.tree[r], vR)
+            l >>= 1
+            r >>= 1
+        return self.func(vL, vR)
+
+    """
+    一点取得
+    O(1)
+    """
+    def getPoint(self, i: int):
+        i += self.offset
+        return self.tree[i]
+
+    """
+    二分探索
+    O(log(self.bottomLen))
+    ※ セグ木上の二分探索をする場合は2べきにすること。
+    # !!!! ng側が返却される !!!!!
+    """
+    def max_right(self, l, is_ok: "function"):
+        print("セグ木上の二分探索をする場合は2べきにすること。")
+        l += self.offset
+        ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+        ans = self.monoid
+        while is_ok(self.func(ans, self.tree[ll])): # そのセグメントが条件を満たすかどうかの判定
+            ans = self.func(ans, self.tree[ll])
+            ll += 1
+            while ~ll & 1: # llの反転 ~ll = -(ll+1)
+                ll >>= 1 # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+            if ll == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+                return self.actualLen
+        while ll < self.offset:
+            ll <<= 1 # 一階層下のセグメントへ移動 (=2倍)
+            if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
+                ans = self.func(ans, self.tree[ll])
+                ll += 1
+        return ll - self.offset # ng側が返る
+
+    # 未検証
+    def min_left(self, r, is_ok):
+        r += self.offset
+        rr = max(r // (~r & -~r), 1)
+        ans = self.monoid
+        while is_ok(self.func(self.tree[rr], ans)):
+            ans = self.func(self.tree[rr], ans)
+            rr -= 1
+            while rr & 1:
+                rr >>= 1
+            if rr == 0:
+                return -1
+        while rr < self.offset:
+            rr <<= 1
+            if is_ok(self.func(self.tree[rr+1], ans)):
+                ans = self.func(self.tree[rr+1], ans)
             else:
-                # move top-down
-                while rightpos < self._seg_length_half - 1:
-                    down_value_trial = self.func(func_value, self.tree[rightpos * 2 + 1])
-                    if condfunc(down_value_trial):
-                        # move left-child
-                        rightpos = rightpos * 2 + 1
-                    else:
-                        # move right-child
-                        func_value = down_value_trial
-                        rightpos = rightpos * 2 + 2
-                return rightpos - self._seg_length_half + 1
-
-    def __str__(self):
-        cnt = 0
-        res = []
-        for i in range((self.N - 1).bit_length() + 1):
-            num = 2 ** i
-            res.append(" ".join(f'{j}' for j in self.tree[cnt:cnt + num]))
-            cnt += num
-        return "\n".join(res)
-
+                rr += 1
+        return rr - self.offset
 
 def solve(N: int, Q: int, A: "List[int]", B: "List[int]", C: "List[int]", D: "List[int]"):
-    kind = 2 * 10 ** 5
-    A = [-i for i in A]
-    B = [i - 1 for i in B]
-    C = [i - 1 for i in C]
-    D = [i - 1 for i in D]
-    hd = [HeapDict() for _ in range(kind)]
-
-    for score, now in zip(A, B):
-        hd[now].insert(score)
+    LK = 2 * 10 ** 5 + 1
+    l = [HeapDictMax() for _ in range(LK)]
+    where = [-1] * N
+    INF = 10 ** 16
+    for i in range(N):
+        where[i] = B[i] - 1
+        l[B[i] - 1].insert(A[i])
+    base = [l[i].dryPop() for i in range(LK)]
+    seg = SegTree(INF, base, min)
+    for cc, dd in zip(C, D):
+        kin = where[cc - 1]
+        l[kin].erase(A[cc - 1])
+        l[dd - 1].insert(A[cc - 1])
+        where[cc - 1] = dd - 1
+        old = l[kin].dryPop()
+        new = l[dd - 1].dryPop()
+        seg.pointUpdate(kin, old)
+        seg.pointUpdate(dd - 1, new)
+        print(seg.getRange(0, LK))
     
-    maxs = [-h.dryPop() for h in hd]
-    st = SegmentTree(initList=maxs, func=min, identityElement=INF)
-
-    # for i in range(kind):
-    #     print(hd[i], hd[i].size())
-    # print("---")
-    for num, to in zip(C, D):
-        hd[B[num]].erase(A[num])
-        st.pointupdate(B[num], -hd[B[num]].dryPop())
-        hd[to].insert(A[num])
-        B[num] = to
-        st.pointupdate(to, -hd[B[num]].dryPop())
-        print(st.segquery(0, kind))
-        # print(st)
-    
-        # for i in range(kind):
-        #     print(hd[i], hd[i].size())
-        # print("-----")
     return
 
 
-# Generated by 1.1.7.1 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)
+# Generated by 2.12.0 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)
 def main():
     def iterate_tokens():
         for line in sys.stdin:
