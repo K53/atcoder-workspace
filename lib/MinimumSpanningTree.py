@@ -1,7 +1,7 @@
 # 最小全域木自体(具体的にどのノードとどのノードが繋がれてるか)を生成する必要がある場合
 #   -> クラスカル法
 #
-# それいがいはどちらも一緒。
+# それ以外はどちらも一緒。
 #
 # ### NOTE: 2023/02時点でのライブラリ間の相違
 
@@ -81,7 +81,7 @@ class Prim():
     
     def addEdge(self, a: int, b: int, cost: int):
         self.G[a].append((cost, b))
-        self.G[b].append((cost, a))
+        # self.G[b].append((cost, a))
         return
 
     def build(self):

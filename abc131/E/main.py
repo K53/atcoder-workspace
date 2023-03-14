@@ -3,6 +3,21 @@ import sys
 
 
 def solve(N: int, K: int):
+    if (N - 1) * (N - 2) // 2 < K:
+        print(-1)
+        return
+    ans = []
+    for i in range(1, N):
+        ans.append((1, i + 1))
+    for i in range(1, N - 1):
+        for j in range(i + 1, N):
+            if K > 0:
+                K -= 1
+                continue
+            ans.append((i + 1, j + 1))
+    print(len(ans))
+    for i in ans:
+        print(*i)
     return
 
 

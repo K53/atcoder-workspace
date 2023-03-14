@@ -8,21 +8,22 @@ def bfs(G: "List[to]", start_node: int) -> list:
     q.append((start_node, 0))
     dist[start_node][0] = 0
     while q:
-        now, hop = q.popleft()
-        next_hop = (hop + 1) % 3
+        now, step = q.popleft()
+        next_step = (step + 1) % 3
         for next in G[now]:
-            if dist[next][next_hop] != INF:
+            if dist[next][next_step] != INF:
                 continue
-            q.append((next, next_hop))
-            dist[next][next_hop] = dist[now][hop] + 1
+            q.append((next, next_step))
+            dist[next][next_step] = dist[now][step] + 1
     return dist
+
 def solve(N: int, M: int, u: "List[int]", v: "List[int]", S: int, T: int):
     G = [[] for _ in range(N)]
     for i in range(M):
         G[u[i] - 1].append(v[i] - 1)
     d = bfs(G, S - 1)
-    print(-1 if d[T - 1][0] == INF else d[T - 1][0] // 3)
-
+    ans = d[T - 1][0]
+    print(-1 if ans == INF else ans // 3)
     return
 
 

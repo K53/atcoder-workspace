@@ -3,11 +3,6 @@ import sys
 
 
 def solve(N: int, a: "List[int]"):
-    if N == 1:
-        print(0)
-        return
-    a.sort()
-    print(a[-1] - a[0])
     return
 
 

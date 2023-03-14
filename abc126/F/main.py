@@ -3,26 +3,6 @@ import sys
 
 
 def solve(M: int, K: int):
-    print(0 ^ 1)
-    print(0 ^ 1 ^ 2)
-    print(0 ^ 1 ^ 2 ^ 3)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7 ^ 8)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7 ^ 8 ^ 9)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7 ^ 8 ^ 9 ^ 10)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7 ^ 8 ^ 9 ^ 10 ^ 11)
-    print(0 ^ 1 ^ 2 ^ 3 ^ 4 ^ 5 ^ 6 ^ 7 ^ 8 ^ 9 ^ 10 ^ 11 ^ 12)
-    if K != 0:
-        print(-1)
-        return
-    ans = []
-    for i in range(2 ** M):
-        ans.append(i)
-        ans.append(i)
-    print(*ans)
     return
 
 

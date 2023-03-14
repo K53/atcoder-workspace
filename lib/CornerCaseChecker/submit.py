@@ -1,50 +1,17 @@
 #!/usr/bin/env python3
 import sys
 
-YES = "Yes"  # type: str
-NO = "No"  # type: str
-from collections import deque
 
-from itertools import groupby
-def runLengthEncode(S: str) -> "List[tuple(str, int)]":
-    grouped = groupby(S)
-    res = []
-    for k, v in grouped:
-        res.append((k, int(len(list(v)))))
-    return res
-
-def solve(s: str, x: int, y: int):
-    l = runLengthEncode(s)
-    sx = 0
-    if l[0][0] == "F":
-        sx = l[0][1]
-        l = l[1:]
-    q = deque([(0, sx, 0, 0)])  # y, x, idx, cur
-    while q:
-        nowy, nowx, idx, cur = q.popleft()
-        if idx == len(l):
-            if nowy == y and nowx == x:
-                print(YES)
-                return
-            continue
-        if l[idx][0] == "T":
-            q.append((nowy, nowx, idx + 1, (cur + l[idx][1]) % 2))
-        else:
-            if cur == 0:
-                dx = l[idx][1]
-                if nowx <= x:
-                    nextx = nowx + dx
-                else:
-                    nextx = nowx - dx
-                q.append((nowy, nextx, idx + 1, cur))
-            else:
-                dy = l[idx][1]
-                if nowy < y:
-                    nexty = nowy + dy
-                else:
-                    nexty = nowy - dy
-                q.append((nexty, nowx, idx + 1, cur))
-    print(NO)
+def solve(N: int, M: int):
+    if not 2 * N <= M <= 4 * N:
+        print(-1, -1, -1)
+        return
+    center = 3 * N
+    diff = M - center
+    if diff > 0:
+        print(0, N - diff, diff)
+    else:
+        print(diff, N - diff, 0)
     return
 
 
@@ -55,10 +22,9 @@ def main():
             for word in line.split():
                 yield word
     tokens = iterate_tokens()
-    s = next(tokens)  # type: str
-    x = int(next(tokens))  # type: int
-    y = int(next(tokens))  # type: int
-    solve(s, x, y)
+    N = int(next(tokens))  # type: int
+    M = int(next(tokens))  # type: int
+    solve(N, M)
 
 if __name__ == '__main__':
     main()

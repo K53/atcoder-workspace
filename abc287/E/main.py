@@ -3,47 +3,41 @@ import sys
 
 
 def solve(N: int, S: "List[str]"):
-    # S = ["k"] * (5 * 10 ** 5)
-    # N = len(S)
-    
-    maxS = 0
+    L = sorted([(S[i], i) for i in range(N)])
+    ans = [0] * N
     for i in range(N):
-        maxS = max(maxS, len(S[i]))
-    l = [[set() for _ in range(26)] for _ in range(N)]
-    for i in range(N):
-        for j in range(maxS):
-            if j >= len(S[i]):
-                continue
-            l[j][ord(S[i][j]) - ord("a")].add(i)
-    # for j in range(maxS):
-    #     print(l[j])
-
-    ans = []
-    for i in range(N):
-        chr = ord(S[i][0]) - ord("a")
-        ok = l[0][chr] | set()
-        # if i == 10:
-        #     print(ok)
-        if len(ok) == 1:
-            ans.append(0)
-            continue
-        if len(S[i]) == 1:
-            ans.append(1)
-            continue
-        for j in range(1, len(S[i])):
-            chr = ord(S[i][j]) - ord("a")
-            now = l[j][chr]
-            # if i == 9:
-            #     print(now)
-            ok &= now
-            # if i == 9:
-            #     print(ok)
-            if len(ok) == 1:
-                ans.append(j)
-                break
+        if i == 0:
+            count = 0
+            for ss, tt in zip(L[i][0], L[i + 1][0]):
+                if ss == tt:
+                    count += 1
+                else:
+                    break
+        elif i == N - 1:
+            count = 0
+            for ss, tt in zip(L[i - 1][0], L[i][0]):
+                if ss == tt:
+                    count += 1
+                else:
+                    break
         else:
-            ans.append(j + 1)
+            count = 0
+            for ss, tt in zip(L[i][0], L[i + 1][0]):
+                if ss == tt:
+                    count += 1
+                else:
+                    break
+            count2 = 0
+            for ss, tt in zip(L[i - 1][0], L[i][0]):
+                if ss == tt:
+                    count2 += 1
+                else:
+                    break
+            count = max(count, count2)
+        ans[L[i][1]] = count
     print(*ans, sep="\n")
+            
+            
     return
 
 

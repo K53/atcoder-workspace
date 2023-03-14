@@ -9,22 +9,23 @@ def main():
     for i in range(M):
         aa, _ = map(int, input().split())
         A.append(aa)
-        bitk = 0
-        for c in list(map(int, input().split())):
-            bitk += 2 ** (c - 1)
-        keys.append(bitk)
-    
+        c = list(map(int, input().split()))
+        k = 0
+        for cc in c:
+            k += 1 << (cc - 1)
+        keys.append(k)
+            
     dp = [[INF] * (2 ** N) for _ in range(M + 1)]
     dp[0][0] = 0
     for i in range(M):
-        for k in range(2 ** N):
-            if dp[i][k] == INF:
+        for j in range(2 ** N):
+            if dp[i][j] == INF:
                 continue
-            dp[i + 1][k | keys[i]] = min(dp[i + 1][k | keys[i]], dp[i][k] + A[i])
-            dp[i + 1][k] = min(dp[i + 1][k], dp[i][k])
-    print(-1 if dp[-1][-1] == INF else dp[-1][-1])
-    
-
+            dp[i + 1][j | keys[i]] = min(dp[i + 1][j | keys[i]], dp[i][j] + A[i])
+            dp[i + 1][j] = min(dp[i + 1][j], dp[i][j])
+    ans = dp[-1][-1]
+    print(-1 if ans == INF else ans)
+    return
 
 if __name__ == '__main__':
     main()

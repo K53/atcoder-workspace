@@ -18,20 +18,6 @@ def bfs(G: "List[to]", start_node: int) -> list:
     return dist
 
 def solve(N: int, M: int, S: "List[str]"):
-    # N = 10
-    # M = 2
-    # S = [
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "11",
-    #     "10",
-    #     "00",
-    # ]
     G = [[] for _ in range(N)]
     revG = [[] for _ in range(N)]
     for i in range(N):
@@ -62,16 +48,13 @@ def solve(N: int, M: int, S: "List[str]"):
     ans = []
     for k in range(1, N - 1):
         pre = max(0, (k - M - 1))
-        d3 = dis_bfs(pre, k)
-        # print(d3)
-        tmp = -1
-        for a in range(M):
-            if k + a > N - 1:
-                break
-            if d1[pre]!= INF and d3[k + a] != INF and d2[k + a] != INF:
-                tmp = max(tmp, d1[pre] + d3[k + a] + d2[k + a])
-        ans.append(tmp)
-        
+        tmp = INF
+        for st in range(pre, k):
+            for next in G[st]:
+                if next <= k:
+                    continue
+                tmp = min(tmp, d1[st] + d2[next] + 1)
+        ans.append(-1 if tmp == INF else tmp)
     print(*ans, sep=" ")
     return
 

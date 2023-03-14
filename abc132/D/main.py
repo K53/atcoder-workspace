@@ -52,7 +52,9 @@ def solve(N: int, K: int):
     red = N - K
     comb = Combination(10 ** 5, MOD)
     for i in range(1, K + 1):
-        print(comb.nCr(red + 1, i) * comb.nHr(i, blue - i) % MOD)
+        p = comb.nCr(red + 1, i)
+        q = comb.nHr(i, blue - i)
+        print(p * q % MOD)
 
 
     

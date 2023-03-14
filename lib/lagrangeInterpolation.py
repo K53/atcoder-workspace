@@ -47,10 +47,10 @@
 # verify
 # - https://atcoder.jp/contests/abc137/tasks/abc137_f
 # ------------------------------------------------------------------------------
-from functools import lru_cache # PyPyで使用不可！！
+from functools import lru_cache
 def lagrangeInterpolation(points: "list[tuple(int, int)]", MOD: int) -> "list[int]":
 
-    @lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)# Pythonだと引数なしでも通ってしまう。PyPyで引数必須！！！
     def modinv(a: int):
         b = MOD
         u, v = 1, 0

@@ -3,10 +3,6 @@ import sys
 
 
 def solve(A: str):
-    if A == "a":
-        print(-1)
-    else:
-        print("a")
     return
 
 

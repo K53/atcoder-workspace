@@ -1,82 +1,157 @@
 #!/usr/bin/env python3
-import sys
-
-class SegmentTree:
-    def __init__(self, monoid: int, bottomLen: int, operation: "function"):
+class SegTree:
+    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", convertLengthToThePowerOf2: bool = False):
         self.monoid = monoid
-        self.bottomLen = bottomLen
-        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
-        self.segLen = self.bottomLen * 2
-        self.tree = [monoid] * self.segLen
-        self.operation = operation
-        return
-    
-    """ 1点更新
-    O(1)
-    """
-    def pointUpdateWithoutRebuild(self, index: int, val: int):
-        segIndex = index + self.offset
-        self.tree[segIndex] ^= val          # 各マスの更新方法
-        return
-    
-    """ 全区間更新
-    O(bottomLen) # =セグ木の配列長
-    """
-    def allBuild(self):
-        for segIndex in reversed(range(self.offset)):
-            if segIndex == 0:
-                return
-            self.tree[segIndex] = self.operation(self.tree[segIndex * 2], self.tree[segIndex * 2 + 1])
-        return
+        self.func = func
+        if convertLengthToThePowerOf2:
+            self.actualLen = len(bottomList)
+            self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        else:
+            self.actualLen = len(bottomList)
+            self.bottomLen = len(bottomList)
+            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.segLen = self.bottomLen * 2
+            self.tree = [monoid] * self.segLen
+        self._build(bottomList)
 
-    """ 1点更新 + リビルド
-    O(log(bottomLen))
-    """
-    def pointUpdate(self, index: int, val: int):
-        segIndex = index + self.offset
-        self.tree[segIndex] ^= val          # 各マスの更新方法
-        while True:
-            segIndex //= 2
-            if segIndex == 0:
-                break
-            self.tree[segIndex] = self.operation(self.tree[segIndex * 2], self.tree[segIndex * 2 + 1])
-        return
+    def _build(self, seq):
+        """
+        初期化
+        O(self.segLen)
+        """
+        # 最下段の初期化
+        for i, x in enumerate(seq, self.offset):
+            self.tree[i] = x
+        # ビルド
+        for i in range(self.offset - 1, 0, -1):
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
 
-    def rangeQuery(self, l: int, r: int):
+    def getSegLenOfThePowerOf2(self, ln: int):
+        """
+        直近の2べきの長さを算出
+        """
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + 1)
+
+    def pointAdd(self, i: int, val: int):
+        """
+        一点加算 他演算
+        O(log(self.bottomLen))
+        """
+        i += self.offset
+        self.tree[i] += val
+        # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+
+    def pointUpdate(self, i: int, val: int):
+        """
+        一点更新
+        O(log(self.bottomLen))
+        """
+        i += self.offset
+        self.tree[i] = val
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+
+    def getRange(self, l: int, r: int):
+        """
+        区間取得 (l ≦ X < r)
+        l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+        O(log(self.bottomLen))
+        """
         l += self.offset
         r += self.offset
-        res = self.monoid                   # クエリの初期値
+        vL = self.monoid
+        vR = self.monoid
         while l < r:
-            if l % 2 == 1:
-                res = self.operation(res, self.tree[l])
+            if l & 1:
+                vL = self.func(vL, self.tree[l])
                 l += 1
-            l //= 2
-            if r % 2 == 1:
-                res = self.operation(res, self.tree[r - 1])
+            if r & 1:
                 r -= 1
-            r //= 2
-        return res
+                vR = self.func(self.tree[r], vR)
+            l >>= 1
+            r >>= 1
+        return self.func(vL, vR)
 
+    def getPoint(self, i: int):
+        """
+        一点取得
+        O(1)
+        """
+        i += self.offset
+        return self.tree[i]
 
-def Xor(a, b):
+    def max_right(self, l, is_ok: "function"):
+        """
+        二分探索
+        O(log(self.bottomLen))
+        ※ セグ木上の二分探索をする場合は2べきにすること。
+        # !!!! ng側が返却される !!!!!
+        """
+        print("セグ木上の二分探索をする場合は2べきにすること。")
+        l += self.offset
+        ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+        ans = self.monoid
+        while is_ok(self.func(ans, self.tree[ll])): # そのセグメントが条件を満たすかどうかの判定
+            ans = self.func(ans, self.tree[ll])
+            ll += 1
+            while ~ll & 1: # llの反転 ~ll = -(ll+1)
+                ll >>= 1 # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+            if ll == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+                return self.actualLen
+        while ll < self.offset:
+            ll <<= 1 # 一階層下のセグメントへ移動 (=2倍)
+            if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
+                ans = self.func(ans, self.tree[ll])
+                ll += 1
+        return ll - self.offset # ng側が返る
+
+    # 未検証
+    def min_left(self, r, is_ok):
+        r += self.offset
+        rr = max(r // (~r & -~r), 1)
+        ans = self.monoid
+        while is_ok(self.func(self.tree[rr], ans)):
+            ans = self.func(self.tree[rr], ans)
+            rr -= 1
+            while rr & 1:
+                rr >>= 1
+            if rr == 0:
+                return -1
+        while rr < self.offset:
+            rr <<= 1
+            if is_ok(self.func(self.tree[rr+1], ans)):
+                ans = self.func(self.tree[rr+1], ans)
+            else:
+                rr += 1
+        return rr - self.offset
+
+def xor(a, b):
     return a ^ b
 
+# Generated by 2.12.0 https://github.com/kyuridenamida/atcoder-tools  (tips: You use the default template now. You can remove this line by using your custom template)
 def main():
     N, Q = map(int, input().split())
     A = list(map(int, input().split()))
-    tr = SegmentTree(monoid=0, bottomLen=(N), operation=Xor)
-    for nn in range(N):
-        tr.pointUpdateWithoutRebuild(index=nn, val=A[nn])
-    tr.allBuild()
+    seg = SegTree(0, A, xor)
     for _ in range(Q):
         T, X, Y = map(int, input().split())
         if T == 1:
-            tr.pointUpdate(X - 1, Y)
+            seg.pointUpdate(X - 1, seg.getPoint(X - 1) ^ Y)
         else:
-            print(tr.rangeQuery(X - 1, Y))
+            print(seg.getRange(X - 1, Y - 1 + 1))
+    return
 
-
-    
-    
 if __name__ == '__main__':
     main()

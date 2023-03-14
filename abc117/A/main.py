@@ -3,7 +3,6 @@ import sys
 
 
 def solve(T: int, X: int):
-    print(T / X)
     return
 
 

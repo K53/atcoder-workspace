@@ -23,16 +23,16 @@ class UnionFind():
         self.group_num = n
         self.parents = [-1] * n # サイズ
 
-    """ 要素xの親を取得。"""
     def find(self, x):
+        """ 要素xの親を取得。"""
         if self.parents[x] < 0:
             return x
         else:
             self.parents[x] = self.find(self.parents[x]) # 経路圧縮
             return self.parents[x]
 
-    """ 2つの要素の併合。"""
     def union(self, x, y):
+        """ 2つの要素の併合。"""
         x = self.find(x)
         y = self.find(y)
 
@@ -47,43 +47,43 @@ class UnionFind():
         self.group_num -= 1
         return
 
-    """ 要素xの属する集合の要素数を取得。"""
     def size(self, x):
+        """ 要素xの属する集合の要素数を取得。"""
         return -self.parents[self.find(x)]
 
-    """ 2つの要素が同一の集合に属するか。"""
     def same(self, x, y):
+        """ 2つの要素が同一の集合に属するか。"""
         return self.find(x) == self.find(y)
 
-    """ 要素xと同一の集合の要素を全取得。
-    計算量 : O(N)
-    """
     def members(self, x):
+        """ 要素xと同一の集合の要素を全取得。
+        計算量 : O(N)
+        """
         root = self.find(x)
         return [i for i in range(self.n) if self.find(i) == root]
 
-    """ 各集合の根を全取得。
-    計算量 : O(N)
-    """
     def roots(self):
+        """ 各集合の根を全取得。
+        計算量 : O(N)
+        """
         return [i for i, x in enumerate(self.parents) if x < 0]
 
-    """ 集合の個数を取得。 v2
-    計算量 : O(1)
-    """
     def group_count_v2(self):
+        """ 集合の個数を取得。 v2
+        計算量 : O(1)
+        """
         return self.group_num
 
-    """ 集合の個数を取得。 v1
-    計算量 : O(N)
-    """
     def group_count_v1(self):
+        """ 集合の個数を取得。 v1
+        計算量 : O(N)
+        """
         return len(self.roots())
 
-    """ 全集合の要素一覧を取得。
-    計算量 : O(N)
-    """
     def all_group_members(self):
+        """ 全集合の要素一覧を取得。
+        計算量 : O(N)
+        """
         group_members = defaultdict(list)
         for member in range(self.n):
             group_members[self.find(member)].append(member)
@@ -91,7 +91,7 @@ class UnionFind():
 
     def __str__(self):
         return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
-    
+
 # Usage
 N = 5
 uf = UnionFind(N)

@@ -1,10 +1,80 @@
 #!/usr/bin/env python3
 import sys
 
-MOD = 10007  # type: int
+def mat_mul(a, b, mod):
+    """
+    行列乗算 a * b
+    eg.)
+    a : [
+        [1, 1],
+        [1, 0],
+        [0, 1],
+    ] 
+    b : [
+        [1, 1, 0, 1],
+        [1, 0, 0, 1],
+    ] 
+    ※ a_cols == b_rows であること!
+    """
+    a_rows, a_cols, b_cols = len(a), len(a[0]), len(b[0])
+    res = [[0] * b_cols for _ in range(a_rows)]
+    for i in range(a_rows):
+        for j in range(b_cols):
+            for k in range(a_cols):
+                res[i][j] += a[i][k] * b[k][j]
+                res[i][j] %= mod
+    return res
 
+def mat_pow(x, n, mod):
+    """
+    行列乗算 x ^ n
+    eg.)
+    x : [
+        [1, 1],
+        [1, 0],
+    ] 
+    ※ x_cols == x_rows であること!
+    """
+    res = [[0] * len(x) for _ in range(len(x))]
+    for i in range(len(x)):
+        res[i][i] = 1
+
+    while n > 0:
+        if n & 1:
+            res = mat_mul(x, res, mod)
+        x = mat_mul(x, x, mod)
+        n //= 2
+    return res
 
 def solve(L: int, A: int, B: int, M: int):
+    # Xn+1  = Xn * 10d + sn    
+    # sn+1  =           sn + B
+    # 1     =                1
+    #
+    # Xn+1  10d 1  0    Xn
+    # sn+1   0  1  B    sn
+    # 1      0  0  1    1
+
+    #an = a1 + (n - 1)d < 99...9 を満たす個数を求める
+    c = [0]
+    for d in range(1, 18 + 1):
+        c.append(max(0, ((10 ** d - 1) - A) // B + 1))
+
+    cur = [
+        [0],
+        [A],
+        [1],
+    ]
+    for d in range(1, 18 + 1):
+        k = [
+            [10 ** d, 1, 0],
+            [0, 1, B],
+            [0, 0, 1],
+        ]
+        count = min(c[d] - c[d - 1], L)
+        L -= count
+        cur = mat_mul(mat_pow(k, count, M), cur, M)
+    print(cur[0][0])
     return
 
 

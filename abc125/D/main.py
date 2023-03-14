@@ -3,17 +3,24 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    INF = 10 ** 16
-    dp = [[0] * 2 for _ in range(N)]
-    dp[0][0] = A[0] # 反転なし
-    dp[0][1] = -INF
-    for i in range(1, N):
-        # 反転しない
-        dp[i][0] = max(dp[i - 1][0] + A[i], dp[i - 1][1] + A[i])
-        # する
-        dp[i][1] = max(dp[i - 1][0] - 2 * A[i - 1] - A[i], dp[i - 1][1] - 2 * -A[i - 1] - A[i])
-    print(max(dp[-1]))
-
+    INF = 10 ** 10
+    dp = [[-INF] * 2 for _ in range(N + 1)]
+    dp[0][0] = 0
+    for i in range(N):
+        for rev in range(2):
+            if dp[i][rev] == -INF:
+                continue
+            if rev:
+                # そのまま足す
+                dp[i + 1][0] = max(dp[i + 1][0], dp[i][rev] - A[i])
+                # 反転する
+                dp[i + 1][1] = max(dp[i + 1][1], dp[i][rev] + A[i])
+            else:
+                # そのまま足す
+                dp[i + 1][0] = max(dp[i + 1][0], dp[i][rev] + A[i])
+                # 反転する
+                dp[i + 1][1] = max(dp[i + 1][1], dp[i][rev] - A[i])
+    print(dp[-1][0])
     return
 
 

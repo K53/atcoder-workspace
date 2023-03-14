@@ -1,13 +1,14 @@
 
 # 0〜Nまでの数全ての個数を求める桁DP。 = N + 1
+# !!! 0を含むのは注意 !!!
 
 def solve(N: str):
     # 文字列として扱うので最大の長さを取得。これがDP配列長になる。
     maxDig = len(str(N)) + 1
     S = str(N)
-    # dp[i][isless] := i桁目まで決めた時、かつその数が上限[以下|ちょうど]である数の個数
+    # dp[i][isless] := i桁目まで決めた時、かつその数が上限[ちょうど(0)|以下(1)]である数の個数
     dp = [[0] * 2 for _ in range(maxDig)]
-    dp[0][0] = 1
+    dp[0][0] = 1 # 個数を数えるなら決まりごと感ある
     for dig in range(maxDig - 1):
         for isless in range(2):
             # 上限を確認 その桁に0〜maxNumまでなら並べられる。
@@ -31,3 +32,5 @@ def solve(N: str):
                 dp[dig + 1][next_isless] += dp[dig][isless]
     print(dp[-1][0] + dp[-1][1])
     return
+
+solve(13) # 14

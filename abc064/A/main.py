@@ -6,10 +6,6 @@ NO = "NO"  # type: str
 
 
 def solve(r: int, g: int, b: int):
-    if (g * 10 + b) % 4 == 0:
-        print(YES)
-    else:
-        print(NO)
     return
 
 

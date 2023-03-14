@@ -3,23 +3,6 @@ import sys
 
 
 def solve(N: int, a: "List[int]"):
-    cols = [0] * 9
-    for aa in a:
-        c = aa // 400
-        if c >= 8:
-            c = 8
-        cols[c] += 1
-    ans = 0
-    for i in range(8):
-        if cols[i] >= 1:
-            ans += 1
-    if cols[8] == 0:
-        print(ans, ans)
-    else:
-        if ans == 0:
-            print(0 + 1, 0 + cols[8])
-        else:
-            print(ans, ans + cols[8])
     return
 
 

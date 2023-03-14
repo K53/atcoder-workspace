@@ -65,6 +65,7 @@
 # - https://yukicoder.me/submissions/757554 # インデックス付きのセグ木
 # - https://yukicoder.me/submissions/632551 # セグ木上の二分探索
 # - https://yukicoder.me/submissions/817123 # 複数要素のセグ木
+# - https://atcoder.jp/contests/abc185/tasks/abc185_f # XORのセグ木
 # ------------------------------------------------------------------------------
 
 class SegTree:
@@ -86,11 +87,11 @@ class SegTree:
             self.tree = [monoid] * self.segLen
         self._build(bottomList)
 
-    """
-    初期化
-    O(self.segLen)
-    """
     def _build(self, seq):
+        """
+        初期化
+        O(self.segLen)
+        """
         # 最下段の初期化
         for i, x in enumerate(seq, self.offset):
             self.tree[i] = x
@@ -98,10 +99,10 @@ class SegTree:
         for i in range(self.offset - 1, 0, -1):
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
 
-    """
-    直近の2べきの長さを算出
-    """
     def getSegLenOfThePowerOf2(self, ln: int):
+        """
+        直近の2べきの長さを算出
+        """
         if ln <= 0:
             return 1
         else:    
@@ -109,11 +110,11 @@ class SegTree:
             decimalPart, integerPart = math.modf(math.log2(ln))
             return 2 ** (int(integerPart) + 1)
 
-    """
-    一点加算 他演算
-    O(log(self.bottomLen))
-    """
     def pointAdd(self, i: int, val: int):
+        """
+        一点加算 他演算
+        O(log(self.bottomLen))
+        """
         i += self.offset
         self.tree[i] += val
         # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
@@ -121,29 +122,28 @@ class SegTree:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
 
-    """
-    一点更新
-    O(log(self.bottomLen))
-    """
     def pointUpdate(self, i: int, val: int):
+        """
+        一点更新
+        O(log(self.bottomLen))
+        """
         i += self.offset
         self.tree[i] = val
         while i > 1:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
 
-    """
-    区間取得 (l ≦ X < r)
-    l ~ r-1までの区間 (0-indexed)。※右端を含まない。
-    O(log(self.bottomLen))
-    """
     def getRange(self, l: int, r: int):
+        """
+        区間取得 (l ≦ X < r)
+        l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+        O(log(self.bottomLen))
+        """
         l += self.offset
         r += self.offset
         vL = self.monoid
         vR = self.monoid
         while l < r:
-            print(l, r)
             if l & 1:
                 vL = self.func(vL, self.tree[l])
                 l += 1
@@ -154,21 +154,21 @@ class SegTree:
             r >>= 1
         return self.func(vL, vR)
 
-    """
-    一点取得
-    O(1)
-    """
     def getPoint(self, i: int):
+        """
+        一点取得
+        O(1)
+        """
         i += self.offset
         return self.tree[i]
 
-    """
-    二分探索
-    O(log(self.bottomLen))
-    ※ セグ木上の二分探索をする場合は2べきにすること。
-    # !!!! ng側が返却される !!!!!
-    """
     def max_right(self, l, is_ok: "function"):
+        """
+        二分探索
+        O(log(self.bottomLen))
+        ※ セグ木上の二分探索をする場合は2べきにすること。
+        # !!!! ng側が返却される !!!!!
+        """
         print("セグ木上の二分探索をする場合は2べきにすること。")
         l += self.offset
         ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
@@ -245,7 +245,7 @@ print(seg.tree) # [0, 33, 24, 9, 1, 23, 7, 2, 0, 1, 14, 9, 2, 5, 1, 1]
 num = seg.getRange(1, 6 + 1) # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
 print(num) # [0, <<<1, 14, 9, 2, 5, 1>>>, 1] -> 1 + 14 + 9 + 2 + 5 + 1 = 32
 
-exit()
+
 # =====================================================
 #     case2
 # =====================================================
@@ -270,6 +270,7 @@ print(seg.tree) # [0, 21, 20, 1, 13, 7, 0, 1, 4, 9, 2, 5]
 # | 4 | 9 | 2 | 5 |          <- に対応
 
 print(seg.getRange(0, 2 + 1)) # 5 = 0 + 1 + 4
+exit()
 
 # セグ木の二分探索 (セグ木外)
 

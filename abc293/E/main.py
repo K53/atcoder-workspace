@@ -1,30 +1,73 @@
 #!/usr/bin/env python3
 import sys
 import math
-# 拡張ユークリッドの互除法
-# ax + by = gcd(a, b) を満たす整数(a,b)の組を求める。
-def ext_gcd(a: int, b: int):
-    if a == 0: return (0, 1, b)
-    else:
-        (X, Y, g) = ext_gcd(b % a, a)
-        return (Y - (b // a) * X, X, g)
 
-def getInverse(A: int, mod: int):
-    x, _, g = ext_gcd(A, mod)
-    if g != 1: return -1 # no inverse exists
-    return x % mod
+def mat_mul(a, b, mod):
+    """
+    行列乗算 a * b
+    eg.)
+    a : [
+        [1, 1],
+        [1, 0],
+        [0, 1],
+    ] 
+    b : [
+        [1, 1, 0, 1],
+        [1, 0, 0, 1],
+    ] 
+    ※ a_cols == b_rows であること!
+    """
+    a_rows, a_cols, b_cols = len(a), len(a[0]), len(b[0])
+    res = [[0] * b_cols for _ in range(a_rows)]
+    for i in range(a_rows):
+        for j in range(b_cols):
+            for k in range(a_cols):
+                res[i][j] += a[i][k] * b[k][j]
+                res[i][j] %= mod
+    return res
+
+def mat_pow(x, n, mod):
+    """
+    行列乗算 x ^ n
+    eg.)
+    x : [
+        [1, 1],
+        [1, 0],
+    ] 
+    ※ x_cols == x_rows であること!
+    """
+    res = [[0] * len(x) for _ in range(len(x))]
+    for i in range(len(x)):
+        res[i][i] = 1
+
+    while n > 0:
+        if n & 1:
+            res = mat_mul(x, res, mod)
+        x = mat_mul(x, x, mod)
+        n //= 2
+    return res
+    
 
 def solve(A: int, X: int, M: int):
-    ol = M
-    aa = A - 1
-    bb = pow(A, X, M) - 1
-    g = math.gcd(math.gcd(aa, bb), M)
-    aa, bb, M = aa//g, bb//g, M//g
-    inv = getInverse(aa, M)
-    if g != 1:
-        M = ol
-    ans = (bb * inv) % M
-    print(ans)
+    # ---------- 行列解
+    # an+1 = A * an + 1
+    # 1    = 0      + 1
+    # と書けるので、
+    # [
+    #   [A, 1],
+    #   [0, 1],
+    # ]
+    # ----------
+    # a1 = [
+    #     [0],
+    #     [1]
+    # ]
+    # mat = [
+    #     [A, 1],
+    #     [0, 1],
+    # ] 
+    # print(mat_mul(mat_pow(mat, X, M), a1, M)[0][0])
+
     return
 
 

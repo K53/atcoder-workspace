@@ -47,10 +47,7 @@ def testNomalCase1(capfd):
 
     for _ in range(checkTimes):
         count += 1
-        l = ["F" if i % 2 == 0 else "T" for i in getRandomValuesList(1, 100, 15)]
-        s = "".join(l)                
-        x = getRandomValueOnce(0, 15)
-        y = getRandomValueOnce(0, 15)
-        # K = getRandomValueOnce(0, N)
-        # H = getRandomValuesList(1, D9, N)
-        _check(s, x, y)
+        ############### ここに入力生成のコードを書く ###############
+        N = getRandomValueOnce(0, 10)
+        M = getRandomValueOnce(2 * N, 4 * N)
+        _check(N, M)

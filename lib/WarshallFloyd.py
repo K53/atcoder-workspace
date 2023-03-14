@@ -14,7 +14,6 @@ class WarshallFloyd():
     
     def build(self):
         """
-        やっていることとしては、
         0 〜 (via - 1)までの地点だけを利用して求めたdpテーブルを使い、viaを経由地とした時の更新処理している。
         """
         for via in range(self.N):
@@ -22,6 +21,20 @@ class WarshallFloyd():
                 for goal in range(self.N):
                     self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
         return self.dp
+    
+
+        # これも同じことである。
+        # start - goal間を固定して、全てのviaを見た中で番距離が小さいものmin_distをとって
+        # dp[start][goal]をmin_distで更新する。
+        #
+        # for start in range(self.N):
+        #     for goal in range(self.N): # 双方向の二重カウントを防ぐなら range(start + 1, N)
+        #         min_dist =  INF # start - goal間の最短経路
+        #         for via in range(self.N):
+        #             min_dist = min(min_dist, self.dp[start][via] + self.dp[via][goal])
+        #         self.dp[start][goal] = min_dist
+        # return self.dp
+        # https://kakedashi-engineer.appspot.com/2020/04/22/abc074d/
 
 # = ワーシャルフロイド(グリッド) =======================================================================
 class WarshallFloyd():

@@ -3,15 +3,6 @@ import sys
 
 
 def solve(N: int, M: int, X: "List[int]"):
-    X.sort()
-    d = []
-    for i in range(M - 1):
-        d.append(X[i + 1] - X[i])
-    d.sort()
-    s = sum(d)
-    print(s)
-    print(X[0] + s // (N - 1))
-    print(X[0] + s // N * 2)
     return
 
 

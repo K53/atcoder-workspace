@@ -6,12 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(N: int, L: "List[int]"):
-    S = sum(L)
-    for ll in L:
-        if ll >= S - ll:
-            print(NO)
-            return
-    print(YES)
     return
 
 
