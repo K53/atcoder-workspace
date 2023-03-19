@@ -3,17 +3,6 @@ import sys
 
 
 def solve(X: int, N: int, p: "List[int]"):
-    s = set(p)
-    ans = -1
-    diff = 10 ** 6
-    for i in range(102):
-        if i in s:
-            continue
-        d = abs(i - X)
-        if diff > d:
-            diff = d
-            ans = i
-    print(ans)
     return
 
 

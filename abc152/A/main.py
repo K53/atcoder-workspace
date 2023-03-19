@@ -6,10 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(N: int, M: int):
-    if N == M:
-        print(YES)
-    else:
-        print(NO)
     return
 
 

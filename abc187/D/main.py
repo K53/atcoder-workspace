@@ -3,21 +3,13 @@ import sys
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
-    l = [(2 * aa + bb, aa + bb, aa) for aa, bb in zip(A, B)]
+    l = [aa * 2 + bb for aa, bb in zip(A, B)]
     l.sort(reverse=True)
-    sumA = [0]
-    sumB = [0]
+    d = -sum(A)
     for i in range(N):
-        sumA.append(sumA[-1] + l[i][1])
-    for i in reversed(range(N)):
-        sumB.append(sumB[-1] + l[i][2])
-    # print(sumA)
-    # print(sumB)
-        
-    # print(l)
-    for i in range(N + 1):
-        if sumA[i] > sumB[-1 - i]:
-            print(i)
+        d += l[i]
+        if d > 0:
+            print(i + 1)
             return
     return
 

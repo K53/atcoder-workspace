@@ -3,9 +3,13 @@
 # ------------------------------------------------------------------------------
 # 解説
 # 無向グラフにおいて橋、関節点のリストを取得する。
+#  - 橋 : その辺を失うとグラフが連結でなくなる辺。
+#  - 関節点 : そのノードを失うとグラフが連結でなくなるノード。
+#  - 連結成分 : 関節点を除く辺を用いてUnionFind木に入れることで連結成分を求められる(2重点連結成分分解)
 #
 # リンク
 # https://algo-logic.info/bridge-lowlink/#
+# https://tubo28.me/compprog/algorithm/articulation-point/ (2重点連結成分分解)
 # 
 # 計算量
 # - O(V + E) : 要するに2回のDFSなので。
@@ -71,23 +75,81 @@ class Lowlink():
 
 # Usage
 N = 7
-A = [1, 2, 3, 4, 4, 5, 6]
-B = [3, 7, 4, 5, 6, 6, 7]
+A = [0, 1, 2, 3, 3, 4, 5]
+B = [2, 6, 3, 4, 5, 5, 6]
 #
-#                [5]
+#                [4]
 #               /   \
-# [1] - [3] - [4] - [6] - [7] - [2]
+# [0] - [2] - [3] - [5] - [6] - [1]
 #
 ll = Lowlink(N)
 for aa, bb in zip(A, B):
-    ll.addEdge(aa - 1, bb - 1)
-    # ll.addEdge(bb - 1, aa - 1)
+    ll.addEdge(aa, bb)
+    ll.addEdge(bb, aa)
 ll.build()
 
 print(ll.bridges) # 橋 : その辺を失うとグラフが連結でなくなる辺。
 # -> [(1, 6), (5, 6), (2, 3), (0, 2)]
 print(ll.artification_points)
 # -> [6, 5, 3, 2] # 関節点 : そのノードを失うとグラフが連結でなくなるノード。
+# print(ll.lowlink)  # <--- 2重点連結成分分解を用いること。
+# -> [0, 6, 1, 2, 2, 2, 5] 
+#     |  |  |  |  |  |  |
+#     0  1  2  3  4  5  6
+
+N = 11
+A = [0, 1, 2, 2, 2, 3, 5, 3, 6, 7, 8, 9]
+B = [1, 2, 0, 3, 5, 4, 4, 6, 7, 8, 9, 6]
+#
+#  [0]       [5]
+#   |  \    /   \
+#  [1] - [2]     [4]
+#           \   /
+#            [3]
+#             |
+#      [9] - [6]
+#       |     |
+#      [8] - [7]
+# 
+ll = Lowlink(N)
+for aa, bb in zip(A, B):
+    ll.addEdge(aa, bb)
+    ll.addEdge(bb, aa)
+ll.build()
+
+q = {
+    2: [0, 1, 3, 5],
+    3: [2, 4, 6],
+    6: [3, 7, 9],
+}
+
+print(ll.bridges)
+# [(3, 6)]
+print(ll.artification_points)
+# [6, 3, 2]
 print(ll.lowlink) 
-# -> [0, 6, 1, 2, 2, 2, 5] # 同一のサイクルに含まれているノードには同じ番号が書かれている。
-    
+# [0, 0, 0, 2, 2, 2, 6, 6, 6, 6, 0]
+# 関節点 6 が 本来は2と6の連結成分に含まれるべきだが6としか表示できない。 -> 2重点連結成分分解へ
+# 孤立したノード(11)も0で出力される (バグ？)
+
+from UnionFind import UnionFind
+uf = UnionFind(N)
+skip_edges= []
+for aa, bb in zip(A, B):
+    if aa in ll.artification_points or \
+        bb in ll.artification_points:
+        skip_edges.append((aa, bb))
+        continue
+    uf.union(aa, bb)
+groups = uf.all_group_members()
+
+for aa, bb in skip_edges:
+    print(aa, bb)
+    parent_a = uf.find(aa)
+    if bb not in groups[parent_a]:
+        groups[parent_a].append(bb)
+    parent_b = uf.find(bb)
+    if aa not in groups[parent_b]:
+        groups[parent_b].append(aa)
+
+print(groups)

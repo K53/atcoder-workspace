@@ -1,45 +1,48 @@
 #!/usr/bin/env python3
 import sys
 import heapq
+from collections import defaultdict
 INF = 10 ** 16
-class Dijkstra():
-    def __init__(self, N: int) -> None:
-        self.N = N 
-        self.G = [[] for _ in range(N)]
-        return
-    
-    # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, cost: int, num):
-        self.G[fromNode].append((cost, toNode, num))
-        self.G[toNode].append((cost, fromNode, num))
-    
-    def build(self, startNode: int):
-        hq = []
-        heapq.heapify(hq)
-        # Set start info
-        dist = [INF] * self.N
-        prev = [-1] * self.N
-        heapq.heappush(hq, (0, startNode))
-        dist[startNode] = 0
-        # dijkstra
-        while hq:
-            min_cost, now = heapq.heappop(hq)
-            if min_cost > dist[now]:
-                continue
-            for cost, next, num in self.G[now]:
-                if dist[next] > dist[now] + cost:
-                    dist[next] = dist[now] + cost
-                    prev[next] = num
-                    heapq.heappush(hq, (dist[next], next))
-        return prev
-
 
 def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
+    edges = [defaultdict(int) for _ in range(N)]
+    class Dijkstra():
+        def __init__(self, N: int) -> None:
+            self.N = N 
+            self.G = [[] for _ in range(N)]
+            return
+        
+        # 辺の追加
+        def addEdge(self, fromNode: int, toNode: int, cost: int):
+            self.G[fromNode].append((cost, toNode))
+            return
+        
+        def build(self, startNode: int):
+            hq = []
+            heapq.heapify(hq)
+            # Set start info
+            dist = [INF] * self.N
+            prev = [-1] * self.N # 経路復元する場合は移動時に直前の頂点や辺を記録して遷移していく。
+            heapq.heappush(hq, (0, startNode))
+            dist[startNode] = 0
+            # dijkstra
+            while hq:
+                min_cost, now = heapq.heappop(hq)
+                if min_cost > dist[now]:
+                    continue
+                for cost, next in self.G[now]:
+                    if dist[next] > dist[now] + cost:
+                        dist[next] = dist[now] + cost
+                        prev[next] = edges[now][next] # 頂点nextに至る直前の頂点を更新。
+                        heapq.heappush(hq, (dist[next], next))
+            return prev
     dk = Dijkstra(N)
     for i in range(M):
-        dk.addEdge(A[i] - 1, B[i] - 1, C[i], i + 1)
-    d = dk.build(0)
-    print(*d[1:], sep=" ")
+        dk.addEdge(A[i] - 1, B[i] - 1, C[i])
+        dk.addEdge(B[i] - 1, A[i] - 1, C[i])
+        edges[A[i] - 1][B[i] - 1] = i + 1
+        edges[B[i] - 1][A[i] - 1] = i + 1
+    print(*dk.build(0)[1:])
     return
 
 

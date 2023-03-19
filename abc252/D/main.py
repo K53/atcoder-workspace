@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 import sys
-
+from collections import Counter
 
 def solve(N: int, A: "List[int]"):
-    l = [0] * (2 * 10 ** 5 + 1)
-    for aa in A:
-        l[aa] += 1
-    # print(l[:10])
-    total = N * (N - 1) * (N - 2) // 6
-    d = 0
-    for ll in l:
-        if ll == 2:
-            d += N - 2
-        elif ll > 2:
-            d += (ll * (ll - 1) * (ll - 2) // 6) + ((ll * (ll - 1) // 2) * (N - ll))
-    print(total - d)
+    d = Counter(A)
+    v = N
+    tot = v * (v - 1) * (v - 2) // 6
+    a = 0
+    for k, v in d.items():
+        a += v * (v - 1) * (v - 2) // 6 + (v * (v - 1) // 2) * (N - v)
+    print(tot - a)
     return
 
 

@@ -22,6 +22,7 @@
 # verify
 # - https://atcoder.jp/contests/abc214/tasks/abc214_c (グラフ)
 # - https://yukicoder.me/problems/no/1995 (グラフ + 座標圧縮)
+# - https://atcoder.jp/contests/abc252/tasks/abc252_e (最短経路木(最短路木)の復元)
 # - https://atcoder.jp/contests/past201912-open/tasks/past201912_j (グリッド)
 # - https://atcoder.jp/contests/abc164/tasks/abc164_e (拡張ダイクストラ)
 # ------------------------------------------------------------------------------
@@ -43,6 +44,11 @@ class Dijkstra():
         self.G[fromNode].append((cost, toNode))
         print("Really directed Graph?")
         return
+
+    # "toノードに到達するための辺の番号"を同時に持たせることで経路復元時にedge_numを使用できる。
+    # def addEdge(self, fromNode: int, toNode: int, cost: int, edge_num: int):
+    #     self.G[fromNode].append((cost, toNode, edge_num))
+    #     return
     
     def build(self, startNode: int):
         hq = []
@@ -60,7 +66,7 @@ class Dijkstra():
             for cost, next in self.G[now]:
                 if dist[next] > dist[now] + cost:
                     dist[next] = dist[now] + cost
-                    # prev[next] = now # 頂点nextに至る直前の頂点を更新。
+                    # prev[next] = now # 頂点nextに至る直前の頂点(now)または辺(edge_num)を更新。
                     heapq.heappush(hq, (dist[next], next))
         return dist
 

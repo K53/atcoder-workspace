@@ -6,11 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(X: int, Y: int):
-    for i in range(X + 1):
-        if i * 2 + (X - i) * 4 == Y:
-            print(YES)
-            return
-    print(NO)
     return
 
 

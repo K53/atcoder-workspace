@@ -2,7 +2,7 @@
 import sys
 import heapq
 from collections import defaultdict
-INF = 10 ** 16
+
 class HeapDictMax:
     def __init__(self):
         self.q=[]
@@ -46,7 +46,7 @@ class HeapDictMax:
 
     def dryPop(self):
         """O(1)。先頭要素(通常は最小値)を返す。キューが空ならNoneを返す"""
-        return -self.q[0] if self.isEmpty() else INF
+        return -self.q[0] if self.isEmpty() else None
 
     def __str__(self):
         """O(len(self.q))。先頭要素取得に影響しない要素は遅延削除のため、キュー内に存在しているが事実上削除済みのものは括弧()書きしている"""
@@ -70,11 +70,11 @@ class SegTree:
             self.tree = [monoid] * self.segLen
         self._build(bottomList)
 
-    """
-    初期化
-    O(self.segLen)
-    """
     def _build(self, seq):
+        """
+        初期化
+        O(self.segLen)
+        """
         # 最下段の初期化
         for i, x in enumerate(seq, self.offset):
             self.tree[i] = x
@@ -82,10 +82,10 @@ class SegTree:
         for i in range(self.offset - 1, 0, -1):
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
 
-    """
-    直近の2べきの長さを算出
-    """
     def getSegLenOfThePowerOf2(self, ln: int):
+        """
+        直近の2べきの長さを算出
+        """
         if ln <= 0:
             return 1
         else:    
@@ -93,11 +93,11 @@ class SegTree:
             decimalPart, integerPart = math.modf(math.log2(ln))
             return 2 ** (int(integerPart) + 1)
 
-    """
-    一点加算 他演算
-    O(log(self.bottomLen))
-    """
     def pointAdd(self, i: int, val: int):
+        """
+        一点加算 他演算
+        O(log(self.bottomLen))
+        """
         i += self.offset
         self.tree[i] += val
         # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
@@ -105,23 +105,23 @@ class SegTree:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
 
-    """
-    一点更新
-    O(log(self.bottomLen))
-    """
     def pointUpdate(self, i: int, val: int):
+        """
+        一点更新
+        O(log(self.bottomLen))
+        """
         i += self.offset
         self.tree[i] = val
         while i > 1:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
 
-    """
-    区間取得 (l ≦ X < r)
-    l ~ r-1までの区間 (0-indexed)。※右端を含まない。
-    O(log(self.bottomLen))
-    """
     def getRange(self, l: int, r: int):
+        """
+        区間取得 (l ≦ X < r)
+        l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+        O(log(self.bottomLen))
+        """
         l += self.offset
         r += self.offset
         vL = self.monoid
@@ -137,21 +137,21 @@ class SegTree:
             r >>= 1
         return self.func(vL, vR)
 
-    """
-    一点取得
-    O(1)
-    """
     def getPoint(self, i: int):
+        """
+        一点取得
+        O(1)
+        """
         i += self.offset
         return self.tree[i]
 
-    """
-    二分探索
-    O(log(self.bottomLen))
-    ※ セグ木上の二分探索をする場合は2べきにすること。
-    # !!!! ng側が返却される !!!!!
-    """
     def max_right(self, l, is_ok: "function"):
+        """
+        二分探索
+        O(log(self.bottomLen))
+        ※ セグ木上の二分探索をする場合は2べきにすること。
+        # !!!! ng側が返却される !!!!!
+        """
         print("セグ木上の二分探索をする場合は2べきにすること。")
         l += self.offset
         ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
@@ -191,26 +191,35 @@ class SegTree:
         return rr - self.offset
 
 def solve(N: int, Q: int, A: "List[int]", B: "List[int]", C: "List[int]", D: "List[int]"):
-    LK = 2 * 10 ** 5 + 1
-    l = [HeapDictMax() for _ in range(LK)]
-    where = [-1] * N
+    max_kinds = 2 * 10 ** 5 + 1
+    max_st = 2 * 10 ** 5 + 1
+    hd = [HeapDictMax() for _ in range(max_kinds)]
+    st_to_kind = [0] * max_st
     INF = 10 ** 16
-    for i in range(N):
-        where[i] = B[i] - 1
-        l[B[i] - 1].insert(A[i])
-    base = [l[i].dryPop() for i in range(LK)]
-    seg = SegTree(INF, base, min)
+    m = [INF] * max_kinds
+    for st in range(N):
+        hd[B[st] - 1].insert(A[st])
+        st_to_kind[st] = B[st] - 1
+        m[B[st] - 1] = A[st] if m[B[st] - 1] == INF else max(m[B[st] - 1], A[st])
+    seg = SegTree(INF, [INF if h.dryPop() is None else h.dryPop() for h in hd], min)
+    # for i in range(max_kinds):
+    #     print(kind[i])
+    # print(maxes.tree)
     for cc, dd in zip(C, D):
-        kin = where[cc - 1]
-        l[kin].erase(A[cc - 1])
-        l[dd - 1].insert(A[cc - 1])
-        where[cc - 1] = dd - 1
-        old = l[kin].dryPop()
-        new = l[dd - 1].dryPop()
-        seg.pointUpdate(kin, old)
-        seg.pointUpdate(dd - 1, new)
-        print(seg.getRange(0, LK))
+        st = cc - 1
+        hd[st_to_kind[st]].erase(A[st])
+        f = hd[st_to_kind[st]].dryPop()
+        seg.pointUpdate(st_to_kind[st], INF if f is None else f)
+        hd[dd - 1].insert(A[st])
+        st_to_kind[st] = dd - 1
+        t = hd[dd - 1].dryPop()
+        seg.pointUpdate(dd - 1, INF if t is None else t)
+        print(seg.getRange(0, max_kinds))
+        
     
+
+
+        
     return
 
 

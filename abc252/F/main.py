@@ -3,17 +3,18 @@ import sys
 import heapq
 
 def solve(N: int, L: int, A: "List[int]"):
-    if L - sum(A) != 0:
-        A.append(L - sum(A))
+    s = sum(A)
+    if L > s:
+        A.append(L - s)
     heapq.heapify(A)
-    cost = 0
-    while len(A) != 1:
+    ans = 0
+    while len(A) > 1:
         aa = heapq.heappop(A)
         bb = heapq.heappop(A)
-        cost += aa + bb
-        heapq.heappush(A, aa + bb)
-    # last = heapq.heappop(A)
-    print(cost)
+        t = aa + bb
+        ans += t
+        heapq.heappush(A, t)
+    print(ans)
     return
 
 

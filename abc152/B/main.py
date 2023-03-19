@@ -3,10 +3,6 @@ import sys
 
 
 def solve(a: int, b: int):
-    if str(a) * b < str(b) * a:
-        print(str(a) * b)
-    else:
-        print(str(b) * a)
     return
 
 

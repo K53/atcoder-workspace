@@ -374,7 +374,6 @@ print(sortedByDegree(L)) # [(13, 7), (0, 1), (-1, 4), (-9, 4), (3, -8)]
 # - 参考
 #   https://python.atelierkobato.com/gcd/
 # ------------------------------------------------------------------------------
-
 import math
 import functools
 def _lcm(a, b):
@@ -384,9 +383,32 @@ def lcm(*vals):
     return functools.reduce(_lcm, *vals)
 
 # Usage
-T = [2,3,5]
-print(lcm(T)) # 30
+T = [2,3,4]
+print(lcm(T)) # 12
 
+# -----------------------------------
+# より高速なversion : 配列Aが大量の要素から成るならこちらの方がいい。
+from Eratosthenes import Eratosthenes
+from collections import defaultdict
+def lcm(A: list, mod: int):
+    er = Eratosthenes(max(A))
+
+    # d[p] := Aの各要素が素数pで割れる最大回数。
+    d = defaultdict(int)
+    for aa in A:
+        for p, count in er.factorize(aa):
+            d[p] = max(d[p], count)
+    
+    # LCM = Π p^(d[p])
+    # max(A)以下の全ての素数pについて、Aの各要素が素数pで割れる最大回数を乗じたものの総積。
+    res = 1
+    for p, max_count in d.items():
+        res *= pow(p, max_count, mod)
+        res %= mod
+    return res
+
+MOD = 10 ** 9 + 7
+print(lcm(T, MOD)) # 12
 
 # ------------------------------------------------------------------------------
 #     行列計算 (行列乗算、行列累乗(ダブリング))

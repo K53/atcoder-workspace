@@ -1,27 +1,20 @@
 #!/usr/bin/env python3
-from collections import Counter
 import sys
-
+from collections import defaultdict
 MOD = 10  # type: int
 
 
 def solve(N: int, S: "List[str]"):
-    d = [[] for _ in range(10)]
-    for ss in S:
-        for i in range(10):
-            d[int(ss[i])].append(i)
-    # for i in range(10):
-    #     print(d[i])
-    # print()
-    ans = []
+    ans = 10 ** 16
     for i in range(10):
-        c = Counter(d[i])
-        l = []
-        for num, count in c.items():
-            l.append(num + 10 * (count - 1))
-        # print(l)
-        ans.append(max(l))
-    print(min(ans))
+        target = str(i)
+        ts = defaultdict(int)
+        for r in range(N):
+            ts[S[r].index(target)] += 1
+        l = [k + (v - 1) * 10 for k, v in ts.items()]
+        ans = min(ans, max(l))
+    print(ans)
+            
     return
 
 

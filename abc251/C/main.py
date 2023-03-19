@@ -3,14 +3,16 @@ import sys
 
 
 def solve(N: int, S: "List[str]", T: "List[int]"):
-    d = {}
+    l = set()
+    num = []
     for i in range(N):
         ss, tt = S[i], T[i]
-        if ss in d:
+        if ss in l:
             continue
-        d[ss] = (tt, -(i + 1))
-    s = sorted(list(d.values()))
-    print(-s[-1][1])
+        l.add(ss)
+        num.append((tt, -(i + 1), ss))
+    num.sort()
+    print(-num[-1][1])
     return
 
 

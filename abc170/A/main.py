@@ -3,10 +3,6 @@ import sys
 
 
 def solve(x: "List[int]"):
-    for i in range(5):
-        if x[i] == 0: 
-            print(i + 1)
-            return
     return
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-
+import math
 MOD = 1000000007  # type: int
 
 class Eratosthenes():
@@ -47,34 +47,37 @@ class Eratosthenes():
             res.append((p, exp))
         return res
 
-    """ 高速約数列挙
-    計算量 : O(σ(N)) 
-    注) σ(N) : 数Nの約数の数
-    """
-    def getDivisors(self, n: int) -> list:
-        res = [1]
-        for p in self.factorize(n):
-            for i in range(len(res)):
-                v = 1
-                for _ in range(p[1]):
-                    v *= p[0]
-                    res.append(res[i] * v)
-        return res
+from collections import defaultdict
+def lcm(A: list, mod: int):
+    er = Eratosthenes(max(A))
+
+    # d[p] := Aの各要素が素数pで割れる最大回数。
+    d = defaultdict(int)
+    for aa in A:
+        for p, count in er.factorize(aa):
+            d[p] = max(d[p], count)
+    
+    # LCM = Π p^(d[p])
+    # max(A)以下の全ての素数pについて、Aの各要素が素数pで割れる最大回数を乗じたものの総積。
+    res = 1
+    for p, max_count in d.items():
+        res *= pow(p, max_count, mod)
+        res %= mod
+    return res
 
 def solve(N: int, A: "List[int]"):
-    er = Eratosthenes(10 ** 6 + 1)
-    from collections import defaultdict
-    d = defaultdict(int)
-    lcm = 1
-    for aa in A:
-        for k, v in er.factorize(aa):
-            d[k] = max(d[k], v)
-    for k, v in d.items():
-        lcm *= pow(k, v, MOD)
-        lcm %= MOD
     ans = 0
+    # l = lcm(A, MOD)
+    import functools
+    def _lcm(a, b):
+        return a * b // math.gcd(a, b)
+
+    def lcm(*vals):
+        return functools.reduce(_lcm, *vals)
+    l = lcm(A)
+    l %= MOD
     for aa in A:
-        ans += lcm * pow(aa, MOD - 2, MOD)
+        ans += l * pow(aa, MOD - 2, MOD)
         ans %= MOD
     print(ans)
     return

@@ -3,9 +3,8 @@ import sys
 
 
 def solve(S: str):
-    N = len(S)
-    q = 6 // N
-    print(S * q)
+    r = 6 // len(S)
+    print(S * r)
     return
 
 

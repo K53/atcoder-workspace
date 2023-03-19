@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 import sys
-def fibonacci_list(n):
-    fib = [1, 1, 2]
-    if n == 1:
-        fib = [1]
-    else:
-        for k in range(3, n):
-            a = fib[k-1]+fib[k-2]+fib[k-3]
-            fib.append(10 ** 6 if a > 10 ** 6 else a)
-    return fib
+
 def solve(W: int):
-    print(300)
-    print(*fibonacci_list(300), sep=" ")
+    ans = []
+    for i in range(1, 100):
+        ans.append(i)
+        ans.append(i * 100)
+        ans.append(i * 10 ** 4)
+    print(len(ans))
+    print(*ans)
     return
 
 

@@ -3,28 +3,28 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    dp1 = [[0] * (N - 1) for _ in range(2)]
-    dp2 = [[0] * (N - 1) for _ in range(2)]
+    INF = 10 ** 16
+    B = A + [INF]
+    dp = [INF] * (N + 1)
+    dp[0] = 0
+    for i in range(N + 1):
+        if i + 1 < len(B):
+            dp[i + 1] = min(dp[i + 1], dp[i] + B[i])
+        if i + 2 < len(B):
+            dp[i + 2] = min(dp[i + 2], dp[i] + B[i])
+        # print(dp)
 
-    dp1[0][0] = A[-1]
-    dp1[1][0] = 10 ** 16
+    B = A + [INF] * 2
+    dp2 = [INF] * (N + 2)
+    dp2[1] = 0
+    for i in range(N + 2):
+        if i + 1 < len(B):
+            dp2[i + 1] = min(dp2[i + 1], dp2[i] + B[i])
+        if i + 2 < len(B):
+            dp2[i + 2] = min(dp2[i + 2], dp2[i] + B[i])
+        # print(dp2)
+    print(min(dp[-1], dp2[-1]))
 
-    dp2[0][0] = 10 ** 16
-    dp2[1][0] = A[0]
-    for i in range(0, N - 2):
-        dp1[0][i + 1] = min(dp1[0][i] + A[i], dp1[1][i] + 0)
-        dp1[1][i + 1] = min(dp1[0][i] + A[i + 1], dp1[1][i] + A[i + 1])
-
-        dp2[0][i + 1] = min(dp2[0][i] + A[i], dp2[1][i] + 0)
-        dp2[1][i + 1] = min(dp2[0][i] + A[i + 1], dp2[1][i] + A[i + 1])
-    # print(dp1[0])
-    # print(dp1[1])
-    # print()
-    # print(dp2[0])
-    # print(dp2[1])
-    print(min(dp1[0][-1], dp1[1][-1], dp2[1][-1]))
-
-    
     return
 
 

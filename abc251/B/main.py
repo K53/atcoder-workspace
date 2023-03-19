@@ -1,30 +1,21 @@
 #!/usr/bin/env python3
 import sys
-import itertools
+
 
 def solve(N: int, W: int, A: "List[int]"):
-    s = set()
-    for aa in A:
-        if aa <= W:
-            s.add(aa)
-    if N == 1:
-        print(len(s))
-        return
-    
-    l = itertools.combinations(A, 2)
-    for ll in l:
-        q = sum(ll)
-        if q <= W:
-            s.add(q)
-    if N == 2:
-        print(len(s))
-        return
-    
-    l = itertools.combinations(A, 3)
-    for ll in l:
-        q = sum(ll)
-        if q <= W:
-            s.add(q)
+    s = set([aa for aa in A if aa <= W])
+    for i in range(N - 1):
+        for j in range(i + 1, N):
+            num = A[i] + A[j]
+            if num <= W:
+                s.add(num)
+        
+    for i in range(N - 2):
+        for j in range(i + 1, N - 1):
+            for k in range(j + 1, N):
+                num = A[i] + A[j] + A[k]
+                if num <= W:
+                    s.add(num)
     print(len(s))
     return
 

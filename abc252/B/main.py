@@ -8,15 +8,11 @@ NO = "No"  # type: str
 def solve(N: int, K: int, A: "List[int]", B: "List[int]"):
     m = max(A)
     s = set()
-    b = set(B)
     for i in range(N):
         if A[i] == m:
             s.add(i + 1)
-    for ss in s:
-        if ss in b:
-            print(YES)
-            return
-    print(NO)
+    b = set(B)
+    print(YES if len(s & b) != 0 else NO)
     return
 
 
