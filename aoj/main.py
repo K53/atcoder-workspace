@@ -1,123 +1,154 @@
 #!/usr/bin/env python3
+from typing import List, Tuple, Callable, TypeVar
+import sys
 
-# https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1330
+input = sys.stdin.readline
 
-from collections import defaultdict
-INF = 10 ** 16
-
-class WeightedUnionFind():
-    def __init__(self, n):
-        self.n = n
-        self.group_num = n
-        self.parents = [-1] * n # 負で表現したサイズ
-        self.diff_weight = [0] * n # 属する集合の親からの距離
-
-    """ 要素xの親を取得。"""
-    def find(self, x):
-        if self.parents[x] < 0:
-            return x
-        else:
-            r = self.find(self.parents[x]) # 経路圧縮
-            self.diff_weight[x] += self.diff_weight[self.parents[x]]; # 累積和をとる
-            self.parents[x] = r
-            return self.parents[x]
-
-    """ 2つの要素の併合。
-    すでに同じ集合に属する場合はFalseを返す。
-    """
-    def union(self, x, y, w):
-        w += self.weight(x)
-        w -= self.weight(y)
-        x = self.find(x)
-        y = self.find(y)
-
-        if x == y:
-            return False
-
-        # xの方がサイズが大きい状態にする。parentsは中身負なので注意
-        if self.parents[x] > self.parents[y]:
-            x, y = y, x
-            w = -w
-
-        self.parents[x] += self.parents[y]
-        self.parents[y] = x
-        self.group_num -= 1
-        self.diff_weight[y] = w; 
-        return True
-    
-    def weight(self, x: int) -> int:
-        self.find(x) # 経路圧縮
-        return self.diff_weight[x]
-
-    """ 2点x, y間の距離を返す。
-    同一の集合に属さない場合は INF を返す。
-    """
-    def diff(self, x: int, y: int) -> int:
-        # 
-        if not self.same(x, y):
-            return INF
-        return self.weight(y) - self.weight(x)
-
-    """ 要素xの属する集合の要素数を取得。"""
-    def size(self, x):
-        return -self.parents[self.find(x)]
-
-    """ 2つの要素が同一の集合に属するか。"""
-    def same(self, x, y):
-        return self.find(x) == self.find(y)
-
-    """ 要素xと同一の集合の要素を全取得。
-    計算量 : O(N)
-    """
-    def members(self, x):
-        root = self.find(x)
-        return [i for i in range(self.n) if self.find(i) == root]
-
-    """ 各集合の根を全取得。
-    計算量 : O(N)
-    """
-    def roots(self):
-        return [i for i, x in enumerate(self.parents) if x < 0]
-
-    """ 集合の個数を取得。 v2
-    計算量 : O(1)
-    """
-    def group_count_v2(self):
-        return self.group_num
-
-    """ 集合の個数を取得。 v1
-    計算量 : O(N)
-    """
-    def group_count_v1(self):
-        return len(self.roots())
-
-    """ 全集合の要素一覧を取得。
-    計算量 : O(N)
-    """
-    def all_group_members(self):
-        group_members = defaultdict(list)
-        for member in range(self.n):
-            group_members[self.find(member)].append((member, self.diff_weight[member]))
-        return group_members
-
-    def __str__(self):
-        return '\n'.join(f'{r}: {m}' for r, m in self.all_group_members().items())
-    
 def main():
-    while True:
-        N, M = map(int, input().split())
-        if N == M == 0:
-            return
-        wuf = WeightedUnionFind(N)
-        for _ in range(M):
-            query = input().split()
-            if query[0] == "!":
-                a, b, w = int(query[1]) - 1, int(query[2]) - 1, int(query[3])
-                wuf.union(a, b, w)
-            else:
-                a, b = int(query[1]) - 1, int(query[2]) - 1
-                d = wuf.diff(a, b)
-                print(d if d != INF else "UNKNOWN")
+    class BIT:
+        def __init__(self, N):
+            self.N = N
+            self.A = [0] * (N + 1)
+
+        def build(self, A):
+            """build BIT with given list"""
+            for i, a in enumerate(A):
+                self.A[i + 1] = a
+            for i in range(1, self.N):
+                if i + (i & -i) > self.N:
+                    continue
+                self.A[i + (i & -i)] += self.A[i]
+
+        def add(self, i, x):
+            """add x to i-th element (0-indexed)"""
+            # assert 0 <= i < self.N
+            i += 1
+            while i <= self.N:
+                self.A[i] += x
+                i += i & -i
+
+        def sum(self, i):
+            """return sum(A[:i])"""
+            assert 0 <= i <= self.N
+            s = 0
+            while i > 0:
+                s += self.A[i]
+                i -= i & -i
+            return s
+
+        def range_sum(self, l, r):
+            """return sum(A[l:r])"""
+            return self.sum(r) - self.sum(l)
+
+
+    class HLD:
+        # reference: https://codeforces.com/blog/entry/53170
+        def __init__(self, N, E, root: int = 0):
+            self.N = N
+            self.E = E
+            self.root = root
+
+            self.D = [0] * self.N
+            self.par = [-1] * self.N
+            self.sz = [0] * self.N
+            self.top = [0] * self.N
+
+            self.ord = [None] * self.N
+
+            self._dfs_sz()
+            self._dfs_hld()
+
+        def path_query_range(self, u: int, v: int, is_edge_query: bool = False) -> List[Tuple[int, int]]:
+            """return list of [l, r) ranges that cover u-v path"""
+            ret = []
+            while True:
+                if self.ord[u] > self.ord[v]:
+                    u, v = v, u
+                if self.top[u] == self.top[v]:
+                    ret.append((self.ord[u] + is_edge_query, self.ord[v] + 1))
+                    return ret
+                ret.append((self.ord[self.top[v]], self.ord[v] + 1))
+                v = self.par[self.top[v]]
+
+        def subtree_query_range(self, v: int) -> Tuple[int, int]:
+            """return [l, r) range that cover vertices of subtree v"""
+            return (self.ord[v], self.ord[v] + self.sz[v])
+
+        def lca(self, u, v):
+            while True:
+                if self.ord[u] > self.ord[v]:
+                    u, v = v, u
+                if self.top[u] == self.top[v]:
+                    return u
+                v = self.par[self.top[v]]
+
+        def _dfs_sz(self):
+            stack = [(self.root, -1)]
+            while stack:
+                v, p = stack.pop()
+                if v < 0:
+                    v = ~v
+                    self.sz[v] = 1
+                    for i, dst in enumerate(self.E[v]):
+                        if dst == p:
+                            continue
+                        self.sz[v] += self.sz[dst]
+                        # v -> E[v][0] will be heavy path
+                        if self.sz[E[v][0]] < self.sz[dst]:
+                            self.E[v][0], self.E[v][i] = self.E[v][i], self.E[v][0]
+                else:
+                    if ~p:
+                        self.D[v] = self.D[p] + 1
+                        self.par[v] = p
+                    # avoid first element of E[v] is parent of vertex v if v has some children
+                    if len(self.E[v]) >= 2 and self.E[v][0] == p:
+                        self.E[v][0], self.E[v][1] = self.E[v][1], self.E[v][0]
+                    stack.append((~v, p))
+                    for dst in self.E[v]:
+                        if dst == p:
+                            continue
+                        stack.append((dst, v))
+
+        def _dfs_hld(self):
+            stack = [(self.root, -1)]
+            cnt = 0
+            while stack:
+                v, p = stack.pop()
+                self.ord[v] = cnt
+                cnt += 1
+                heavy_path_idx = len(self.E[v]) - 1
+                for i, dst in enumerate(self.E[v][::-1]):
+                    if dst == p:
+                        continue
+                    # top[dst] is top[v] if v -> dst is heavy path otherwise dst itself
+                    self.top[dst] = self.top[v] if i == heavy_path_idx else dst
+                    stack.append((dst, v))
+
+
+    N = int(input())
+    E = [[] for _ in range(N)]
+    for _ in range(N - 1):
+        u, v = map(int, input().split())
+        u -= 1
+        v -= 1
+        E[u].append(v)
+        E[v].append(u)
+
+    solver = HLD(N, E)
+    bit = BIT(N)
+    Q = int(input())
+    for _ in range(Q):
+        a, b = map(int, input().split())
+        a -= 1
+        b -= 1
+        for l, r in solver.path_query_range(a, b):
+            bit.add(l, 1)
+            bit.add(r, -1)
+    ans = 0
+    for i in range(N):
+        cnt = bit.sum(i + 1)
+        ans += (1 + cnt) * cnt // 2
+    print(ans)
 
 if __name__ == '__main__':
     main()

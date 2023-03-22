@@ -67,6 +67,7 @@ class BIT:
 
     def sum(self, pos):
         ''' Sum
+            0からposまでの和を返す(posを含む)
             O(logN)
             posは0-index。内部で1-indexedに変換される。
             Return Sum(A[0], ... , A[pos])

@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
 import sys
-from collections import Counter
 
-def solve(N: int, A: "List[int]"):
-    d = Counter(A)
-    keys = list(d.keys())
-    L = len(keys)
-    ans = 0
-    for i in range(L - 1):
-        for j in range(i + 1, L):
-            ans += (keys[i] - keys[j]) ** 2 * (d[keys[i]] * d[keys[j]])
-    print(ans)
+
+def solve(N: int, M: int, A: "List[int]", B: "List[int]", C: "List[int]"):
     return
 
 
@@ -22,8 +14,15 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, A)
+    M = int(next(tokens))  # type: int
+    A = [int()] * (M)  # type: "List[int]"
+    B = [int()] * (M)  # type: "List[int]"
+    C = [int()] * (M)  # type: "List[int]"
+    for i in range(M):
+        A[i] = int(next(tokens))
+        B[i] = int(next(tokens))
+        C[i] = int(next(tokens))
+    solve(N, M, A, B, C)
 
 if __name__ == '__main__':
     main()

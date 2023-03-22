@@ -104,6 +104,7 @@ class Combination():
         print("**** factorial_maxの最大値としてn + rが必要となる! ****")
         return self.nCr(n - 1 + r, r)
 
+
 # Usage
 MOD = 10 ** 9 + 7
 comb = Combination(5000, MOD)
