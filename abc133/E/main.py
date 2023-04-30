@@ -1,10 +1,31 @@
 #!/usr/bin/env python3
 import sys
-
+sys.setrecursionlimit(10 ** 9)
 MOD = 1000000007  # type: int
 
-
 def solve(N: int, K: int, a: "List[int]", b: "List[int]"):
+    G = [[] for _ in range(N)]
+    for i in range(N - 1):
+        G[a[i] - 1].append(b[i] - 1)
+        G[b[i] - 1].append(a[i] - 1)
+    fixG = [[] for _ in range(N)]
+    ans = K
+    
+    def dfs(cur, pre):
+        nonlocal ans
+        if pre != -1:
+            fixG[pre].append(cur)
+            fixG[cur].append(pre)
+            fixed = len(fixG[pre])
+            # print(fixed)
+            ans *= K - fixed
+            ans %= MOD
+        for next in G[cur]:
+            if next == pre:
+                continue
+            dfs(next, cur)
+    dfs(0, -1)
+    print(ans)
     return
 
 

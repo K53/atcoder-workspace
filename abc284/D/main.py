@@ -1,81 +1,64 @@
 #!/usr/bin/env python3
+from collections import defaultdict
+from math import gcd
 
+class PollardsRho():
+    def __init__(self) -> None:
+        pass
 
-class Eratosthenes():
-    """ 素数列挙
-    計算量 : O(NloglogN)
-    """
-    def __init__(self, N: int) -> None:
-        self.primeTable = [True] * (N + 1) # 数iが素数かどうかのフラグ
-        self.primeTable[0] = False
-        self.primeTable[1] = False
-        self.minfactor = [0] * (N + 1) # 数iの最小の素因数
-        self.minfactor[1] = 1
-        self.primes = []    # 数Nまでの素数のリスト
-        for p in range(2, N + 1):  # p : 判定対象の数
-            if not self.primeTable[p]:
-                continue
-            self.minfactor[p] = p
-            self.primes.append(p)
-            # pが素数のためそれ以降に出現するpの倍数を除外する。
-            # なお、ループはp始まりでも良いが、p * _ のかける側はすでに同じ処理で弾かれているはずのため無駄。
-            for i in range(p * p, N + 1, p):
-                if self.minfactor[i] == 0:
-                    self.minfactor[i] = p
-                self.primeTable[i] = False
-        return
-    
-    """ 素数判定
-    計算量 : 0(1)
-    """
-    def isPrime(self, n: int) -> bool:
-        return self.primeTable[n]
+    def _isprime(self, n: int):
+        if n < 2:
+            return False
+        i = 2
+        while i * i <= n: # sqrt(N)まで試し割りする。
+            if n % i == 0:
+                return False
+            i += 1
+        return True
 
-    """ 高速素因数分解
-    計算量 : O(NlogN)
-    """
-    def factorize(self, n: int) -> list:
-        res = [] # (p, exp)
-        while n > 1:
-            p = self.minfactor[n]
-            exp = 0
-            while self.minfactor[n] == p:
-                n //= p
-                exp += 1
-            res.append((p, exp))
-        return res
+    # 疑似乱数生成
+    def _get_rand(self, n, mod: int, seed: int):
+        return (pow(n, 2, mod) + seed) % mod
 
-    """ 高速約数列挙
-    計算量 : O(σ(N)) 
-    注) σ(N) : 数Nの約数の数
-    """
-    def getDivisors(self, n: int) -> list:
-        res = [1]
-        for p in self.factorize(n):
-            for i in range(len(res)):
-                v = 1
-                for _ in range(p[1]):
-                    v *= p[0]
-                    res.append(res[i] * v)
-        return res
+    def _get_prime_recursive(self, target, N: int, _seed = 3):
+        if self._isprime(target):
+            return target
+        x, y, g = 2, 2, 1
+        seed = _seed
+        while g == 1:
+            x = self._get_rand(x, N, seed)
+            y = self._get_rand(self._get_rand(y, N, seed), N, seed)
+            g = gcd(abs(x - y), target)
+            seed += 1
+
+        if g % 2 == 0: return 2 # 最大公約数が偶数なら2
+        return self._get_prime_recursive(g, N, 1) if self._isprime(g) else self._get_prime_recursive(g, N, 1)
+
+    # メイン
+    def factorization(self, N: int):
+        dic = defaultdict(int)
+        rest = N
+
+        if(self._isprime(rest)):
+            dic[rest] = 1
+            return dic
+
+        while True:
+            ret = self._get_prime_recursive(rest, N)
+            dic[ret] += 1
+            rest //= ret
+            if rest == 1 or rest // ret == 0:
+                break
+
+        return dic
 
 def main():
     T = int(input())
-    er = Eratosthenes(3 * 10 ** 6)
-    s = set(er.primes)
+    p = PollardsRho()
     for _ in range(T):
         N = int(input())
-        for i in er.primes:
-            p, q = divmod(N, i ** 2)
-            if q == 0:
-                print(i, p)
-                break
-            else:
-                p, q = divmod(N, i)
-                if q == 0:
-                    print(int(pow(p, 0.5)), i)
-                    break
-            
+        print(p.factorization(N))
+
 
         
 

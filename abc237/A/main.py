@@ -6,11 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(N: int):
-    a = 2 ** 31
-    if -a <= N < a:
-        print(YES)
-    else:
-        print(NO)
     return
 
 

@@ -1,8 +1,66 @@
 #!/usr/bin/env python3
 import sys
-
+from functools import cmp_to_key
 
 def solve(N: int, Q: int, A: "List[int]", l: "List[int]", r: "List[int]"):
+    sq = Q ** 0.5
+    total_kinds = 0
+    each_count = [0] * (max(A) + 1)
+
+    queries = []
+    for i in range(Q):
+        queries.append([l[i] - 1, r[i], i])
+
+    sq = int(Q ** 0.5)
+    unit = N // sq + 1
+    # 
+    # |       |       |      |           |
+    # | area1 | area2 |      |  area(sq) |
+    # |       |       |      |           |
+    # +----------------- ... ---------------
+    #  <-unit-> 
+    # 
+    sqrt_divideds = [[] for _ in range(sq + 1)]
+    for x, y, i in queries:
+        sqrt_divideds[x // unit].append([x, y, i])
+
+    # areaの偶奇で交互になるように配置
+    mo_list = []
+    for i in range(len(sqrt_divideds)):
+        if i & 1:
+            mo_list += sorted(sqrt_divideds[i], key=lambda x: x[1])[::-1]
+            continue
+        mo_list += sorted(sqrt_divideds[i], key=lambda x: x[1])
+
+    def _add(k):
+        nonlocal total_kinds
+        total_kinds += each_count[k] * (each_count[k] - 1) // 2
+        each_count[k] += 1
+    
+    def _del(k):
+        nonlocal total_kinds
+        each_count[k] -= 1
+        total_kinds -= each_count[k] * (each_count[k] - 1) // 2
+
+    ans = [-1] * Q
+    cur_l, cur_r = 0, 0
+    for i in range(Q):
+        ll, rr, idx = mo_list[i]
+        # print(i, "---", cur_l, ll, cur_r, rr)
+        while cur_l > ll:
+            cur_l -= 1
+            _add(A[cur_l]) # 移動先を足す
+        while cur_l < ll:
+            _del(A[cur_l]) # 移動元を引く
+            cur_l += 1
+        while cur_r > rr:
+            cur_r -= 1
+            _del(A[cur_r]) # 移動先を引く
+        while cur_r < rr:
+            _add(A[cur_r]) # 移動元を足す
+            cur_r += 1
+        ans[idx] = total_kinds
+    print(*ans, sep="\n")
     return
 
 

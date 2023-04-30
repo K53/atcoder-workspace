@@ -19,7 +19,11 @@ class WarshallFloyd():
         for via in range(self.N):
             for start in range(self.N):
                 for goal in range(self.N):
+                    if self.dp[start][via] == INF or self.dp[via][goal] == INF:
+                        continue
+                    # print(via, start, goal, ":", self.dp[start][goal], "<", self.dp[start][via], "+", self.dp[via][goal])
                     self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+                    # print_for_inf_replacable(self.dp, INF)
         return self.dp
     
 
@@ -35,6 +39,35 @@ class WarshallFloyd():
         #         self.dp[start][goal] = min_dist
         # return self.dp
         # https://kakedashi-engineer.appspot.com/2020/04/22/abc074d/
+
+from Debug import print_for_inf_replacable
+# N = 8
+# A = [0, 0, 1, 6, 6, 7, 2, 5, 5]
+# B = [1, 2, 6, 4, 7, 3, 5, 4, 3]
+# C = [1, 4, 6, 2, 5, 2, 5, 1, 3]
+# #
+# # [0] -- [1] -- [6] -- [7]
+# #  |             |      |
+# # [2] -- [5] -- [4]     |
+# #         |             |
+# #        [3] -----------|
+# #
+# N = 4
+# A = [0, 1, 2, 3]
+# B = [1, 2, 3, 0]
+# C = [2, 4, 1, 2]
+N = 6
+A = [0, 0, 1, 1, 4, 3, 2]
+B = [1, 2, 3, 4, 3, 5, 5]
+C = [3, 10, 8, 4, 1, 5, 4]
+wf = WarshallFloyd(N)
+for aa, bb, cc in zip(A, B, C):
+    wf.addEdge(aa, bb, cc)
+    wf.addEdge(bb, aa, cc)
+d = wf.build()
+print_for_inf_replacable(d, replace_target=INF)
+
+
 
 # = ワーシャルフロイド(グリッド) =======================================================================
 class WarshallFloyd():
@@ -67,4 +100,6 @@ class WarshallFloyd():
         for via in range(self.H * self.W):
             for start in range(self.H * self.W):
                 for goal in range(self.H * self.W):
+                    if self.dp[start][via] == INF or self.dp[via][goal] == INF:
+                        continue
                     self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])

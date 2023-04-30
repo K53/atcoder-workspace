@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-
+import heapq
 
 def main():
-    import heapq
     Q = int(input())
-    h = []
-    now = 0
+    q = []
+    offset = 0
+    heapq.heapify(q)
     for _ in range(Q):
-        query = list(map(int, input().split()))
-        if query[0] == 1:
-            heapq.heappush(h, query[1] - now)
-        elif query[0] == 2:
-            now += query[1]
+        t, *arg = map(int, input().split())
+        if t == 1:
+            num = arg[0] - offset
+            heapq.heappush(q, num)
+        elif t == 2:
+            offset += arg[0]
         else:
-            print(heapq.heappop(h) + now)
+            num = heapq.heappop(q)
+            print(num + offset)
     return
-
-
 
 if __name__ == '__main__':
     main()

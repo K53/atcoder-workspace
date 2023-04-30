@@ -1,6 +1,42 @@
 #!/usr/bin/env python3
 import sys
 INF = 10 ** 16
+import heapq
+class Dijkstra():
+    def __init__(self, N: int) -> None:
+        self.N = N 
+        self.G = [[] for _ in range(N)]
+        return
+    
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
+        self.G[fromNode].append((cost, toNode))
+        return
+
+    # "toノードに到達するための辺の番号"を同時に持たせることで経路復元時にedge_numを使用できる。
+    # def addEdge(self, fromNode: int, toNode: int, cost: int, edge_num: int):
+    #     self.G[fromNode].append((cost, toNode, edge_num))
+    #     return
+    
+    def build(self, startNode: int):
+        hq = []
+        heapq.heapify(hq)
+        # Set start info
+        dist = [INF] * self.N
+        # prev = [-1] * self.N # 経路復元する場合は移動時に直前の頂点や辺を記録して遷移していく。
+        heapq.heappush(hq, (0, startNode))
+        dist[startNode] = 0
+        # dijkstra
+        while hq:
+            min_cost, now = heapq.heappop(hq)
+            if min_cost > dist[now]:
+                continue
+            for cost, next in self.G[now]:
+                if dist[next] > dist[now] + cost:
+                    dist[next] = dist[now] + cost
+                    # prev[next] = now # 頂点nextに至る直前の頂点(now)または辺(edge_num)を更新。
+                    heapq.heappush(hq, (dist[next], next))
+        return dist
 
 class BellmanFord():
     def __init__(self, N: int) -> None:
@@ -28,18 +64,24 @@ class BellmanFord():
         return dist
 
 def solve(N: int, M: int, P: int, A: "List[int]", B: "List[int]", C: "List[int]"):
+    # ぽてんしゃるのてすと
     bf = BellmanFord(N)
     for aa, bb, cc in zip(A, B, C):
         bf.addEdge(aa - 1, bb - 1, -cc + P) 
     
-    c = bf.build(startNode=0)
-    if c[-1] == -INF:
+    p = bf.build(startNode=0)
+    if p[-1] == -INF:
         print(-1)
         return
-    if c[-1] >= 0:
+    if p[-1] >= 0:
         print(0)
         return
-    print(-c[-1])
+    
+    dk = Dijkstra(N)
+    for aa, bb, cc in zip(A, B, C):
+        dk.addEdge(aa - 1, bb - 1, -cc + P + p[aa - 1] - p[bb - 1])
+    res = dk.build(0)
+    print(-(res[-1] + p[-1] - p[0]))
     return
 
 

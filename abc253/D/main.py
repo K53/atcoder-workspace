@@ -1,25 +1,8 @@
 #!/usr/bin/env python3
-from math import gcd
 import sys
 
 
 def solve(N: int, A: int, B: int):
-    AB = A * B // gcd(A, B)
-
-    # k
-    aa = (N - A) // A + 1
-    bb = (N - B) // B + 1
-    ab = (N - AB) // AB + 1
-
-    numA = (aa * (2 * A + (aa - 1) * A)) // 2
-    numB = (bb * (2 * B + (bb - 1) * B)) // 2
-    numAB = (ab * (2 * AB + (ab - 1) * AB)) // 2
-
-    total = (N * (2 + (N - 1))) // 2
-
-    print(total - (numA + numB - numAB))
-
-
     return
 
 

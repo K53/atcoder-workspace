@@ -1,7 +1,32 @@
 #!/usr/bin/env python3
 import sys
 import heapq
+
 INF = 10 ** 16
+class BellmanFord():
+    def __init__(self, N: int) -> None:
+        self.N = N 
+        self.E: "list[tuple(int, int, int)]" = [] # ダイクストラ等と異なりベルマンフォード法では辺に着目する
+        return
+    
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
+        self.E.append((fromNode, toNode, cost))
+        return
+    
+    def build(self, startNode: int):
+        dist = [INF] * self.N
+        dist[startNode] = 0
+        # 少なくとも頂点数N回だけ全部の辺について最短手数を更新すれば最短経路がもとまる。 O(V * E)
+        # N + 1回目に更新が発生するということは閉路があるということなので、そこから到達可能な辺は全て影響を受けることから=INFで潰す。 O(V * E)
+        for i in range(self.N * 2):
+            for fromNode, toNode, cost in self.E:
+                if dist[fromNode] != INF and dist[toNode] > dist[fromNode] + cost:
+                    if i >= self.N - 1:
+                        dist[toNode] = -INF
+                    else:
+                        dist[toNode] = dist[fromNode] + cost
+        return dist
+
 class Dijkstra():
     def __init__(self, N: int) -> None:
         self.N = N 
@@ -9,16 +34,22 @@ class Dijkstra():
         return
     
     # 辺の追加
-    def addEdge(self, fromNode: int, toNode: int, cost: int, bothDirection: bool):
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
         self.G[fromNode].append((cost, toNode))
-        if bothDirection:
-            self.G[toNode].append((cost, fromNode))
+        print("Really directed Graph?")
+        return
+
+    # "toノードに到達するための辺の番号"を同時に持たせることで経路復元時にedge_numを使用できる。
+    # def addEdge(self, fromNode: int, toNode: int, cost: int, edge_num: int):
+    #     self.G[fromNode].append((cost, toNode, edge_num))
+    #     return
     
     def build(self, startNode: int):
         hq = []
         heapq.heapify(hq)
         # Set start info
         dist = [INF] * self.N
+        # prev = [-1] * self.N # 経路復元する場合は移動時に直前の頂点や辺を記録して遷移していく。
         heapq.heappush(hq, (0, startNode))
         dist[startNode] = 0
         # dijkstra
@@ -29,24 +60,86 @@ class Dijkstra():
             for cost, next in self.G[now]:
                 if dist[next] > dist[now] + cost:
                     dist[next] = dist[now] + cost
+                    # prev[next] = now # 頂点nextに至る直前の頂点(now)または辺(edge_num)を更新。
                     heapq.heappush(hq, (dist[next], next))
         return dist
 
-
+class WarshallFloyd():
+    def __init__(self, N):
+        self.N = N
+        dp = [[INF] * N for _ in range(N)]
+        for i in range(N):
+            dp[i][i] = 0
+        self.dp = dp
+    
+    # 自己ループを持つグラフの扱いは注意。
+    def addEdge(self, fromNode: int, toNode: int, cost: int = 1):
+        self.dp[fromNode][toNode] = cost
+    
+    def build(self):
+        """
+        0 〜 (via - 1)までの地点だけを利用して求めたdpテーブルを使い、viaを経由地とした時の更新処理している。
+        """
+        for via in range(self.N):
+            for start in range(self.N):
+                for goal in range(self.N):
+                    if self.dp[start][via] == INF or self.dp[via][goal] == INF:
+                        continue
+                    # print(via, start, goal, ":", self.dp[start][goal], "<", self.dp[start][via], "+", self.dp[via][goal])
+                    self.dp[start][goal] = min(self.dp[start][goal], self.dp[start][via] + self.dp[via][goal])
+                    # print_for_inf_replacable(self.dp, INF)
+        return self.dp
 
 def solve(N: int, M: int, H: "List[int]", U: "List[int]", V: "List[int]"):
+    N = 6
+    e = [
+        (1, 2, 8),
+        (1, 3, 5),
+        (3, 2, -2),
+        (4, 2, -3),
+        (4, 3, -3),
+        (4, 5, 2),
+        (5, 6, 3),
+        (4, 6, 7)
+    ]
+    bf = BellmanFord(N)
+    for a, b, c in e:
+        bf.addEdge(a - 1, b - 1, c)
+    p = bf.build(0)
+    print(p)
+    dist2 = []
     dk = Dijkstra(N)
-    for uu, vv in zip(U, V):
-        d = H[uu - 1] - H[vv - 1]
-        if d >= 0:
-            dk.addEdge(uu - 1, vv - 1, -d, bothDirection=False)
-            dk.addEdge(vv - 1, uu - 1, 2 * d, bothDirection=False)
-        else:
-            dk.addEdge(uu - 1, vv - 1, -2 * d, bothDirection=False)
-            dk.addEdge(vv - 1, uu - 1, d, bothDirection=False)
+    for a, b, c in e:
+        dist2.append(c + p[a - 1] - p[b - 1])
+        dk.addEdge(a - 1, b - 1, c + p[a - 1] - p[b - 1])
+    print(dist2)
+    print("------")
+    results = []
+    for st in range(N):
+        results.append(dk.build(st))
+        for ed in range(N):
+            if results[st][ed] != INF:
+                results[st][ed] += p[ed] - p[st]
+        print(results[st])
+    
+    print(results[0][2])
+    print(results[1][5])
+    print(results[2][3])
 
-    ans = dk.build(startNode=0)
-    print(-min(ans))
+    wf = WarshallFloyd(N)
+    for a, b, c in e:
+        wf.addEdge(a - 1, b - 1, c)
+    print("----")
+    res = wf.build()
+    # [
+    #     (1, 5)
+    #     (2, 6)
+    #     (3, 4)
+    # ]
+    for st in range(N):
+        print(res[st])
+
+
     return
 
 

@@ -6,12 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(a: int, b: int, c: int):
-    l = [a, b, c]
-    l.sort()
-    if b == l[1]:
-        print(YES)
-    else:
-        print(NO)
     return
 
 

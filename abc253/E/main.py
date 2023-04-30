@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
 import sys
 from itertools import accumulate
-
 MOD = 998244353  # type: int
+
 
 def solve(N: int, M: int, K: int):
     if K == 0:
-        print((M ** N) % MOD)
+        print(pow(M, N, MOD))
         return
-    dp = [[0] + [1] * (M)] + [[0] * (M + 1) for _ in range(N)]
-    sdp = [0] * (M + 1)
-    sdp = list(accumulate(dp[0]))
-    # print(sdp)
-    for i in range(1, N):
-        for num in range(1, M + 1):
-            dp[i][num] = ((sdp[-1] - sdp[num + K - 1]) if num + K - 1 < len(sdp) else sdp[0]) + ((sdp[num - K] - sdp[0]) if num - K >= 0 else sdp[0])
-            # print(i, num, (num + K - 1) < len(sdp), (num - K - 1) >= 0)
-            # print(i, num, (sdp[-1], sdp[num + K - 1]) if num + K - 1 < len(sdp) else 0, (sdp[num - K], sdp[0]) if num - K >= 0 else sdp[0])
-            # print(i, num, (sdp[-1] - sdp[num + K - 1]) if num + K - 1 < len(sdp) else 0), ((sdp[num - K] - sdp[0]) if num - K >= 0 else sdp[0])
-            dp[i][num] %= MOD
-        sdp = list(accumulate(dp[i]))
-        # print(i, sdp)
-        # print(i, dp)
+    dp = [1] * M
+    sdp = [0] + list(accumulate(dp))
+    for _ in range(N - 1):
+        tmp = []
+        for j in range(1, M + 1):
+            tmp.append((sdp[M] - sdp[min(M, j + K - 1)] + sdp[max(0, j - K)]) % MOD)
+        dp = tmp
+        sdp = [0]
+        for num in dp:
+            sdp.append((sdp[-1] + num) % MOD)
+
     print(sdp[-1] % MOD)
     return
 

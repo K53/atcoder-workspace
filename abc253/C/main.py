@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import bisect
 
-INF = 10 ** 10
+INF = 10 ** 9
 class BIT:
     def __init__(self, N):
         self.N = N
@@ -21,6 +21,7 @@ class BIT:
     def deleteNonNegative(self, pos, val) -> int:
         '''Add
             O(logN)
+            ※ multisetで使用される関数
             posは0-index。内部で1-indexedに変換される。
             すでにMultiSetに含まれている個数以上は削除されない。
             A[pos] -= val 
@@ -34,6 +35,7 @@ class BIT:
 
     def sum(self, pos):
         ''' Sum
+            0からposまでの和を返す(posを含む)
             O(logN)
             posは0-index。内部で1-indexedに変換される。
             Return Sum(A[0], ... , A[pos])
@@ -73,23 +75,29 @@ class BIT:
         return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
     
 class MultiSet:
-    def __init__(self, allVals: "list[int]" ,isSorted: bool = False):
+    def __init__(self, allVals: "list[int]"):
         # print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")
-        self.arr = allVals if isSorted else sorted(allVals)
+        self.arr = sorted(allVals)
         self.bit = BIT(len(allVals))
+        self.elems = {val: 0 for val in allVals}
         self.ammounts = 0
         
     def insert(self, val: int, count: int = 1):
         idx = bisect.bisect_left(self.arr, val)
         self.bit.add(idx, count)
+        self.elems[val] += count
         self.ammounts += count
     
     def delete(self, val: int, count : int = 1):
         k = bisect.bisect_left(self.arr, val)
         self.bit.add(k, -count)
+        self.elems[val] -= count
         self.ammounts -= count
     
-    def deleteNonNegative(self, val: int, count : int = 1):
+    def deleteIgnoreOverSubstract(self, val: int, count : int = 1):
+        '''
+        MultiSetで保持している個数以上の削除を求められたら無視する。
+        '''
         k = bisect.bisect_left(self.arr, val)
         actualSubstractVal = self.bit.deleteNonNegative(k, count)
         self.ammounts -= actualSubstractVal
@@ -100,14 +108,14 @@ class MultiSet:
         小さい方からK番目の値を取得。
         '''
         return self.arr[self.bit.lowerLeft(k + 1)] if 0 <= k < self.ammounts else -INF
-    
+
     def getKthFromLargest(self, k: int) -> int:
         '''getKth
         k : 0-indexed
         大きい方からK番目の値を取得。
         '''
         return self.arr[self.bit.lowerLeft(self.ammounts - k)] if 0 <= k < self.ammounts else -INF
-    
+        
     def countLessThanOrEqualTo(self, val: int) -> int:
         '''
         val以下(≦ val)の要素数を返す。
@@ -126,7 +134,7 @@ class MultiSet:
                  l u
         valより大きい値において、小さい方からk番目の値を取得
         k: 0-indexed
-        (存在しないindexではINFが返る。)
+        (存在しないindexでは-INFが返る。)
         '''
         return self.getKth(self.countLessThanOrEqualTo(val) + k)
 
@@ -136,7 +144,7 @@ class MultiSet:
                  l  u
         val以上の値において、小さい方からk番目の値を取得
         k: 0-indexed
-        (存在しないindexではINFが返る。)
+        (存在しないindexでは-INFが返る。)
         '''
         return self.getKth(self.countUnder(val) + k)
 
@@ -149,28 +157,33 @@ class MultiSet:
         return "[" + ", ".join(f'{self.arr[v]}' for v in res) + "]"
 
 def main():
-    queries = []
-    kinds = set()
     Q = int(input())
+    queries = []
+    L = set()
+
     for _ in range(Q):
-        query = list(map(int, input().split()))
-        queries.append(query)
-        if query[0] == 1 or  query[0] == 2:
-            kinds.add(query[1])
-    ms = MultiSet(kinds, False)
-    for i in range(Q):
-        query = queries[i]
-        if query[0] == 1:
-            x = query[1]
-            ms.insert(x)
-        elif query[0] == 2:
-            x, c = query[1], query[2]
-            ms.deleteNonNegative(x, c)
+        t, *args = map(int, input().split())
+        queries.append((t, args))
+        if t == 1:
+            L.add(args[0])
+
+    # raw_to_compressed = {}
+    # compressed_to_raw = []
+    # for index, val in enumerate(sorted(list(L))):
+    #     raw_to_compressed[val] = index
+    #     compressed_to_raw.append(val)
+    
+    ml = MultiSet(list(L))
+
+    for t, args in queries:
+        if t == 1:
+            ml.insert(args[0], 1)
+        elif t == 2:
+            if args[0] not in ml.elems:
+                continue
+            ml.delete(args[0], min(ml.elems[args[0]], args[1]))
         else:
-            print(ms.getKthFromLargest(0) - ms.getKth(0))
-    return
-
-
+            print(ml.getKthFromLargest(0) - ml.getKth(0))
 
 if __name__ == '__main__':
     main()

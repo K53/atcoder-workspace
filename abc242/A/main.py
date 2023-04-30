@@ -3,14 +3,6 @@ import sys
 
 
 def solve(A: int, B: int, C: int, X: int):
-    if X <= A:
-        print(1)
-        return
-    if X <= B:
-        print(C / (B - (A + 1) + 1))
-        return
-    print(0)
-
     return
 
 

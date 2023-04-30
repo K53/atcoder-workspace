@@ -8,16 +8,20 @@ def print_for_inf_replacable(l, replace_target):
             return ['' if i == replace_target else i for i in l]
     print(_replace(l))
 
-# Usage
-INF = 10 ** 16
-d1 = [1,2,3,4,INF,5,INF,INF]
-print_for_inf_replacable(d1, replace_target=INF) 
-# [1, 2, 3, 4, '', 5, '', '']
+def main():
+    # Usage
+    INF = 10 ** 16
+    d1 = [1,2,3,4,INF,5,INF,INF]
+    print_for_inf_replacable(d1, replace_target=INF) 
+    # [1, 2, 3, 4, '', 5, '', '']
 
-d2 = [d1, d1]
-print_for_inf_replacable(d2, replace_target=INF) 
-# [[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']]
+    d2 = [d1, d1]
+    print_for_inf_replacable(d2, replace_target=INF) 
+    # [[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']]
 
-d3 = [d2, d2]
-print_for_inf_replacable(d3, replace_target=INF) 
-# [[[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']], [[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']]]
+    d3 = [d2, d2]
+    print_for_inf_replacable(d3, replace_target=INF) 
+    # [[[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']], [[1, 2, 3, 4, '', 5, '', ''], [1, 2, 3, 4, '', 5, '', '']]]
+
+if __name__ == '__main__':
+    main()

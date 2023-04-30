@@ -1,66 +1,62 @@
 #!/usr/bin/env python3
+# from functools import cmp_to_key
 import sys
-from functools import cmp_to_key
 input = lambda: sys.stdin.readline().strip()
 N = int(input())
 A = list(map(int, input().split()))
 Q = int(input())
+
+total_kinds = 0
+each_count = [0] * (max(A) + 1)
 queries = []
 for i in range(Q):
     l, r = map(int, input().split())
-    queries.append((l - 1, r, i))
+    queries.append([l - 1, r, i])
 
+sq = int(Q ** 0.5)
+unit = N // sq + 1
+# 
+# |       |       |      |           |
+# | area1 | area2 |      |  area(sq) |
+# |       |       |      |           |
+# +----------------- ... ---------------
+#  <-unit-> 
+# 
+sqrt_divideds = [[] for _ in range(sq + 1)]
+for x, y, i in queries:
+    sqrt_divideds[x // unit].append([x, y, i])
 
-# Mo's Algorithm =============
-sq = Q ** 0.5
-# aがbよりも前に置くなら-1、後ろに置くなら1
-@cmp_to_key
-def _f(a, b):
-    if a[0]//sq != b[0]//sq:
-        if a[0] > b[0]: return 1
-        if a[0] < b[0]: return -1
-        return 0
-    else:
-        if a[0]//sq % 2 == 0:
-            if a[1] > b[1]: return 1
-            if a[1] < b[1]: return -1
-            return 0
-        else:
-            if a[1] > b[1]: return -1
-            if a[1] < b[1]: return 1
-            return 0
+mo_list = []
+for i in range(len(sqrt_divideds)):
+    if i & 1:
+        mo_list += sorted(sqrt_divideds[i], key=lambda x: x[1])[::-1]
+        continue
+    mo_list += sorted(sqrt_divideds[i], key=lambda x: x[1])
     
-lr = sorted(queries, key=_f)
-# print(lr)
-total_pairs = 0
-each_count = [0] * (N + 1)
-
 ans = [-1] * Q
 cur_l, cur_r = 0, 0
 for i in range(Q):
-    ll, rr, idx = lr[i]
-    # print(i, "---", cur_l, ll, cur_r, rr, ":", total_pairs, each_count)
+    ll, rr, idx = mo_list[i]
+    # print(i, "---", cur_l, ll, cur_r, rr)
     while cur_l > ll:
         cur_l -= 1
+        if each_count[A[cur_l]] % 2 != 0:
+            total_kinds += 1
         each_count[A[cur_l]] += 1
-        if each_count[A[cur_l]] % 2 == 0:
-            total_pairs += 1
     while cur_l < ll:
-        if each_count[A[cur_l]] % 2 == 0:
-            total_pairs -= 1
         each_count[A[cur_l]] -= 1
+        if each_count[A[cur_l]] % 2 != 0:
+            total_kinds -= 1
         cur_l += 1
     while cur_r > rr:
         cur_r -= 1
-        if each_count[A[cur_r]] % 2 == 0:
-            total_pairs -= 1
         each_count[A[cur_r]] -= 1
+        if each_count[A[cur_r]] % 2 != 0:
+            total_kinds -= 1
     while cur_r < rr:
-        # print("", total_pairs, each_count)
+        if each_count[A[cur_r]] % 2 != 0:
+            total_kinds += 1
         each_count[A[cur_r]] += 1
-        if each_count[A[cur_r]] % 2 == 0:
-            total_pairs += 1
         cur_r += 1
-    ans[idx] = total_pairs
+    ans[idx] = total_kinds
 print(*ans, sep="\n")
-

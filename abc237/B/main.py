@@ -3,9 +3,6 @@ import sys
 
 
 def solve(H: int, W: int, A: "List[List[int]]"):
-    a = list(zip(*A[::1]))
-    for i in range(W):
-        print(*a[i], sep=" ")
     return
 
 

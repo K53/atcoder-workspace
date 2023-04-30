@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 import sys
+def scheduling(brackets: "list[int, int]", slotsize: int = 1):
+    """
+    brackets: ("end time", "begin time")
+    slotsize: 区間内で重複を許す個数。(一度に並列実行できるタスク数。)
+    """
+    brackets = sorted(brackets)
+    ans = []
+    slots = [-1] * slotsize
+    for end_time, begin_time in brackets:
+        # 開始点の時点で終了しているタスクがスロットに含まれるなら、それを差し替える。
+        already_done_tasks = [s for s in slots if s < begin_time]
+        if len(already_done_tasks) != 0:
+            slots[slots.index(max(already_done_tasks))] = end_time
+            ans.append(begin_time)
+    return ans
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
     l = [(bb, aa) for aa, bb in zip(A, B)]
-    l.sort()
-    now = 0
-    ans = 0
-    for bb, aa in l:
-        if now < aa:
-            now = bb
-            ans += 1
-    print(ans)
+    print(len(scheduling(l)))
     return
 
 

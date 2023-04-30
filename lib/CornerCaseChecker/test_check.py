@@ -25,6 +25,7 @@ def getRandomValuesList(min_val: int, max_val: int, length: int):
         raise Exception(f"min_val ({min_val}) > max_val ({max_val})")
     return [random.randint(min_val, max_val) for _ in range(length)]
 
+
 def testNomalCase1(capfd):
     count = 0
     def _check(*args):
