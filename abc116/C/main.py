@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import sys
-from itertools import groupby
 
 def solve(N: int, h: "List[int]"):
     ans = 0
-    for border in range(max(h)):
-        l = [hh > border for hh in h]
-        grouped = groupby(l)
-        ll = [k for k, _ in grouped]
-        # print(ll)
-        ans += ll.count(True)
+    h.append(0)
+    prv = 0
+    for hh in h:
+        if hh > prv:
+            ans += hh - prv
+        prv = hh
     print(ans)
     return
 

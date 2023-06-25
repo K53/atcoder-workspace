@@ -1,8 +1,48 @@
 #!/usr/bin/env python3
 import sys
-
+from collections import defaultdict
+import heapq
 
 def solve(N: int, K: int, t: "List[int]", d: "List[int]"):
+    l = [(dd, tt - 1) for tt, dd in zip(t, d)]
+    l.sort(reverse=True)
+    x = 0
+    selected = defaultdict(list)
+    cur = 0
+    candidates = []
+    for dd, tt in l[:K]:
+        if len(selected[tt]) == 0:
+            x += 1
+        heapq.heappush(selected[tt], dd)
+        cur += dd
+    cur += x ** 2
+    for dd, tt in l[K:]:
+        if len(selected[tt]) == 0:
+            heapq.heappush(candidates, (-dd, tt))
+
+    ans = cur
+    # print(candidates)
+    # print(ans)
+    for tt in range(N):
+        for _ in range(len(selected[tt]) - 1):
+            dd = heapq.heappop(selected[tt])
+            while True:
+                if len(candidates) == 0:
+                    print(ans)
+                    return
+                new_dd, new_tt = heapq.heappop(candidates)
+                # print(new_dd, new_tt)
+                if len(selected[new_tt]) == 0:
+                    break
+            cur -= dd
+            cur += -new_dd
+            if len(selected[new_tt]) == 0:
+                cur += (x + 1) ** 2 - x ** 2
+                x += 1
+            ans = max(ans, cur)
+            heapq.heappush(selected[new_tt], -new_dd)
+            # print(cur, selected)
+    print(ans)
     return
 
 

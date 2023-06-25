@@ -2,22 +2,7 @@
 import sys
 
 
-def solve(N: int, M: int, A: "List[int]"):
-    cur = sum(A[:M])
-    tot = 0
-    for i in range(M):
-        tot += (i + 1) * A[i]
-    ans = tot
-    
-    for i in range(N - M):
-        tot -= cur
-        tot += A[i + M] * M
-        ans = max(ans, tot)
-
-        cur -= A[i]
-        cur += A[i + M]
-    print(ans)
-
+def solve(N: int, K: int, P: int):
     return
 
 
@@ -29,9 +14,9 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    M = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, M, A)
+    K = int(next(tokens))  # type: int
+    P = int(next(tokens))  # type: int
+    solve(N, K, P)
 
 if __name__ == '__main__':
     main()

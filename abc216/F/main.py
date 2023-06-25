@@ -5,6 +5,24 @@ MOD = 998244353  # type: int
 
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
+    AB = sorted([(aa, bb) for aa, bb in zip(A, B)])
+    mA = max(A) + 1
+    dp = [[0 for _ in range(mA)] for _ in range(N + 1)]
+    dp[0][0] = 1
+    for i in range(N):
+        for num in range(mA):
+            dp[i + 1][num] += dp[i][num]
+            dp[i + 1][num] %= MOD
+            if num + AB[i][1] < mA:
+                dp[i + 1][num + AB[i][1]] += dp[i][num]
+                dp[i + 1][num + AB[i][1]] %= MOD
+    ans = 0
+    for i in range(N):
+        for num in range(mA):
+            if num <= AB[i][0] - AB[i][1]:
+                ans += dp[i][num]
+                ans %= MOD
+    print(ans)
     return
 
 

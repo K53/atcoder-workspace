@@ -2,22 +2,16 @@
 import sys
 
 
-def solve(N: int, M: int, A: "List[int]"):
-    cur = sum(A[:M])
-    tot = 0
-    for i in range(M):
-        tot += (i + 1) * A[i]
-    ans = tot
-    
-    for i in range(N - M):
-        tot -= cur
-        tot += A[i + M] * M
-        ans = max(ans, tot)
-
-        cur -= A[i]
-        cur += A[i + M]
+def solve(N: int, M: int, S: "List[str]"):
+    ans = 0
+    for i in range(N):
+        for j in range(i + 1, N):
+            for num in range(M):
+                if S[i][num] == "x" and S[j][num] == "x":
+                    break
+            else:
+                ans += 1
     print(ans)
-
     return
 
 
@@ -30,8 +24,8 @@ def main():
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
     M = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    solve(N, M, A)
+    S = [next(tokens) for _ in range(N)]  # type: "List[str]"
+    solve(N, M, S)
 
 if __name__ == '__main__':
     main()
