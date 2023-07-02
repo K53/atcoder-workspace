@@ -51,6 +51,10 @@ class Dijkstra():
     #     return
     
     def build(self, startNode: int):
+        """
+        多始点ダイクストラの場合、初期化するdistとヒープを各スタートノード分やってbuildすればいい。
+        これは単一の超頂点をスタートとして与えられた多始点それぞれにコスト0の辺が伸びていたと解釈すれば成立すると分かる。
+        """
         hq = []
         heapq.heapify(hq)
         # Set start info

@@ -56,6 +56,9 @@
 #
 # 計算量
 # 
+# 依存関係
+# EulerTour.py から依存されている
+#
 # verify
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_A&lang=ja # Range Min Query (RMQ)
 # - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_B&lang=ja # Range Sum Query (RSQ)
@@ -207,127 +210,128 @@ class SegTree:
                 rr += 1
         return rr - self.offset
 
-print("#---case1---#")
-# Usage
-N = 8
-# |               0               |
-# |       0       |       0       |
-# |   0   |   0   |   0   |   0   |
-# | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | <- 0~7に対応
+if __name__ == "__main__":
+    print("#---case1---#")
+    # Usage
+    N = 8
+    # |               0               |
+    # |       0       |       0       |
+    # |   0   |   0   |   0   |   0   |
+    # | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | <- 0~7に対応
 
-# モノイド
-monoid = 0
+    # モノイド
+    monoid = 0
 
-# 利用する関数を定義
-def add(A: int, B: int):
-    return A + B
+    # 利用する関数を定義
+    def add(A: int, B: int):
+        return A + B
 
-# 配列の初期化とビルド
-seg = SegTree(monoid, [0, 1, 4, 9, 2, 5, 3, 1], add)
-print(seg.tree) # [0, 25, 14, 11, 1, 13, 7, 4, 0, 1, 4, 9, 2, 5, 3, 1]
+    # 配列の初期化とビルド
+    seg = SegTree(monoid, [0, 1, 4, 9, 2, 5, 3, 1], add)
+    print(seg.tree) # [0, 25, 14, 11, 1, 13, 7, 4, 0, 1, 4, 9, 2, 5, 3, 1]
 
-# |              25               | = seg.tree[1] ※ index0は使用しない。
-# |      14       |      11       |
-# |   1   |  13   |   7   |   4   |
-# | 0 | 1 | 4 | 9 | 2 | 5 | 3 | 1 | <- 0~7に対応
+    # |              25               | = seg.tree[1] ※ index0は使用しない。
+    # |      14       |      11       |
+    # |   1   |  13   |   7   |   4   |
+    # | 0 | 1 | 4 | 9 | 2 | 5 | 3 | 1 | <- 0~7に対応
 
-seg.pointAdd(3 - 1, 10) # 3番目に10を加える。
-print(seg.tree) # [0, 35, 24, 11, 1, 23, 7, 4, 0, 1, 14, 9, 2, 5, 3, 1]
+    seg.pointAdd(3 - 1, 10) # 3番目に10を加える。
+    print(seg.tree) # [0, 35, 24, 11, 1, 23, 7, 4, 0, 1, 14, 9, 2, 5, 3, 1]
 
-# |              35               |
-# |      24       |      11       |
-# |   1   |  23   |   7   |   4   |
-# | 0 | 1 | 14| 9 | 2 | 5 | 3 | 1 |
+    # |              35               |
+    # |      24       |      11       |
+    # |   1   |  23   |   7   |   4   |
+    # | 0 | 1 | 14| 9 | 2 | 5 | 3 | 1 |
 
-seg.pointUpdate(7 - 1, 1) # 7番目を1に変更する。
-print(seg.tree) # [0, 33, 24, 9, 1, 23, 7, 2, 0, 1, 14, 9, 2, 5, 1, 1]
+    seg.pointUpdate(7 - 1, 1) # 7番目を1に変更する。
+    print(seg.tree) # [0, 33, 24, 9, 1, 23, 7, 2, 0, 1, 14, 9, 2, 5, 1, 1]
 
-num = seg.getRange(1, 6 + 1) # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
-print(num) # [0, <<<1, 14, 9, 2, 5, 1>>>, 1] -> 1 + 14 + 9 + 2 + 5 + 1 = 32
-
-
-# =====================================================
-#     case2
-# =====================================================
-print("#---case2---#")
-N = 6
-
-# モノイド
-monoid = 0
-
-# 利用する関数を定義
-def add(A: int, B: int):
-    return A + B
-
-# 配列の初期化とビルド
-seg = SegTree(monoid, [0, 1, 4, 9, 2, 5], add)
-
-print(seg.tree) # [0, 21, 20, 1, 13, 7, 0, 1, 4, 9, 2, 5]
-
-# |           21          | = seg.tree[1] ※ index0は使用しない。
-# |      20       |   1   |
-# |  13   |   7   | 0 | 1 |  <- 0 ~ 5
-# | 4 | 9 | 2 | 5 |          <- に対応
-
-print(seg.getRange(0, 2 + 1)) # 5 = 0 + 1 + 4
-exit()
-
-# セグ木の二分探索 (セグ木外)
-
-# eg) 左端からの累積和が5以下を満たす最大の要素を取り出したい。
-# True ------ ok | ng ---- False
-def is_ok(k: int, threshold: int):
-    return seg.getRange(0, k + 1) <= threshold   # 条件式
-
-def binSearch(ok: int, ng: int, threshold: int):
-    # print(ok, ng)              # はじめの2値の状態
-    while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
-        mid = (ok + ng) // 2
-        # print("target > ", mid)
-        result = is_ok(mid, threshold)
-        # print(result)
-        if result:
-            ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
-        else:
-            ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
-        # print(ok, ng)          # 半分に切り分ける毎の2値の状態
-    return ok    # 関数呼び出し時の引数のngは絶対評価されないのでngに書く値が答えになりうるならその数マイナス1を指定する。
-
-threshold = 5
-ans = binSearch(0, N + 1, threshold)
-print(ans) # 2 ->  [0, 1, "4", 9, 2, 5]
-
-# セグ木上の二分探索
-print("#---case3---#")
-
-# モノイド
-monoid = 0
-
-N = 5
-
-# 利用する関数を定義
-def add(A: int, B: int):
-    return A + B
-
-# 配列の初期化とビルド
-seg = SegTree(monoid, [0, 1, 0, 1, 2, 0, 0, 0], add) # 2べきになるように末尾にモノイドを追加
-
-print(seg.tree) # [0, 4, 2, 2, 1, 1, 2, 0, 0, 1, 0, 1, 2, 0, 0, 0]
-
-# |               4               | = seg.tree[1] ※ index0は使用しない。
-# |       2       |       2       |
-# |   1   |   1   |   2   |   0   |
-# | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | <- 0~7に対応
-
-# ng側が返るので注意。 K番目の要素算出では x < K とすることでng側が答えになる。
-print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
-print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
-print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
-print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
+    num = seg.getRange(1, 6 + 1) # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
+    print(num) # [0, <<<1, 14, 9, 2, 5, 1>>>, 1] -> 1 + 14 + 9 + 2 + 5 + 1 = 32
 
 
-print(seg.min_left(-1, lambda x: x < 1)) # 4
-print(seg.min_left(-1, lambda x: x < 2)) # 4
-print(seg.min_left(-1, lambda x: x < 3)) # 3
-print(seg.min_left(-1, lambda x: x < 4)) # 1
+    # =====================================================
+    #     case2
+    # =====================================================
+    print("#---case2---#")
+    N = 6
+
+    # モノイド
+    monoid = 0
+
+    # 利用する関数を定義
+    def add(A: int, B: int):
+        return A + B
+
+    # 配列の初期化とビルド
+    seg = SegTree(monoid, [0, 1, 4, 9, 2, 5], add)
+
+    print(seg.tree) # [0, 21, 20, 1, 13, 7, 0, 1, 4, 9, 2, 5]
+
+    # |           21          | = seg.tree[1] ※ index0は使用しない。
+    # |      20       |   1   |
+    # |  13   |   7   | 0 | 1 |  <- 0 ~ 5
+    # | 4 | 9 | 2 | 5 |          <- に対応
+
+    print(seg.getRange(0, 2 + 1)) # 5 = 0 + 1 + 4
+    exit()
+
+    # セグ木の二分探索 (セグ木外)
+
+    # eg) 左端からの累積和が5以下を満たす最大の要素を取り出したい。
+    # True ------ ok | ng ---- False
+    def is_ok(k: int, threshold: int):
+        return seg.getRange(0, k + 1) <= threshold   # 条件式
+
+    def binSearch(ok: int, ng: int, threshold: int):
+        # print(ok, ng)              # はじめの2値の状態
+        while abs(ok - ng) > 1:     # 終了条件（差が1となり境界を見つけた時)
+            mid = (ok + ng) // 2
+            # print("target > ", mid)
+            result = is_ok(mid, threshold)
+            # print(result)
+            if result:
+                ok = mid            # midが条件を満たすならmidまではokなのでokの方を真ん中まで持っていく
+            else:
+                ng = mid            # midが条件を満たさないならmidまではngなのでngの方を真ん中まで持っていく
+            # print(ok, ng)          # 半分に切り分ける毎の2値の状態
+        return ok    # 関数呼び出し時の引数のngは絶対評価されないのでngに書く値が答えになりうるならその数マイナス1を指定する。
+
+    threshold = 5
+    ans = binSearch(0, N + 1, threshold)
+    print(ans) # 2 ->  [0, 1, "4", 9, 2, 5]
+
+    # セグ木上の二分探索
+    print("#---case3---#")
+
+    # モノイド
+    monoid = 0
+
+    N = 5
+
+    # 利用する関数を定義
+    def add(A: int, B: int):
+        return A + B
+
+    # 配列の初期化とビルド
+    seg = SegTree(monoid, [0, 1, 0, 1, 2, 0, 0, 0], add) # 2べきになるように末尾にモノイドを追加
+
+    print(seg.tree) # [0, 4, 2, 2, 1, 1, 2, 0, 0, 1, 0, 1, 2, 0, 0, 0]
+
+    # |               4               | = seg.tree[1] ※ index0は使用しない。
+    # |       2       |       2       |
+    # |   1   |   1   |   2   |   0   |
+    # | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | <- 0~7に対応
+
+    # ng側が返るので注意。 K番目の要素算出では x < K とすることでng側が答えになる。
+    print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
+    print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
+    print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
+    print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
+
+
+    print(seg.min_left(-1, lambda x: x < 1)) # 4
+    print(seg.min_left(-1, lambda x: x < 2)) # 4
+    print(seg.min_left(-1, lambda x: x < 3)) # 3
+    print(seg.min_left(-1, lambda x: x < 4)) # 1
 
