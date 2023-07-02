@@ -1,25 +1,115 @@
 #!/usr/bin/env python3
 import sys
-sys.setrecursionlimit(10 ** 9)
+INF = 10 ** 16
+
+class EulerTour():
+    def __init__(self, N: int, rootNode: int, vertexCosts: "list[int]" = None) -> None:
+        self.N = N
+        self.G = [[] for _ in range(self.N)]
+        self.vertexCosts = vertexCosts if vertexCosts != None else [0] * self.N
+        self.rootNode = rootNode
+
+        self.eulerTourPath = []         # オイラーツアーパス
+        self.eulerTourDepth = []        # オイラーツアーの各ノードの深さの遷移
+        self.vertexCostsPosOnly = []    # ノードを遡上する際にコストを減算しない
+        self.vertexCostsPosAndNeg = []  # ノードを遡上する際にコストを減算する
+        self.edgeCostsPosOnly = []       # 辺を遡上する際にコストを減算しない
+        self.edgeCostsPosAndNeg = []     # 辺を遡上する際にコストを減算する
+
+        self.parent = [None] * self.N   # 各ノードの親ノード番号
+        self.nodeDepth = [-1] * self.N  # 各ノードの根からの深さ (0-indexed)
+        
+        # nodeIn/nodeOut
+        self.nodeIn = [-1] * self.N     # nodeIn[i]  := 根から何ステップでノードiに到着するか (nodeInとnodeOut合算してナンバリング)
+        self.nodeOut = [-1] * self.N    # nodeOut[i] := 根から何ステップでノードiを出発するか (nodeInとnodeOut合算してナンバリング)
+        
+        # self.usedPreorder = [False] * self.N
+        # self.preorder = []
+        # self.postordercnt = [-1] * self.N
+        # self.postorder = []
+
+        # SegTree
+        self.lcaSeg = None # LCA用
+        self.vertexPosSumSeg = None # 部分木用(ノード)
+        self.edgePosSumSeg = None # 部分木用(辺)
+        self.vertexAllSumSeg = None # パスクエリ用(ノード)
+        self.edgeAllSumSeg = None # パスクエリ用(辺)
+
+    # 辺の追加
+    def addEdge(self, fromNode: int, toNode: int, cost: int):
+        self.G[fromNode].append((toNode, cost))
+        return
+
+    def build(self):
+        """
+        O(V + E)
+        """
+        curStep = 0
+        # q: nodenum, depth, vcost, ecost
+        q = [(self.rootNode, 0, 0, self.vertexCosts[self.rootNode])]
+        while len(q) > 0:
+            curNode, curdepth, vcost, ecost = q.pop()
+            # 行きがけ処理
+            if curNode >= 0:
+                if self.nodeIn[curNode] == -1:
+                    self.nodeIn[curNode] = curStep
+                self.nodeDepth[curNode] = curdepth
+                self.eulerTourDepth.append(curdepth)
+                self.eulerTourPath.append(curNode)
+                self.edgeCostsPosOnly.append(vcost)
+                self.edgeCostsPosAndNeg.append(vcost)
+                self.vertexCostsPosOnly.append(ecost)
+                self.vertexCostsPosAndNeg.append(ecost)
+
+                # 葉である場合は帰りがけの処理もする
+                if len(self.G[curNode]) == 1:
+                    self.nodeOut[curNode] = curStep + 1
+                
+                for nextnode, nextvcost in self.G[curNode][::-1]:
+                    # if nextnode == self.parent[nextnode]: continue
+                    # print("! ", nextnode, vcost)
+                    if self.nodeDepth[nextnode] != -1:
+                        continue
+                    q.append((~curNode, curdepth, nextvcost, -self.vertexCosts[nextnode]))
+                    q.append((nextnode, curdepth + 1, nextvcost, self.vertexCosts[nextnode]))
+                    self.parent[nextnode] = curNode
+            
+            # 帰りがけ処理
+            else:
+                curNode = ~curNode
+                if self.nodeIn[curNode] == -1:
+                    self.nodeIn[curNode] = curStep
+                self.eulerTourPath.append(curNode)
+                self.edgeCostsPosOnly.append(0)
+                self.edgeCostsPosAndNeg.append(-vcost)
+                self.vertexCostsPosOnly.append(0)
+                self.vertexCostsPosAndNeg.append(ecost)
+                self.eulerTourDepth.append(curdepth)
+                self.nodeOut[curNode] = curStep + 1
+
+            # 次のStepへ
+            curStep += 1
+
+        # 最後の調整
+        self.vertexCostsPosOnly.append(0)
+        self.vertexCostsPosAndNeg.append(-self.vertexCosts[self.rootNode])
+        self.edgeCostsPosOnly.append(0)
+        self.edgeCostsPosAndNeg.append(0)
+
 
 def solve(N: int, A: "List[int]", B: "List[int]"):
-    G = [[] for _ in range(N)]
+    er = EulerTour(N, 0)
     for aa, bb in zip(A, B):
-        G[aa - 1].append(bb - 1)
-        G[bb - 1].append(aa - 1)
+        er.addEdge(aa - 1, bb - 1, 0)
+        er.addEdge(bb - 1, aa - 1, 0)
+    
     for i in range(N):
-        G[i].sort()
-    eularTourNodes_pattarnA = []
-    def getEularTourNodes(now: int, pre: int = -1):
-        eularTourNodes_pattarnA.append(now + 1) 
-        for next in G[now]:
-            if next == pre:
-                continue
-            getEularTourNodes(next, now) 
-            eularTourNodes_pattarnA.append(now + 1)
-        return
-    getEularTourNodes(0)
-    print(*eularTourNodes_pattarnA)
+        er.G[i].sort()
+    er.build()
+    ans = []
+    for i in er.eulerTourPath:
+        ans.append(i + 1)
+    print(*ans)
     return
 
 

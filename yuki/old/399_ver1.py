@@ -121,14 +121,15 @@ def main():
         imos[a - 1] += 1
         imos[b - 1] += 1
         lc = ld.getLca(a - 1, b - 1)
-        imos[lc] -= 2
-    print(imos)
+        imos[lc] -= 1 # 辺に加算したいならimos[lc] -= 2としてp_lcの処理はいらない。
+        p_lc = ld.upstream(lc, 1)
+        if p_lc != -1:
+            imos[p_lc] -= 1
     dfs(-1, 0)
-    print(imos)
-    # ans = 0
-    # for num in imos:
-    #     ans += num * (num + 1) // 2
-    # print(ans)
+    ans = 0
+    for num in imos:
+        ans += num * (num + 1) // 2
+    print(ans)
     return
         
 if __name__ == '__main__':

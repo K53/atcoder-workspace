@@ -1,8 +1,27 @@
 #!/usr/bin/env python3
 import sys
 
+def calc(num):
+    tmp = 0
+    if len(num) > 0:
+        tmp = 2 - len(num)
+        for i in num:
+            tmp += 10 - int(i)
+    return tmp
 
 def solve(N: str):
+    num = []
+    ans = 0
+    for ss in N:
+        if int(ss) <= 5:
+            ans += int(ss)
+            ans += calc(num)
+            num = []
+        else:
+            num.append(ss)
+
+    ans += calc(num)
+    print(ans)
     return
 
 
