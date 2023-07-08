@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 import sys
-import bisect
 
-def solve(N: int, Q: int, A: "List[int]", x: "List[int]"):
-    A.sort()
-    for i in range(Q):
-        idx = bisect.bisect_left(A, x[i])
-        print(N - idx)
+MOD = 998244353  # type: int
+
+
+def solve(N: int, S: "List[str]"):
     return
 
 
@@ -18,10 +16,8 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    Q = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
-    x = [int(next(tokens)) for _ in range(Q)]  # type: "List[int]"
-    solve(N, Q, A, x)
+    S = [next(tokens) for _ in range(N)]  # type: "List[str]"
+    solve(N, S)
 
 if __name__ == '__main__':
     main()

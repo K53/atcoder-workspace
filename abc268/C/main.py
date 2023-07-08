@@ -7,6 +7,7 @@ def solve(N: int, p: "List[int]"):
         c[(p[i] - 1 - i) % N] += 1
         c[(p[i] - i) % N] += 1
         c[(p[i] + 1 - i) % N] += 1
+        print(c)
         # print((p[i] - 1 - i) % N)
         # print((p[i] - i) % N)
         # print((p[i] + 1 - i) % N)

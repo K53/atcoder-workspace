@@ -3,7 +3,6 @@ import sys
 
 
 def solve(A: int, B: int, C: int, D: int, E: int):
-    print(len({i for i in [A, B, C, D, E]}))
     return
 
 

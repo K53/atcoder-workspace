@@ -6,14 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(S: str, T: str):
-    if len(S) > len(T):
-        print(NO)
-        return
-    for i in range(len(S)):
-        if S[i] != T[i]:
-            print(NO)
-            return
-    print(YES)
     return
 
 

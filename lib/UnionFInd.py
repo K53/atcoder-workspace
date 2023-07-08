@@ -80,8 +80,10 @@ class UnionFind():
         """
         return len(self.roots())
 
-    def all_group_members(self):
+    def all_group_members(self) -> dict:
         """ 全集合の要素一覧を取得。
+        key : 根 (int)
+        value : 要素ノード (list[int])
         計算量 : O(N)
         """
         group_members = defaultdict(list)
