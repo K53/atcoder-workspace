@@ -3,6 +3,11 @@ import sys
 
 
 def solve(S: str, a: int, b: int):
+    S = list(S)
+    a -= 1
+    b -= 1
+    S[a], S[b] = S[b], S[a]
+    print(*S, sep="")
     return
 
 

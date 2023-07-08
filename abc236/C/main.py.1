@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 import sys
-from collections import Counter
 
-def solve(N: int, A: "List[int]"):
-    d = Counter(A)
-    for k, v in d.items():
-        if v == 3:
-            print(k)
-            return
+YES = "Yes"  # type: str
+NO = "No"  # type: str
+
+
+def solve(N: int, M: int, S: "List[str]", T: "List[str]"):
+    T = set(T)
+    for ss in S:
+        if ss in T:
+            print(YES)
+        else:
+            print(NO)
     return
 
 
@@ -19,8 +23,10 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(4 * N - 1)]  # type: "List[int]"
-    solve(N, A)
+    M = int(next(tokens))  # type: int
+    S = [next(tokens) for _ in range(N)]  # type: "List[str]"
+    T = [next(tokens) for _ in range(M)]  # type: "List[str]"
+    solve(N, M, S, T)
 
 if __name__ == '__main__':
     main()

@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 import sys
-from collections import Counter
+
 
 def solve(N: int, A: "List[int]"):
-    d = Counter(A)
-    for k, v in d.items():
-        if v == 3:
-            print(k)
-            return
     return
 
 
@@ -19,7 +14,7 @@ def main():
                 yield word
     tokens = iterate_tokens()
     N = int(next(tokens))  # type: int
-    A = [int(next(tokens)) for _ in range(4 * N - 1)]  # type: "List[int]"
+    A = [int(next(tokens)) for _ in range(N)]  # type: "List[int]"
     solve(N, A)
 
 if __name__ == '__main__':

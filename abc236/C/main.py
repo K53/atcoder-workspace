@@ -8,10 +8,7 @@ NO = "No"  # type: str
 def solve(N: int, M: int, S: "List[str]", T: "List[str]"):
     T = set(T)
     for ss in S:
-        if ss in T:
-            print(YES)
-        else:
-            print(NO)
+        print(YES if ss in T else NO)
     return
 
 
