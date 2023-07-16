@@ -76,21 +76,14 @@ class SegTree:
         print("index0 は使用されない。常にdefault値")
         self.monoid = monoid
         self.func = func
-        if convertLengthToThePowerOf2:
-            self.actualLen = len(bottomList)
-            self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
-            self.offset = self.bottomLen       # セグ木の最下層の最初のインデックスに合わせるためのオフセット
-            self.segLen = self.bottomLen * 2
-            self.tree = [monoid] * self.segLen
-        else:
-            self.actualLen = len(bottomList)
-            self.bottomLen = len(bottomList)
-            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
-            self.segLen = self.bottomLen * 2
-            self.tree = [monoid] * self.segLen
-            self.isLogging = isLogging
-            if self.isLogging:
-                self.logtree = [len(str(monoid)) + 2] * self.segLen
+        self.bottomLen = self._getSegLenOfThePowerOf2(len(bottomList)) if convertLengthToThePowerOf2 else len(bottomList)
+        self.actualLen = len(bottomList)
+        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+        self.segLen = self.bottomLen * 2
+        self.tree = [monoid] * self.segLen
+        self.isLogging = isLogging
+        if self.isLogging:
+            self.logtree = [len(str(monoid)) + 2] * self.segLen
         self._build(bottomList)
 
     def _build(self, seq):
@@ -121,7 +114,7 @@ class SegTree:
             res.append("|")
         return "".join(res)
 
-    def getSegLenOfThePowerOf2(self, ln: int):
+    def _getSegLenOfThePowerOf2(self, ln: int):
         """
         直近の2べきの長さを算出
         """
@@ -130,7 +123,7 @@ class SegTree:
         else:    
             import math
             decimalPart, integerPart = math.modf(math.log2(ln))
-            return 2 ** (int(integerPart) + 1)
+            return 2 ** (int(integerPart) + (0 if decimalPart == float(0) else 1))
 
     def pointAdd(self, i: int, val: int):
         """
@@ -224,7 +217,7 @@ class SegTree:
         ※ セグ木上の二分探索をする場合は2べきにすること。
         # !!!! ng側が返却される !!!!!
         """
-        print("セグ木上の二分探索をする場合は2べきにすること。")
+        print("セグ木上の二分探索をする場合は2べきにすること。 convertLengthToThePowerOf2=True")
         l += self.offset
         idx = l // (l & -l) # lから始まる最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
         ans = self.monoid
@@ -245,7 +238,7 @@ class SegTree:
             if is_ok(self.func(ans, self.tree[idx])): # 条件を満たすなら同一階層の右側のセグメントの下層(左側)へ。満たさないならそのまま下層(左側)へ。
                 ans = self.func(ans, self.tree[idx])
                 idx += 1
-        return idx - self.offset - 1 # ng側が返る?
+        return idx - self.offset - 1
 
 
     # 未検証
@@ -366,7 +359,7 @@ if __name__ == "__main__":
     # → セグ木のindexを各値に対応させてそれが何個あるかを数える。
 
     # 配列の初期化とビルド
-    seg = SegTree(monoid=0, bottomList=[0, 1, 0, 1, 2, 0, 0, 0], func=(lambda A, B: A + B), isLogging=True) # 2べきになるように末尾にモノイドを追加
+    seg = SegTree(monoid=0, bottomList=[0, 1, 0, 1, 2], func=(lambda A, B: A + B), isLogging=True, convertLengthToThePowerOf2=True) # 2べきになるように末尾にモノイドを追加
 
     print(seg)
     # |               4               | = seg.tree[1] ※ index0は使用しない。
@@ -379,10 +372,10 @@ if __name__ == "__main__":
     # print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
     # print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
     # print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
-    print(seg.max_right_v2(0, lambda x: x < 1) + 1) # 1番目の要素 → 1
-    print(seg.max_right_v2(0, lambda x: x < 2) + 1) # 2番目の要素 → 3
-    print(seg.max_right_v2(0, lambda x: x < 3) + 1) # 3番目の要素 → 4
-    print(seg.max_right_v2(0, lambda x: x < 4) + 1) # 4番目の要素 → 4
+    print(seg.max_right(0, lambda x: x < 1) + 1) # 1番目の要素 → 1
+    print(seg.max_right(0, lambda x: x < 2) + 1) # 2番目の要素 → 3
+    print(seg.max_right(0, lambda x: x < 3) + 1) # 3番目の要素 → 4
+    print(seg.max_right(0, lambda x: x < 4) + 1) # 4番目の要素 → 4
 
 
     # print(seg.min_left(-1, lambda x: x < 1)) # 4
