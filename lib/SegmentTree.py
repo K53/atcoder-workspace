@@ -43,7 +43,7 @@
 # 右も同様に考える(ただし、rは含まないので注意)ことで、奇数(右の部屋)なら左に進んでからその値を取って、真上の階へ(繰り返すが、rは含まないのでこれでいい)
 # 偶数ならそのまま真上に進む。
 # ※ ここでrはどうやっても真上の部屋にしか進まないことがわかる!!!
-# → lは真上か右上の部屋兵器売るがrは真上なのでクロスしてしまうことがあり得ないと言える。
+# → lは真上か右上の部屋へ行き得るがrは真上なのでクロスしてしまうことがあり得ないと言える。
 # → よって、この操作を行うのは l < r が成り立つ間だけ。もっと言えば(l == r)になったら終了。
 #
 # ================================================================================================================
@@ -72,14 +72,14 @@
 # ------------------------------------------------------------------------------
 
 class SegTree:
-    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", convertLengthToThePowerOf2: bool = False):
+    def __init__(self, monoid: int, bottomList: "list[int]", func: "function", isLogging: bool = False, convertLengthToThePowerOf2: bool = False):
         print("index0 は使用されない。常にdefault値")
         self.monoid = monoid
         self.func = func
         if convertLengthToThePowerOf2:
             self.actualLen = len(bottomList)
             self.bottomLen = self.getSegLenOfThePowerOf2(len(bottomList))
-            self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+            self.offset = self.bottomLen       # セグ木の最下層の最初のインデックスに合わせるためのオフセット
             self.segLen = self.bottomLen * 2
             self.tree = [monoid] * self.segLen
         else:
@@ -88,6 +88,9 @@ class SegTree:
             self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
             self.segLen = self.bottomLen * 2
             self.tree = [monoid] * self.segLen
+            self.isLogging = isLogging
+            if self.isLogging:
+                self.logtree = [len(str(monoid)) + 2] * self.segLen
         self._build(bottomList)
 
     def _build(self, seq):
@@ -98,9 +101,25 @@ class SegTree:
         # 最下段の初期化
         for i, x in enumerate(seq, self.offset):
             self.tree[i] = x
+            if self.isLogging:
+                self.logtree[i] = len(str(x)) + 2
         # ビルド
         for i in range(self.offset - 1, 0, -1):
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
+
+    def __str__(self) -> str:
+        if not self.isLogging:
+            return "[" + ", ".join([str(i) for i in seg.tree]) + "]"
+        
+        res = ["|"]
+        for i in range(1, self.segLen):
+            if i in set([2, 4, 8, 16, 32]):
+                res.append("\n|")
+            res.append(str(self.tree[i]).center(self.logtree[i], " "))
+            res.append("|")
+        return "".join(res)
 
     def getSegLenOfThePowerOf2(self, ln: int):
         """
@@ -120,10 +139,14 @@ class SegTree:
         """
         i += self.offset
         self.tree[i] += val
+        if self.isLogging:
+            self.logtree[i] = len(str(self.tree[i])) + 2
         # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
         while i > 1:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
 
     def pointUpdate(self, i: int, val: int):
         """
@@ -132,9 +155,13 @@ class SegTree:
         """
         i += self.offset
         self.tree[i] = val
+        if self.isLogging:
+            self.logtree[i] = len(str(self.tree[i])) + 2
         while i > 1:
             i >>= 1 # 2で割って頂点に達するまで下層から遡上
             self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
 
     def getRange(self, l: int, r: int):
         """
@@ -165,6 +192,31 @@ class SegTree:
         i += self.offset
         return self.tree[i]
 
+    # def max_right(self, l, is_ok: "function"):
+    #     """
+    #     二分探索
+    #     O(log(self.bottomLen))
+    #     ※ セグ木上の二分探索をする場合は2べきにすること。
+    #     # !!!! ng側が返却される !!!!!
+    #     """
+    #     print("セグ木上の二分探索をする場合は2べきにすること。")
+    #     l += self.offset
+    #     ll = l // (l & -l) # lから始まる最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+    #     ans = self.monoid
+    #     while is_ok(self.func(ans, self.tree[ll])): # そのセグメントが条件を満たすかどうかの判定
+    #         ans = self.func(ans, self.tree[ll])
+    #         ll += 1
+    #         while ~ll & 1: # llの反転 ~ll = -(ll+1)
+    #             ll >>= 1 # lから始まる最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+    #         if ll == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+    #             return self.actualLen
+    #     while ll < self.offset:
+    #         ll <<= 1 # 一階層下のセグメントへ移動 (=2倍)
+    #         if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
+    #             ans = self.func(ans, self.tree[ll])
+    #             ll += 1
+    #     return ll - self.offset # ng側が返る
+
     def max_right(self, l, is_ok: "function"):
         """
         二分探索
@@ -174,21 +226,27 @@ class SegTree:
         """
         print("セグ木上の二分探索をする場合は2べきにすること。")
         l += self.offset
-        ll = l // (l & -l) # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+        idx = l // (l & -l) # lから始まる最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
         ans = self.monoid
-        while is_ok(self.func(ans, self.tree[ll])): # そのセグメントが条件を満たすかどうかの判定
-            ans = self.func(ans, self.tree[ll])
-            ll += 1
-            while ~ll & 1: # llの反転 ~ll = -(ll+1)
-                ll >>= 1 # lから始まる含む最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
-            if ll == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+        while is_ok(self.func(ans, self.tree[idx])): # そのセグメントが条件を満たすかどうかの判定
+            # 条件を満たす限り上へとより範囲を広げていく。
+            ans = self.func(ans, self.tree[idx])
+            idx += 1
+            idx //= (idx & -idx) 
+            if idx == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
                 return self.actualLen
-        while ll < self.offset:
-            ll <<= 1 # 一階層下のセグメントへ移動 (=2倍)
-            if is_ok(self.func(ans, self.tree[ll])): # 条件を満たすなら同一階層の隣のセグメントの下層へ。満たさないならそのまま下層へ。
-                ans = self.func(ans, self.tree[ll])
-                ll += 1
-        return ll - self.offset # ng側が返る
+        while idx < self.offset:
+            # 下へと降りていき境界値を見つける。
+            idx <<= 1 # 一階層下のセグメント(左側)へ移動 (=2倍)
+            #
+            # |           idx           |
+            # |   idx<<1   | idx<<1 + 1 |
+            #
+            if is_ok(self.func(ans, self.tree[idx])): # 条件を満たすなら同一階層の右側のセグメントの下層(左側)へ。満たさないならそのまま下層(左側)へ。
+                ans = self.func(ans, self.tree[idx])
+                idx += 1
+        return idx - self.offset - 1 # ng側が返る?
+
 
     # 未検証
     def min_left(self, r, is_ok):
@@ -210,73 +268,69 @@ class SegTree:
                 rr += 1
         return rr - self.offset
 
+# Usage
 if __name__ == "__main__":
-    print("#---case1---#")
-    # Usage
+    print("# =====================================================")
+    print("#     case1")
+    print("# =====================================================")
     N = 8
     # |               0               |
     # |       0       |       0       |
     # |   0   |   0   |   0   |   0   |
     # | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | <- 0~7に対応
 
-    # モノイド
-    monoid = 0
-
     # 利用する関数を定義
     def add(A: int, B: int):
         return A + B
 
     # 配列の初期化とビルド
-    seg = SegTree(monoid, [0, 1, 4, 9, 2, 5, 3, 1], add)
+    seg = SegTree(monoid=0, bottomList=[0, 1, 4, 9, 2, 5, 3, 1], func=add, isLogging=True)
     print(seg.tree) # [0, 25, 14, 11, 1, 13, 7, 4, 0, 1, 4, 9, 2, 5, 3, 1]
-
-    # |              25               | = seg.tree[1] ※ index0は使用しない。
-    # |      14       |      11       |
-    # |   1   |  13   |   7   |   4   |
+    print(seg)
+    # |               25              | = seg.tree[1] ※ index0は使用しない。
+    # |       14      |       11      |
+    # |   1   |   13  |   7   |   4   |
     # | 0 | 1 | 4 | 9 | 2 | 5 | 3 | 1 | <- 0~7に対応
 
     seg.pointAdd(3 - 1, 10) # 3番目に10を加える。
-    print(seg.tree) # [0, 35, 24, 11, 1, 23, 7, 4, 0, 1, 14, 9, 2, 5, 3, 1]
-
+    print()
+    print("■ 3番目に10を加える。")
+    print(seg)
     # |              35               |
     # |      24       |      11       |
     # |   1   |  23   |   7   |   4   |
     # | 0 | 1 | 14| 9 | 2 | 5 | 3 | 1 |
 
     seg.pointUpdate(7 - 1, 1) # 7番目を1に変更する。
-    print(seg.tree) # [0, 33, 24, 9, 1, 23, 7, 2, 0, 1, 14, 9, 2, 5, 1, 1]
+    print()
+    print("■ 7番目を1に変更する。")
+    print(seg)
 
-    num = seg.getRange(1, 6 + 1) # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
-    print(num) # [0, <<<1, 14, 9, 2, 5, 1>>>, 1] -> 1 + 14 + 9 + 2 + 5 + 1 = 32
+    # 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。
+    print()
+    print("■ 1〜6番目までの要素の演算結果(func)を取得。右端を含まない。")
+    print(seg.getRange(1, 6 + 1))
+    print(seg)
+    print("     <---------------------->")
 
-
-    # =====================================================
-    #     case2
-    # =====================================================
-    print("#---case2---#")
+    print("# =====================================================")
+    print("#     case2")
+    print("# =====================================================")
     N = 6
 
-    # モノイド
-    monoid = 0
-
-    # 利用する関数を定義
-    def add(A: int, B: int):
-        return A + B
-
     # 配列の初期化とビルド
-    seg = SegTree(monoid, [0, 1, 4, 9, 2, 5], add)
+    seg = SegTree(monoid=0, bottomList=[0, 1, 4, 9, 2, 5], func=(lambda A, B: A + B), isLogging=True)
 
-    print(seg.tree) # [0, 21, 20, 1, 13, 7, 0, 1, 4, 9, 2, 5]
-
+    print(seg)
     # |           21          | = seg.tree[1] ※ index0は使用しない。
     # |      20       |   1   |
     # |  13   |   7   | 0 | 1 |  <- 0 ~ 5
     # | 4 | 9 | 2 | 5 |          <- に対応
 
     print(seg.getRange(0, 2 + 1)) # 5 = 0 + 1 + 4
-    exit()
-
+    print()
     # セグ木の二分探索 (セグ木外)
+    print("セグ木の外で二分探索する ===================================")
 
     # eg) 左端からの累積和が5以下を満たす最大の要素を取り出したい。
     # True ------ ok | ng ---- False
@@ -302,36 +356,37 @@ if __name__ == "__main__":
     print(ans) # 2 ->  [0, 1, "4", 9, 2, 5]
 
     # セグ木上の二分探索
-    print("#---case3---#")
-
-    # モノイド
-    monoid = 0
-
+    print("# =====================================================")
+    print("#     case3")
+    print("数字の集合S(重複を許容)に数値iを追加削除するクエリ、小さい方からK番目の値を出力するクエリが与えられる。")
+    print("# =====================================================")
     N = 5
 
-    # 利用する関数を定義
-    def add(A: int, B: int):
-        return A + B
+    # 例題 : [1, 3, 4, 4]の場合。
+    # → セグ木のindexを各値に対応させてそれが何個あるかを数える。
 
     # 配列の初期化とビルド
-    seg = SegTree(monoid, [0, 1, 0, 1, 2, 0, 0, 0], add) # 2べきになるように末尾にモノイドを追加
+    seg = SegTree(monoid=0, bottomList=[0, 1, 0, 1, 2, 0, 0, 0], func=(lambda A, B: A + B), isLogging=True) # 2べきになるように末尾にモノイドを追加
 
-    print(seg.tree) # [0, 4, 2, 2, 1, 1, 2, 0, 0, 1, 0, 1, 2, 0, 0, 0]
-
+    print(seg)
     # |               4               | = seg.tree[1] ※ index0は使用しない。
     # |       2       |       2       |
     # |   1   |   1   |   2   |   0   |
     # | 0 | 1 | 0 | 1 | 2 | 0 | 0 | 0 | <- 0~7に対応
 
     # ng側が返るので注意。 K番目の要素算出では x < K とすることでng側が答えになる。
-    print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
-    print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
-    print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
-    print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
+    # print(seg.max_right(0, lambda x: x < 1)) # 1番目の要素 → 1
+    # print(seg.max_right(0, lambda x: x < 2)) # 2番目の要素 → 3
+    # print(seg.max_right(0, lambda x: x < 3)) # 3番目の要素 → 4
+    # print(seg.max_right(0, lambda x: x < 4)) # 4番目の要素 → 4
+    print(seg.max_right_v2(0, lambda x: x < 1) + 1) # 1番目の要素 → 1
+    print(seg.max_right_v2(0, lambda x: x < 2) + 1) # 2番目の要素 → 3
+    print(seg.max_right_v2(0, lambda x: x < 3) + 1) # 3番目の要素 → 4
+    print(seg.max_right_v2(0, lambda x: x < 4) + 1) # 4番目の要素 → 4
 
 
-    print(seg.min_left(-1, lambda x: x < 1)) # 4
-    print(seg.min_left(-1, lambda x: x < 2)) # 4
-    print(seg.min_left(-1, lambda x: x < 3)) # 3
-    print(seg.min_left(-1, lambda x: x < 4)) # 1
+    # print(seg.min_left(-1, lambda x: x < 1)) # 4
+    # print(seg.min_left(-1, lambda x: x < 2)) # 4
+    # print(seg.min_left(-1, lambda x: x < 3)) # 3
+    # print(seg.min_left(-1, lambda x: x < 4)) # 1
 
