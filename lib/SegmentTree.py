@@ -225,11 +225,12 @@ class SegTree:
 
     def __str__(self) -> str:
         if not self.isLogging:
-            return "[" + ", ".join([str(i) for i in seg.tree]) + "]"
+            return "[" + ", ".join([str(i) for i in self.tree]) + "]"
         
-        res = ["|"]
+        res = []
+        PowerOf2Set = set([2 ** i for i in range(8)]) # どうぜログ出力で確認できるのはせいぜいこの辺まで
         for i in range(1, self.segLen):
-            if i in set([2, 4, 8, 16, 32]):
+            if i in PowerOf2Set:
                 res.append("\n|")
             res.append(str(self.tree[i]).center(self.logtree[i], " "))
             res.append("|")

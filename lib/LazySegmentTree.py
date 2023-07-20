@@ -1,144 +1,552 @@
 # ------------------------------------------------------------------------------
-#     遅延セグメント木 (1-indexed)
+#     遅延セグメント木 (1-indexed | 非2冪)
 # ------------------------------------------------------------------------------
 # 解説
-# 
+# - https://qiita.com/Kept1994/items/d156a1ac1fe28553bf94
+#
+# Note
+# - 2冪でなくてもいい。
+# - Pythonだと遅い。 PyPyで実行すること。
 #
 # リンク
+# - https://smijake3.hatenablog.com/entry/2018/11/03/100133
+# - https://tjkendev.github.io/procon-library/python/range_query/rmq_raq_segment_tree_lp.html
 # - https://tsutaj.hatenablog.com/entry/2017/03/30/224339
-# 
+#
 # 計算量
 # 
 # verify
-# - 
+# - https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=8086512 置換/最小値
+# - https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=8086374 加算/合計値
+# - https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=8086070 加算/最小値
+# - https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=8086550 置換/合計値
 # ------------------------------------------------------------------------------
-class LazySegmentTree:
-    pass
-
-
-
-# ---------------------------------------------------------------
-# 遅延セグメント木 (区間加算用)
-# Python/pypy系は再帰が遅いので場合によっては展開してインラインに書く必要あり
-#
-#
-# verify
-# - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_E&lang=ja
-# ---------------------------------------------------------------
-
-
-#!/usr/bin/env python3
-import sys
-read = sys.stdin.buffer.read
-readline = sys.stdin.buffer.readline
-readlines = sys.stdin.buffer.readlines
-
-# 2べきでなくてもいい
+INF = 10 ** 9
 class LazySegTree:
-    monoid = 0
-    monoidForOperation = 0
+    unit_value = 0
+    unit_lazy = 0
 
     @classmethod
-    def X_f(cls, x, y):
-        return x + y
+    def lazy_propagate_downward(cls, org, late): # 遅延配列内での伝播処理(遅延している更新同士の扱い)
+        if org is None: org = cls.unit_lazy
+        return org + late
 
     @classmethod
-    def A_f(cls, x, y):
-        return x + y
+    def operation(cls, org, late, width): # 遅延配列→値配列への伝播処理(処理を実際にどうするのか)
+        """
+        width: セル幅(加算クエリなどセルの個数に依存する場合に使用)
+        """
+        if org is None: org = cls.unit_lazy
+        return org + late * width
 
     @classmethod
-    def operate(cls, x, y):
-        return x + y
+    def value_propagate_upward(cls, left, right): # 値配列内での遡上処理(より大きいセグメントへの伝播)
+        return left + right
 
-    def __init__(self, N):
-        self.bottomLen = N
+    def __init__(self, bottomList: "list[int]", isLogging: bool = False, convertLengthToThePowerOf2: bool = False):
+        print("index0 は使用されない。常にdefault値")
+        self.bottomLen = self._getSegLenOfThePowerOf2(len(bottomList)) if convertLengthToThePowerOf2 else len(bottomList)
+        self.actualLen = len(bottomList)
         self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
         self.segLen = self.bottomLen * 2
-        self.tree = [self.monoid] * self.segLen
-        self.operationTree = [self.monoidForOperation] * self.segLen
+        self.value = [self.unit_value] * self.segLen
+        self.width = [1] * self.segLen
+        self.lazy = [None] * self.segLen
+        self.isLogging = isLogging
+        if self.isLogging:
+            self.logvalue = [len(str(self.unit_value)) + 2] * self.segLen
+            self.loglazy = [6] * self.segLen # lazyは初期値Noneのため
+        self._build(bottomList)
 
-    def build(self, seq):
+    def _build(self, seq):
+        """
+        初期化
+        O(self.segLen)
+        """
         # 最下段の初期化
         for i, x in enumerate(seq, self.offset):
-            self.tree[i] = x
-        # ビルド
+            self.value[i] = x
+            self.lazy[i] = x
+
         for i in range(self.offset - 1, 0, -1):
-            self.tree[i] = self.X_f(self.tree[i << 1], self.tree[i << 1 | 1])
-            print(self.tree)
+            self.width[i] = self.width[i << 1] + self.width[i << 1 | 1]
+            self.value[i] = self.value_propagate_upward(self.value[i << 1], self.value[i << 1 | 1])
 
-    def _eval_at(self, i):
-        return self.operate(self.tree[i], self.operationTree[i]) # 評価待ち用の木からセグ木側に反映
+        # ビルド
+        if self.isLogging:
+            for i, x in enumerate(seq, self.offset):
+                self.logvalue[i] = len(str(x)) + 2
+                self.loglazy[i] = len(str(x)) + 2
+            for i in range(self.offset - 1, 0, -1):
+                self.logvalue[i] = self.logvalue[i << 1] + self.logvalue[i << 1 | 1] + 1
+                self.loglazy[i] = self.loglazy[i << 1] + self.loglazy[i << 1 | 1] + 1
 
-    def _propagate_at(self, i):
-        self.tree[i] = self._eval_at(i) # 評価待ちの演算を実施
-        # 対象ノードの子要素(左右)に対して評価待ち用の木を更新。
-        self.operationTree[i << 1] = self.A_f(self.operationTree[i << 1], self.operationTree[i]) 
-        self.operationTree[i << 1 | 1] = self.A_f(self.operationTree[i << 1 | 1], self.operationTree[i])
-        self.operationTree[i] = self.monoidForOperation # 対象の評価待ちは無くなったのでクリア。
+    def _getSegLenOfThePowerOf2(self, ln: int):
+        """
+        直近の2べきの長さを算出
+        """
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + (0 if decimalPart == float(0) else 1))
 
-    def _propagate_above(self, i):
-        H = i.bit_length() - 1 # 対象の要素の上に属する全ての要素について評価と伝播を実施。
-        # 頂点側から実行(下に行くほど評価遅延しているので当然上から実施)
-        for h in range(H, 0, -1):
-            self._propagate_at(i >> h) # 評価の伝播
+    def _propagateAt(self, idx: int):
+        if self.lazy[idx] is None:
+            return
+        # 下層の遅延配列に伝播
+        self.lazy[idx << 1] = self.lazy_propagate_downward(self.lazy[idx << 1], self.lazy[idx])
+        self.lazy[idx << 1 | 1] = self.lazy_propagate_downward(self.lazy[idx << 1 | 1], self.lazy[idx])
+
+        # 値配列側に反映
+        self.value[idx << 1] = self.operation(self.value[idx << 1], self.lazy[idx], self.width[idx << 1])
+        self.value[idx << 1 | 1] = self.operation(self.value[idx << 1 | 1], self.lazy[idx], self.width[idx << 1 | 1])
+
+        # 評価終了。初期化。
+        self.lazy[idx] = None
         return
-
-    def _recalc_above(self, i):
-        while i > 1:
-            i >>= 1
-            self.tree[i] = self.X_f(self._eval_at(i << 1), self._eval_at(i << 1 | 1))
-        return
-
-    def fold(self, l, r):
+    
+    def rangeUpdate(self, l: int, r: int, x: int):
+        if r == -1:
+            r = self.offset
+        if r == l:
+            raise Exception("you need to direct [l, r). (l != r)")
         l += self.offset
         r += self.offset
-        L0 = l // (l & -l) # 奇数になるまでLを2で割ったもの
-        R0 = r // (r & -r) - 1 # 奇数になるまでRを2で割ったもの
-        self._propagate_above(L0)
-        self._propagate_above(R0)
-        vL = self.monoid
-        vR = self.monoid
+
+        related_indices = list(self._gindex(l, r))
+        # 1) 更新区間に関係するlazyを全て子に伝播させる。
+        for i in reversed(related_indices):
+            self._propagateAt(i)
+        
+        # 2) 値の更新区間への処理
+        cellWidth = 1 # 各セグメントの傘下の要素数
         while l < r:
-            if l & 1:
-                vL = self.X_f(vL, self._eval_at(l))
+            if l & 1: # 奇数(=右側のセグメント)なら配列を更新、右の部屋に行って(+1)から上層へ(>>1)。
+                self.lazy[l] = self.lazy_propagate_downward(self.lazy[l], x)
+                self.value[l] = self.operation(self.value[l], x, self.width[l])
                 l += 1
             if r & 1:
                 r -= 1
-                vR = self.X_f(self._eval_at(r), vR)
+                self.lazy[r] = self.lazy_propagate_downward(self.lazy[r], x)
+                self.value[r] = self.operation(self.value[r], x, self.width[r])
             l >>= 1
             r >>= 1
-        return self.X_f(vL, vR)
+            cellWidth <<= 1
 
-    def operate_range(self, l, r, x):
+        # 3) 値配列の更新
+        for i in related_indices:
+            self.value[i] = self.value_propagate_upward(self.value[i << 1], self.value[i << 1 | 1])
+
+    def getPoint(self, idx: int):
+        """
+        一点取得
+        O(1)
+        """
+        if idx == -1:
+            idx = self.offset
+        idx += self.offset
+        related_indices = list(self._gindex(idx, idx + 1))
+        # 更新区間に関係するlazyを全て子に伝播させる。
+        for i in reversed(related_indices):
+            self._propagateAt(i)
+        
+        return self.value[idx]
+
+    def getRange(self, l: int, r: int):
+        if r == -1:
+            r = self.offset
         l += self.offset
         r += self.offset
+        related_indices = list(self._gindex(l, r))
+        # 更新区間に関係するlazyを全て子に伝播させる。
+        for i in reversed(related_indices):
+            self._propagateAt(i)
+
+        vL = self.unit_value
+        vR = self.unit_value
         while l < r:
             if l & 1:
-                self.operationTree[l] = self.A_f(self.operationTree[l], x)
+                vL = self.value_propagate_upward(vL, self.value[l])
                 l += 1
             if r & 1:
                 r -= 1
-                self.operationTree[r] = self.A_f(self.operationTree[r], x)
+                vR = self.value_propagate_upward(self.value[r], vR)
             l >>= 1
             r >>= 1
+        return self.value_propagate_upward(vL, vR)
+
+    def _gindex(self, l, r):
+        """
+        区間[l, r)の値を算出するのに必要なlazyの区間を降順(ボトムアップ)で返す。
+        """
+        if l < self.offset or r < self.offset:
+            raise Exception("need to add offset")
+        lm = (l // (l & -l)) >> 1   # lから遡上していき、右側に位置するまで進む。右側に位置したセグメントの1つ上を新たにlとして更新し、そこまでは伝播必要といえる。
+        rm = (r // (r & -r)) >> 1   # lから遡上していき、右側に位置するまで進む。右側に位置したセグメントの1つ上を新たにrとして更新し、そこまでは伝播必要といえる。
+        while l < r:
+            if r <= rm:
+                yield r
+            if l <= lm:
+                yield l
+            l >>= 1
+            r >>= 1
+        while l:
+            yield l
+            l >>= 1
+
+    def __str__(self) -> str:
+        if not self.isLogging:
+            return "[" + ", ".join([str(i) for i in self.value]) + "]"
+        
+        res = ["---------------------\nTree:"]
+        PowerOf2Set = set([2 ** i for i in range(8)]) # どうぜログ出力で確認できるのはせいぜいこの辺まで
+        for i in range(1, self.segLen):
+            if i in PowerOf2Set:
+                res.append("\n|")
+            res.append(str(self.value[i]).center(self.logvalue[i], " "))
+            res.append("|")
+        res.append("\nLazy:")
+        for i in range(1, self.segLen):
+            if i in PowerOf2Set:
+                res.append("\n|")
+            res.append(str(self.lazy[i]).center(self.loglazy[i], " "))
+            res.append("|")
+        return "".join(res)
 
 
-def main():
-    N, Q = map(int, readline().split())
-    seg = LazySegTree(N + 1)
-    # print(seg.tree)
-    for _ in range(Q):
-        query = list(map(int, readline().split()))
-        if query[0] == 0:
-            s, t, x = query[1], query[2], query[3]
-            seg.operate_range(s - 1, t - 1 + 1, x)
-            # print(seg.tree)
-            # print(seg.operationTree)
-            # print()
-        else:
-            x = query[1]
-            print(seg.fold(x - 1, x))
-    return
+# Usage
+if __name__ == "__main__":
+    print("# =====================================================")
+    print("#     case1 更新クエリ/最小値クエリ")
+    print("# =====================================================")
+    N = 4
+    INF = 10 ** 6
+    def updateFunc(org, late, width):
+        return late
 
-if __name__ == '__main__':
-    main()
+    def propagateFunc(org, late):
+        return late
+    
+    seg = LazySegTree(INF, [INF] * N, min, updateFunc, propagateFunc, isLogging=True)
+    seg.rangeUpdate(1, 3, 4)
+    # print(seg)
+    seg.rangeUpdate(0, 2, 2)
+    # print(seg)
+    print(seg.getRange(1, 2))
+
+    print("# =====================================================")
+    print("#     case2 加算クエリ/合計値クエリ")
+    print("# =====================================================")
+    N = 6
+    def func(a, b):
+        return a + b
+
+    def updateFunc(org, late, width):
+        if org is None:
+            return late * width
+        return org + late * width
+
+    def propagateFunc(org, late):
+        if org is None:
+            return late // 2
+        return org + late // 2
+    
+    seg = LazySegTree(0, [0] * N, func=func, updateFunc=updateFunc, propagateFunc=propagateFunc, isLogging=True)
+    seg.rangeUpdate(0, 5, 2)
+    # print(seg)
+    seg.rangeUpdate(1, 4, 1)
+    # print(seg)
+    print(seg.getRange(3, 5)) # 5
+
+    print("# =====================================================")
+    print("#     case3")
+    print("# =====================================================")
+    N = 4
+    def updateFunc(org, late, width):
+        return late
+    
+    def propagateFunc(org, late):
+        return late
+
+    lst = LazySegTree(unit=INF, bottomList=[INF] * N, func=min, updateFunc=updateFunc, propagateFunc=propagateFunc, isLogging=True)
+    print(lst)
+    lst.rangeUpdate(0, 1, 2)
+    print("---")
+    print(lst)
+    try:
+        lst.rangeUpdate(1, 1, 1) # l != r
+    except:
+        pass
+    print("---")
+    print(lst)
+    print(lst.getRange(0, 1))
+
+
+
+#---
+# OLD
+
+# class LazySegTree:
+
+#     @classmethod
+#     def opeA(cls, org, late): # 遅延配列内での伝播処理(遅延している更新同士の扱い)
+#         return late
+
+#     @classmethod
+#     def opeB(cls, org, late): # 遅延配列→値配列への伝播処理(処理を実際にどうするのか)
+#         return late
+
+#     @classmethod
+#     def calc(clas, org, late): # 値配列内での遡上処理(より大きいセグメントへの伝播)
+#         return min(org, late)
+
+#     def __init__(self, unit: int, bottomList: "list[int]", func: "function", updateFunc: "function", propagateFunc: "function", isLogging: bool = False, convertLengthToThePowerOf2: bool = False):
+#         print("index0 は使用されない。常にdefault値")
+#         self.unit = unit
+#         self.func = func
+#         self.updateFunc = updateFunc
+#         self.propagateFunc = propagateFunc
+#         self.bottomLen = self._getSegLenOfThePowerOf2(len(bottomList)) if convertLengthToThePowerOf2 else len(bottomList)
+#         self.actualLen = len(bottomList)
+#         self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+#         self.segLen = self.bottomLen * 2
+#         self.segDepth = (self.segLen - 1).bit_length()
+#         self.value = [unit] * self.segLen
+#         self.lazy = [None] * self.segLen
+#         self.isLogging = isLogging
+#         if self.isLogging:
+#             self.logvalue = [len(str(unit)) + 2] * self.segLen
+#             self.loglazy = [6] * self.segLen # lazyは初期値Noneのため
+#         self._build(bottomList)
+
+#     def _build(self, seq):
+#         """
+#         初期化
+#         O(self.segLen)
+#         """
+#         # 最下段の初期化
+#         for i, x in enumerate(seq, self.offset):
+#             self.value[i] = x
+#             self.lazy[i] = x
+
+#         # ビルド
+#         if self.isLogging:
+#             for i, x in enumerate(seq, self.offset):
+#                 self.logvalue[i] = len(str(x)) + 2
+#                 self.loglazy[i] = len(str(x)) + 2
+#             for i in range(self.offset - 1, 0, -1):
+#                 self.logvalue[i] = self.logvalue[i << 1] + self.logvalue[i << 1 | 1] + 1
+#                 self.loglazy[i] = self.loglazy[i << 1] + self.loglazy[i << 1 | 1] + 1
+
+#     def _getSegLenOfThePowerOf2(self, ln: int):
+#         """
+#         直近の2べきの長さを算出
+#         """
+#         if ln <= 0:
+#             return 1
+#         else:    
+#             import math
+#             decimalPart, integerPart = math.modf(math.log2(ln))
+#             return 2 ** (int(integerPart) + (0 if decimalPart == float(0) else 1))
+
+#     def _propagateAt(self, idx: int):
+#         if self.lazy[idx] is None:
+#             return
+#         # # 値配列側に反映
+#         self.value[idx << 1] = self.propagateFunc(self.value[idx << 1], self.lazy[idx])
+#         self.value[idx << 1 | 1] = self.propagateFunc(self.value[idx << 1 | 1], self.lazy[idx])
+
+#         # 現在の評価対象が最下層でないなら下層の遅延配列に伝播
+#         self.lazy[idx << 1] = self.propagateFunc(self.lazy[idx << 1], self.lazy[idx])
+#         self.lazy[idx << 1 | 1] = self.propagateFunc(self.lazy[idx << 1 | 1], self.lazy[idx])
+
+#         # 評価終了。初期化。
+#         self.lazy[idx] = None
+#         return
+    
+#     def rangeUpdate(self, l: int, r: int, x: int):
+#         if r == l:
+#             raise Exception("you need to direct [l, r). (l != r)")
+#         l += self.offset
+#         r += self.offset
+
+#         related_indices = list(self._gindex(l, r))
+#         # 更新区間に関係するlazyを全て子に伝播させる。
+#         for idx in reversed(related_indices):
+#             self._propagateAt(idx)
+        
+#         # 値の更新区間への処理
+#         cellWidth = 1 # 各セグメントの傘下の要素数
+#         while l < r:
+#             if l & 1: # 奇数(=右側のセグメント)なら配列を更新、右の部屋に行って(+1)から上層へ(>>1)。
+#                 self.lazy[l] = self.updateFunc(self.lazy[l], x * cellWidth)
+#                 self.value[l] = self.updateFunc(self.value[l], x * cellWidth)
+#                 l += 1
+#             if r & 1:
+#                 r -= 1
+#                 self.lazy[r] = self.updateFunc(self.lazy[r], x * cellWidth)
+#                 self.value[r] = self.updateFunc(self.value[r], x * cellWidth)
+#             l >>= 1
+#             r >>= 1
+#             cellWidth <<= 1
+        
+#         for idx in related_indices:
+#             self.value[idx] = self.func(self.value[idx << 1], self.value[idx << 1 | 1])
+
+#     def getRange(self, l: int, r: int):
+#         l += self.offset
+#         r += self.offset
+#         related_indices = list(self._gindex(l, r))
+#         # 更新区間に関係するlazyを全て子に伝播させる。
+#         for idx in reversed(related_indices):
+#             self._propagateAt(idx)
+
+#         vL = self.unit
+#         vR = self.unit
+#         while l < r:
+#             if l & 1:
+#                 vL = self.func(vL, self.value[l])
+#                 l += 1
+#             if r & 1:
+#                 r -= 1
+#                 vR = self.func(self.value[r], vR)
+#             l >>= 1
+#             r >>= 1
+#         return self.func(vL, vR)
+
+#     def _gindex(self, l, r):
+#         """
+#         区間[l, r)の値を算出するのに必要なlazyの区間を降順(ボトムアップ)で返す。
+#         """
+#         if l < self.offset or r < self.offset:
+#             raise Exception("need to add offset")
+#         lm = (l // (l & -l)) >> 1   # lから遡上していき、右側に位置するまで進む。右側に位置したセグメントの1つ上を新たにlとして更新し、そこまでは伝播必要といえる。
+#         rm = (r // (r & -r)) >> 1   # lから遡上していき、右側に位置するまで進む。右側に位置したセグメントの1つ上を新たにrとして更新し、そこまでは伝播必要といえる。
+#         while l < r:
+#             if r <= rm:
+#                 yield r
+#             if l <= lm:
+#                 yield l
+#             l >>= 1
+#             r >>= 1
+#         while l:
+#             yield l
+#             l >>= 1
+
+#     def __str__(self) -> str:
+#         if not self.isLogging:
+#             return "[" + ", ".join([str(i) for i in self.value]) + "]"
+        
+#         res = ["Tree:"]
+#         PowerOf2Set = set([2 ** i for i in range(8)]) # どうぜログ出力で確認できるのはせいぜいこの辺まで
+#         for i in range(1, self.segLen):
+#             if i in PowerOf2Set:
+#                 res.append("\n|")
+#             res.append(str(self.value[i]).center(self.logvalue[i], " "))
+#             res.append("|")
+#         res.append("\nLazy:")
+#         for i in range(1, self.segLen):
+#             if i in PowerOf2Set:
+#                 res.append("\n|")
+#             res.append(str(self.lazy[i]).center(self.loglazy[i], " "))
+#             res.append("|")
+#         return "".join(res)
+
+# # Usage
+# if __name__ == "__main__":
+#     print("# =====================================================")
+#     print("#     case1 更新クエリ/最小値クエリ")
+#     print("# =====================================================")
+#     N = 4
+#     INF = 10 ** 6
+#     def updateFunc(org, late, width):
+#         return late
+
+#     def propagateFunc(org, late):
+#         return late
+    
+#     seg = LazySegTree(INF, [INF] * N, min, updateFunc, propagateFunc, isLogging=True)
+#     seg.rangeUpdate(1, 3, 4)
+#     # print(seg)
+#     seg.rangeUpdate(0, 2, 2)
+#     # print(seg)
+#     print(seg.getRange(1, 2))
+
+#     print("# =====================================================")
+#     print("#     case2 加算クエリ/合計値クエリ")
+#     print("# =====================================================")
+#     N = 6
+#     def func(a, b):
+#         return a + b
+
+#     def updateFunc(org, late, width):
+#         if org is None:
+#             return late * width
+#         return org + late * width
+
+#     def propagateFunc(org, late):
+#         if org is None:
+#             return late // 2
+#         return org + late // 2
+    
+#     seg = LazySegTree(0, [0] * N, func=func, updateFunc=updateFunc, propagateFunc=propagateFunc, isLogging=True)
+#     seg.rangeUpdate(0, 5, 2)
+#     # print(seg)
+#     seg.rangeUpdate(1, 4, 1)
+#     # print(seg)
+#     print(seg.getRange(3, 5)) # 5
+
+#     print("# =====================================================")
+#     print("#     case3")
+#     print("# =====================================================")
+#     N = 4
+#     def updateFunc(org, late, width):
+#         return late
+    
+#     def propagateFunc(org, late):
+#         return late
+
+#     lst = LazySegTree(unit=INF, bottomList=[INF] * N, func=min, updateFunc=updateFunc, propagateFunc=propagateFunc, isLogging=True)
+#     print(lst)
+#     lst.rangeUpdate(0, 1, 2)
+#     print("---")
+#     print(lst)
+#     try:
+#         lst.rangeUpdate(1, 1, 1) # l != r
+#     except:
+#         pass
+#     print("---")
+#     print(lst)
+#     print(lst.getRange(0, 1))
+
+
+    
+
+
+
+# lst = LazySegTree(unit=0, bottomList=[0] * 8, func=(lambda A, B: A + B), isLogging=True)
+# l = 6
+# print(lst)
+
+# print(l.bit_length() - 1)
+# l = l // (l & -l)
+# print(l)
+
+
+# # print(lst._gindex)
+# # N = 16
+# # LV = (N-1).bit_length()
+# # print(LV, "#s")
+# # N0 = 2**LV
+# # print(N0)
+
+# print([i for i in lst._gindex(2, 5)])
+
+
+# # |                        [1]                          |
+# # |          [2]            |            [3]            |
+# # |    [4]    |     [5]     |     [6]     |     [7]     |
+# # | [8] | [9] | [10] | [11] | [12] | [13] | [14] | [15] | <- この実測値の部分の長さを"bottomLen"
+# #   0      1      2    3      4       5       6       7 
