@@ -1,13 +1,11 @@
 # ------------------------------------------------------------------------------
 #     Affine Transformation (アフィン変換)
 # ------------------------------------------------------------------------------
-# Input
-#   1. 隣接リスト
-#   2. 開始ノード
-# Order
-#   O(V + E)
-# Output
-#   スタートから各ノードへの最小コスト
+# 解説
+# 座標平面に対し回転や平行移動の操作を行うクエリと、任意の座標の移動後の位置を求めるクエリが繰り返される場合。
+# 各座標に対して操作を行うのは重いので、原点(0,0)と任意の2点(1,0)/(0,1)の3点の移動だけを追跡しておき、
+# 任意の座標の移動後の座標を即座に計算できるようにする。
+# 
 # verify
 #  
 # ------------------------------------------------------------------------------
@@ -15,14 +13,17 @@
 # COPIED FROM https://atcoder.jp/contests/abc189/submissions/38873526
 from math import sin, cos, radians
 class AffineMap():
-    NEW = [
+    origin = [
         [1, 0, 0], 
         [0, 1, 0], 
         [0, 0, 1]
     ]
     @staticmethod
-    def new():
-        return AffineMap.NEW[:]
+    def generateOrigin():
+        """
+        原点座標を取得する。
+        """
+        return AffineMap.origin[:]
 
     @staticmethod
     def _matmul3(a: "list[list[int]]", b: "list[list[int]]"):
@@ -57,28 +58,32 @@ class AffineMap():
         return AffineMap._matmul3(b, a)
 
     @staticmethod
-    def rotate(a: "list[int]", digree: int = 0):
+    def rotate(a: "list[int]", center_x: int = 0, center_y: int = 0, digree: int = 0):
         """
         回転
         degree度(度数法)回転する。
         """
         if digree == 90:
             b = [
-                [0, -1, 0], 
-                [1, 0, 0], 
+                [0, -1, center_x + center_y], 
+                [1, 0, center_y - center_x], 
                 [0, 0, 1]
             ]
         elif digree == -90:
             b = [
-                [0, 1, 0], 
-                [-1, 0, 0], 
+                [0, 1, center_x - center_y], 
+                [-1, 0, center_y + center_x], 
                 [0, 0, 1]
             ]
         else:
             digree = radians(digree)
-            b = [[cos(digree), -sin(digree), 0], [sin(digree), cos(digree), 0], [0, 0, 1]]
+            b = [
+                [cos(digree), -sin(digree), center_x - center_x * cos(digree) + center_y * sin(digree)], 
+                [sin(digree), cos(digree), center_y - center_x * sin(digree) - center_y * cos(digree)], 
+                [0, 0, 1]
+            ]
         return AffineMap._matmul3(b, a)
-
+    
     @staticmethod
     def x_symmetrical_move(a: "list[int]", p: int):
         """
@@ -115,7 +120,10 @@ class AffineMap():
         return x, y
 
 # Usage
-matrix = AffineMap.new() # (0, 0), (1, 0), (0, 1)の3点の変化を記録する行列
+matrix = AffineMap.generateOrigin() # (0, 0), (1, 0), (0, 1)の3点の変化を記録する行列
+
+print(AffineMap.get(matrix, x=1, y=10)) # 何もしていない状態では (x, y) = (1, 10)
+
 # 初期値は以下
 # [
 #     [1, 0, 0], 
@@ -124,7 +132,9 @@ matrix = AffineMap.new() # (0, 0), (1, 0), (0, 1)の3点の変化を記録する
 # ]
 
 # 反時計回りに90度回転
-matrix = AffineMap.rotate(matrix, -90)
+matrix = AffineMap.rotate(matrix, digree=-90)
+
+print(AffineMap.get(matrix, x=1, y=10))  # 90度回転後は (x, y) = (10, -1)
 
 # 直線 x = 3 で対称移動
 #   |   |
@@ -136,3 +146,29 @@ matrix = AffineMap.rotate(matrix, -90)
 #   |0  |3
 #
 matrix = AffineMap.x_symmetrical_move(matrix, 3)
+
+print(AffineMap.get(matrix, x=1, y=10)) # 90度回転後は (x, y) = (-4, -1)
+
+#--------
+print("-------------------------------------")
+print("任意の1点(2, 3)の変換をするだけでいい場合。")
+
+matrix = AffineMap.generateOrigin() # (0, 0), (1, 0), (0, 1)の3点の変化を記録する行列
+print(AffineMap.get(matrix, x=10, y=10)) # S(10, 10)
+matrix = AffineMap.rotate(matrix, center_x=15, center_y=15, digree=90)
+print(matrix)
+print(AffineMap.get(matrix, x=10, y=10)) # G(20, 10)
+
+#               y
+#               ↑
+#               |
+#               |        ・ (15, 15)
+#               |     
+#               |   *S    →     *G
+#               |   (10, 10)    (20, 10)
+# --------------+------------------> x
+#               |
+#               |
+#               |
+#               |
+#               |

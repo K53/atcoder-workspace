@@ -46,6 +46,7 @@
 # - https://atcoder.jp/contests/abc241/tasks/abc241_d
 # - https://atcoder.jp/contests/abc253/tasks/abc253_c
 # - https://atcoder.jp/contests/abc217/tasks/abc217_d
+# - https://atcoder.jp/contests/abc217/tasks/abc217_e
 # ------------------------------------------------------------------------------
 
 from BIT import BIT
@@ -53,6 +54,7 @@ import bisect
 
 INF = 10 ** 9
 
+# 単に常にソートされたデータ構造が必要なだけで任意要素の削除が発生しないならheapqで実装できないか確認！！軽い。
 class MultiSet:
     def __init__(self, allVals: "list[int]"):
         print("allValsは重複禁止!!!!入りうる要素を全部入れておく。")

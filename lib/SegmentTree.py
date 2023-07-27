@@ -150,6 +150,8 @@ class SegTree:
         l ~ r-1までの区間 (0-indexed)。※右端を含まない。
         O(log(self.bottomLen))
         """
+        if r == -1:
+            r = self.offset
         l += self.offset
         r += self.offset
         vL = self.monoid
@@ -170,6 +172,8 @@ class SegTree:
         一点取得
         O(1)
         """
+        if i == -1:
+            i = self.offset
         i += self.offset
         return self.tree[i]
 
