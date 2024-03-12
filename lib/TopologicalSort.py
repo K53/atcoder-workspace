@@ -103,9 +103,9 @@ class TopologicalTree:
         """
         for node in range(self.N - 1):
             if not self.topologicalOrder[node + 1] in self.G[self.topologicalOrder[node]]:
-                return True
+                return False
         else:
-            return False
+            return True
     
     # トポロジカルソートした結果の数列が何通りあるか -> bitDP
     # https://ferin-tech.hatenablog.com/entry/2017/01/24/184750

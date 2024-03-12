@@ -2,9 +2,13 @@
 #     ポテンシャル付き/重み付き Union-Find木
 # ------------------------------------------------------------------------------
 # 解説
-# - 要素数Nのリストを持ち、根の要素の番号を格納する。
-# - その要素自体が根の場合はマイナスを付して格納しておく。
+# - 2要素を同一の集合に含める際にノード間の距離を持たせることができる。向きがあるため注意。
 # 
+# 使い方
+# - union(x, y, w) : [yの重み] = [xの重み] + w となるようにxとyをマージする。
+# - same(x, y) : x,yが同一集合に属するかを返す。
+# - diff(x, y) : x,yの間の距離を返す。
+#
 # リンク
 # - https://qiita.com/drken/items/cce6fc5c579051e64fab (メイン)
 # - https://at274.hatenablog.com/entry/2018/02/03/140504 (参考)
@@ -13,9 +17,7 @@
 # - α(N) ・・・ Ackermann 関数の逆関数であり、ほぼ定数。
 # 
 # verify
-# - https://yukicoder.me/problems/no/1390
-# - https://atcoder.jp/contests/abl/tasks/abl_c
-# - https://atcoder.jp/contests/abc229/tasks/abc229_e
+# - https://atcoder.jp/contests/abc087/tasks/arc090_b
 # ------------------------------------------------------------------------------
 from collections import defaultdict
 INF = 10 ** 16
@@ -123,7 +125,7 @@ N = 5
 wuf = WeightedUnionFind(N)
 wuf.union(2, 3, 10)
 wuf.union(4, 2, 1)
-wuf.union(4, 3, 1000000) # False となり無視される。
+wuf.union(4, 3, 1000000) # すでに同一集合にあり False となり無視される。
 print(wuf)
 print(wuf.diff_weight)
 """

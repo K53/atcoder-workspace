@@ -1,4 +1,23 @@
-#!/usr/bin/env python3
+# ------------------------------------------------------------------------------
+#     Doubly Linked List (双方向連結リスト)
+# ------------------------------------------------------------------------------
+# 
+# 条件
+# - 各要素について重複がないこと。
+# - インデックスに対する操作がないこと。 (前からi番目にxxxをするのようなクエリは不向き。)
+#
+# 関数
+# - insert_front(x, val) : 要素xの前にvalを挿入する。要素xが存在しない場合は例外を返す。
+# - insert_back(x, val) : 要素xの後ろにvalを挿入する。要素xが存在しない場合は例外を返す。
+# - delete(x) : 要素xを削除する。要素xが存在しない場合は例外を返す。
+# - get_actual_list() : 先頭から全ての要素を順にリストで返す。
+# - get_front(x) : 要素xの前の要素を返す。
+# - get_back(x) : 要素xの後の要素を返す。
+#
+# 検証
+# - https://atcoder.jp/contests/abc344/tasks/abc344_e
+# ------------------------------------------------------------------------------
+
 class DoublyLinkedList():
     def __init__(self, init_list: list = [], inf: int = 10 ** 12) -> None:
         self.INF = inf
@@ -21,11 +40,12 @@ class DoublyLinkedList():
             self.backs[target] = back_of_target
         return
     
-    def get_front(self, x: int):
-        return self.fronts[x]
+    # 速度面から直接fronts / backs にアクセスせよ。
+    # def get_front(self, x: int) -> int:
+    #     return self.fronts[x]
 
-    def get_back(self, x: int):
-        return self.backs[x]
+    # def get_back(self, x: int) -> int:
+    #     return self.backs[x]
     
     def insert_front(self, x: int, val: int):
         """
@@ -74,44 +94,3 @@ class DoublyLinkedList():
 
     def __str__(self) -> str:
         return " ".join(map(str, self.get_actual_list()))
-
-def main():
-    N = int(input())
-    A = list(map(int, input().split()))
-    Q = int(input())
-    queries = []
-    nums = set(A)
-    for _ in range(Q):
-        l = list(map(int, input().split()))
-        queries.append(l)
-        if l[0] == 1:
-            nums.add(l[2])
-
-    raw_to_compressed = {}
-    compressed_to_raw = []
-    for index, val in enumerate(sorted(list(nums))):
-        raw_to_compressed[val] = index
-        compressed_to_raw.append(val)
-    
-    A_cp = [raw_to_compressed[aa] for aa in A]
-    dll = DoublyLinkedList(A_cp)
-    queries_cp = []
-    for qq in queries:
-        if qq[0] == 1:
-            queries_cp.append((qq[0], raw_to_compressed[qq[1]], raw_to_compressed[qq[2]]))
-        else:
-            queries_cp.append((qq[0], raw_to_compressed[qq[1]]))
-
-    for qq in queries_cp:
-        if qq[0] == 1:
-            x, y = qq[1], qq[2]
-            dll.insert_back(x, y)
-        else: 
-            x = qq[1]
-            dll.delete(x)
-
-    print(*[compressed_to_raw[num] for num in dll.get_actual_list()])
-    return
-
-if __name__ == '__main__':
-    main()

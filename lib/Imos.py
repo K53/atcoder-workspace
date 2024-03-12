@@ -3,7 +3,6 @@
 # ------------------------------------------------------------------------------
 # 
 # verify
-# - https://atcoder.jp/contests/abc183/tasks/abc183_d
 # - https://atcoder.jp/contests/abc221/tasks/abc221_d (座圧いもす)
 # ------------------------------------------------------------------------------
 
@@ -20,6 +19,45 @@ for i in range(N):
 # ビルド
 for i in range(1, len(imos)):
     imos[i] += imos[i - 1]
+
+# ------------------------------------------------------------------------------
+#     木上のImos法 (木上のいもす法)
+# ------------------------------------------------------------------------------
+# 木のいもす法
+#
+# verify
+# - https://atcoder.jp/contests/abc183/tasks/abc183_d
+# ------------------------------------------------------------------------------
+
+N = 5
+a = [1, 2, 2, 3]
+b = [2, 3, 4, 5]
+imos = [0] * N
+
+# グラフ構築
+G = [[] for _ in range(N)]
+for i in range(N - 1):
+    G[a[i] - 1].append(b[i] - 1)
+    G[b[i] - 1].append(a[i] - 1)
+
+# テーブルの初期化 : S[i]を根とする部分木に加算。
+S = [1,3]
+for i in range(len(S)):
+    imos[S[i] - 1] += 1
+
+# ビルド
+from collections import deque
+q = deque()
+q.append((-1, 0))
+while q:
+    pre, cur = q.popleft()
+    for next in G[cur]:
+        if pre == next:
+            continue
+        q.append((cur, next))
+        imos[next] += imos[cur]
+
+print(*imos) # 1 1 2 1 2
 
 # ------------------------------------------------------------------------------
 #     座標圧縮 + Imos法 (いもす法)
