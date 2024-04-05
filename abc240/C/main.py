@@ -6,18 +6,16 @@ NO = "No"  # type: str
 
 
 def solve(N: int, X: int, a: "List[int]", b: "List[int]"):
-    s = set()
-    # all = set()
-    s.add(0)
+    dp = [[0] * (X + 1) for _ in range(N + 1)]
+    dp[0][0] = 1
     for i in range(N):
-        l = set()
-        for now in s:
-            l.add(now + a[i])
-            l.add(now + b[i])
-        s = l
-        # all |= l
-    # print(all)
-    print(YES if X in s else NO)
+        for k in range(X + 1):
+            if dp[i][k]:
+                if k + a[i] < X + 1:
+                    dp[i + 1][k + a[i]] = 1
+                if k + b[i] < X + 1:
+                    dp[i + 1][k + b[i]] = 1
+    print(YES if dp[-1][X] else NO)
     return
 
 

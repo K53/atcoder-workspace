@@ -6,7 +6,6 @@ NO = "No"  # type: str
 
 
 def solve(N: str):
-    print(YES if sum(map(int, list(N))) % 9 == 0 else NO)
     return
 
 

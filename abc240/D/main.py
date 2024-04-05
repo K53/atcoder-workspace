@@ -1,30 +1,31 @@
 #!/usr/bin/env python3
-from collections import deque
 import sys
-
+from collections import deque
 
 def solve(N: int, a: "List[int]"):
     q = deque()
-    tot = 0
+    count = 0
     for aa in a:
         if len(q) == 0:
             q.append((aa, 1))
-            tot += 1
-            print(tot)
+            count += 1
+            print(count)
             continue
-        # print(q)
-        ch, num = q.pop()
-        if ch == aa:
-            if num + 1 != ch:
-                q.append((aa, num + 1))
-                tot += 1
+        top, num = q.pop()
+        if top == aa:
+            num += 1
+            count += 1
+            if num == aa:
+                count -= num
+                print(count)
+                continue
             else:
-                tot -= num
+                q.append((aa, num))
         else:
-            q.append((ch, num))
+            q.append((top, num))
             q.append((aa, 1))
-            tot += 1
-        print(tot)
+            count += 1
+        print(count)
     return
 
 

@@ -18,3 +18,12 @@ for i in range(3 ** N):
         else:
             pass
 # → 仕組みN進数変換のコード参照
+        
+
+# bのNビット目を0にする。
+# https://yottagin.com/?p=5139
+def unset_nth_bit(b: int, N: int):
+    return b & ~(1 << N)
+
+def set_nth_bit(b: int, N: int):
+    return b | (1 << N)

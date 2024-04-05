@@ -3,14 +3,6 @@ import sys
 
 
 def solve(s: str):
-    ans = []
-    for ss in s:
-        if ss == "1":
-            ans.append("0")
-        else:
-            ans.append("1")
-    print(*ans, sep="")
-
     return
 
 

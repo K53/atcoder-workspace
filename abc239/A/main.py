@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import math
 import sys
 
 
 def solve(H: int):
-    print(math.sqrt(H * (12800000 + H)))
+    print((H * (12800000 + H)) ** 0.5)
     return
 
 

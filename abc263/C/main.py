@@ -1,28 +1,20 @@
 #!/usr/bin/env python3
-from copy import deepcopy
 import sys
 sys.setrecursionlimit(10 ** 9)
 
 def solve(N: int, M: int):
-    ans = []
-    def dfs(acc: list):
-        nonlocal ans
-        # --- 探索終了条件 ----------------------------
-        if len(acc) > N:
-            # print("#", acc)
-            ans.append(acc)
+    def dfs(l):
+        if len(l) == N:
+            print(*l, sep=" ")
             return
-        # --- 次の探索(分岐) --------------------------
-        for mm in range(acc[-1] + 1, M + 1): # 0なしMまで
-            # print(acc, mm)
-            cpacc = deepcopy(acc)
-            cpacc.append(mm)
-            dfs(cpacc)
-        return
-    dfs([0])
-    # print(ans)
-    for aa in ans:
-        print(*aa[1:], sep=" ")
+        for i in range(1, M + 1):
+            if len(l) > 0 and i <= l[-1]:
+                continue
+            l.append(i)
+            dfs(l)
+            l.pop()
+    
+    dfs([])
     return
 
 

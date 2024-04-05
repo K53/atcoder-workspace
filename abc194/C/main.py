@@ -4,13 +4,14 @@ from collections import Counter
 
 def solve(N: int, A: "List[int]"):
     d = Counter(A)
-    keys = list(d.keys())
-    L = len(keys)
+    *l, = d.keys()
     ans = 0
-    for i in range(L - 1):
-        for j in range(i + 1, L):
-            ans += (keys[i] - keys[j]) ** 2 * (d[keys[i]] * d[keys[j]])
+    for i in range(len(l)):
+        for j in range(i + 1, len(l)):
+            ans += (d[l[i]] * d[l[j]] * (l[i] - l[j]) ** 2)
     print(ans)
+
+
     return
 
 

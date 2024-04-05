@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import sys
+from collections import Counter
 
 
 def solve(N: int, a: "List[int]"):
-    print(len(list(set(a))))
+    print(len(Counter(a).keys()))
     return
 
 

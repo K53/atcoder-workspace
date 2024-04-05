@@ -1,80 +1,82 @@
 #!/usr/bin/env python3
+from collections import deque
 class DoublyLinkedList():
     def __init__(self, init_list: list = [], inf: int = 10 ** 12) -> None:
         self.INF = inf
-        self.fronts = {
-            -self.INF: None,
-            self.INF: -self.INF,
-        }
-        self.backs = {
-            -self.INF: self.INF,
-            self.INF: None,
-        }
-        self.original = [-self.INF] + init_list + [self.INF]
-        self.top = -self.INF
+        self.HEAD = -inf
+        self.TAIL = inf
+        self.heads = {}
+        self.tails = {}
+        self.original = [self.HEAD] + init_list + [self.TAIL]
+        # self.top = self.HEAD
         
         for i in range(len(self.original)):
-            front_of_target = self.original[i - 1] if i - 1 >= 0 else None
+            head_of_target = self.original[i - 1] if i - 1 >= 0 else None
             target = self.original[i]
-            back_of_target = self.original[i + 1] if i + 1 < len(self.original) else None
-            self.fronts[target] = front_of_target
-            self.backs[target] = back_of_target
+            tail_of_target = self.original[i + 1] if i + 1 < len(self.original) else None
+            self.heads[target] = head_of_target
+            self.tails[target] = tail_of_target
         return
     
-    def get_front(self, x: int):
-        return self.fronts[x]
+    # 速度面から直接fronts / backs にアクセスせよ。
+    # def get_front(self, x: int) -> int:
+    #     return self.heads[x]
 
-    def get_back(self, x: int):
-        return self.backs[x]
+    # def get_back(self, x: int) -> int:
+    #     return self.tails[x]
+
+    def add(self, val: int, head: int = None, tail: int = None) -> None:
+        self.heads[val] = head if head != None else self.HEAD
+        self.tails[val] = tail if tail != None else self.TAIL
+        return
     
     def insert_front(self, x: int, val: int):
         """
         要素xの前に挿入
         """
-        if x not in self.fronts.keys():
+        if x not in self.heads.keys():
             raise Exception(f"{x} is not in the list")
-        front_of_x = self.fronts[x]
-        self.fronts[x] = val
-        self.backs[front_of_x] = val
-        self.fronts[val] = front_of_x
-        self.backs[val] = x
+        head_of_x = self.heads[x]
+        self.heads[x] = val
+        self.tails[head_of_x] = val
+        self.heads[val] = head_of_x
+        self.tails[val] = x
 
     def insert_back(self, x: int, val: int):
         """
         要素xの前に挿入
         """
-        if x not in self.fronts.keys():
+        if x not in self.heads.keys():
             raise Exception(f"{x} is not in the list")
-        back_of_x = self.backs[x]
-        self.fronts[back_of_x] = val
-        self.backs[x] = val
-        self.fronts[val] = x
-        self.backs[val] = back_of_x
+        tail_of_x = self.tails[x]
+        self.heads[tail_of_x] = val
+        self.tails[x] = val
+        self.heads[val] = x
+        self.tails[val] = tail_of_x
 
     def delete(self, x: int):
         """
         要素xを削除
         """
-        if x not in self.fronts.keys():
+        if x not in self.heads.keys():
             raise Exception(f"{x} is not in the list")
-        front_of_x = self.fronts[x]
-        back_of_x = self.backs[x]
-        self.fronts[back_of_x] = front_of_x
-        self.backs[front_of_x] = back_of_x
-        del self.fronts[x]
-        del self.backs[x]
+        head_of_x = self.heads[x]
+        tail_of_x = self.tails[x]
+        self.heads[tail_of_x] = head_of_x
+        self.tails[head_of_x] = tail_of_x
+        del self.heads[x]
+        del self.tails[x]
 
-    def get_actual_list(self) -> list:
-        actual_list = []
-        next = self.backs[self.top]
-        while next != self.INF:
+    def get_actual_list(self, x: int = None) -> list:
+        actual_list = deque()
+        next = x if x != None else self.tails[self.HEAD]
+        while next != self.TAIL:
             actual_list.append(next)
-            next = self.backs[next]
+            next = self.tails[next]
         return actual_list
 
     def __str__(self) -> str:
         return " ".join(map(str, self.get_actual_list()))
-
 def main():
     N = int(input())
     A = list(map(int, input().split()))

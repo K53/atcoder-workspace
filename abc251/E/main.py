@@ -1,30 +1,33 @@
 #!/usr/bin/env python3
 import sys
 
+# 1 1 0 0 0
+#   ^
+#   i----->
 
+INF = 10 ** 16
 def solve(N: int, A: "List[int]"):
-    INF = 10 ** 16
-    B = A + [INF]
-    dp = [INF] * (N + 1)
-    dp[0] = 0
-    for i in range(N + 1):
-        if i + 1 < len(B):
-            dp[i + 1] = min(dp[i + 1], dp[i] + B[i])
-        if i + 2 < len(B):
-            dp[i + 2] = min(dp[i + 2], dp[i] + B[i])
-        # print(dp)
-
-    B = A + [INF] * 2
-    dp2 = [INF] * (N + 2)
-    dp2[1] = 0
-    for i in range(N + 2):
-        if i + 1 < len(B):
-            dp2[i + 1] = min(dp2[i + 1], dp2[i] + B[i])
-        if i + 2 < len(B):
-            dp2[i + 2] = min(dp2[i + 2], dp2[i] + B[i])
-        # print(dp2)
-    print(min(dp[-1], dp2[-1]))
-
+    cur = [INF, A[0]] # まだ、すみ
+    for i in range(1, N):
+        next = [INF, INF]
+        # まだiは選ばれていない → i,i+1 で選ぶしかない
+        next[1] = min(next[1], cur[0] + A[i])
+        # すでにiは選ばれてる。 → i,i+1 はどっちでもいい
+        next[1] = min(next[1], cur[1] + A[i])
+        next[0] = min(next[0], cur[1])
+        cur = next
+    ans = min(next)
+    cur = [INF, A[-1]] # まだ、すみ
+    for i in range(N - 1):
+        next = [INF, INF]
+        # まだiは選ばれていない → i,i+1 で選ぶしかない
+        next[1] = min(next[1], cur[0] + A[i])
+        # すでにiは選ばれてる。 → i,i+1 はどっちでもいい
+        next[1] = min(next[1], cur[1] + A[i])
+        next[0] = min(next[0], cur[1])
+        cur = next
+    ans = min(*next, ans)
+    print(ans)
     return
 
 

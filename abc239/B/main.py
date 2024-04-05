@@ -3,21 +3,7 @@ import sys
 
 
 def solve(X: int):
-    if 0 <= X <= 9:
-        print(0)
-        return
-    if -9 <= X <= -1:
-        print(-1)
-        return
-    b = X >= 0
-    S = str(X)
-    if S[-1] == "0":
-        print(X // 10)
-        return
-    if b:
-        print(int(S[:-1]))
-    else:
-        print(int(S[:-1]) - 1)
+    print(X // 10)
     return
 
 

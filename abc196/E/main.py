@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 import sys
 
-
-
-
 def solve(N: int, a: "List[int]", t: "List[int]", Q: int, x: "List[int]"):
+    offset = 0
+    INF = 10 ** 16
+    MAX = INF
+    MIN = -INF
+    for aa, tt in zip(a, t):
+        if tt == 2: # max
+            MIN = max(aa, MIN)
+            MAX = max(aa, MAX)
+        elif tt == 3: # min
+            MIN = min(aa, MIN)
+            MAX = min(aa, MAX)
+        else:
+            offset += aa
+            MIN += aa
+            MAX += aa
+    for xx in x:
+        print(max(MIN, min(MAX, xx + offset)))
     return
 
 

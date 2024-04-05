@@ -6,24 +6,34 @@ NO = "No"  # type: str
 
 
 def solve(N: int, x: int, y: int, A: "List[int]"):
-    dpx = [[0] * 2 for _ in range(N)]
-    dpy = [[0] * 2 for _ in range(N)]
-    dpx[0] = A[0]
-    xx = []
-    yy = []
-    for i in range(1, N):
-        if i % 2 == 0:
-            yy.append(A[i])
+    mx = 10 ** 4
+    offset = mx
+    L = 2 * mx + 1
+    cur_xdp = [0] * L
+    next_xdp = [0] * L
+    cur_ydp = [0] * L
+    next_ydp = [0] * L
+    cur_xdp[offset] = 1
+    cur_ydp[offset] = 1
+    for i in range(N):
+        if i % 2 == 1:
+            for point in range(L):
+                if cur_ydp[point] == 1:
+                    next_ydp[point - A[i]] = 1
+                    next_ydp[point + A[i]] = 1
+            cur_ydp = next_ydp
+            next_ydp = [0] * L
+            
         else:
-            xx.append(A[i])
+            for point in range(L):
+                if cur_xdp[point] == 1:
+                    if i != 0:
+                        next_xdp[point - A[i]] = 1
+                    next_xdp[point + A[i]] = 1
+            cur_xdp = next_xdp
+            next_xdp = [0] * L
 
-    print(xx)
-    print(yy)
-    for i in range(len(xx)):
-        dpx[i + 1] = dpx[i] + xx[i], dpx[i] - xx[i]
-
-
-
+    print(YES if cur_ydp[y + offset] and cur_xdp[x + offset] else NO)
     return
 
 

@@ -3,14 +3,6 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    am = [0] * (2 * N + 2)
-    for i in range(1, N + 1):
-        now = am[A[i - 1]]
-        am[2 * i] = now + 1
-        am[2 * i + 1] = now + 1
-        # print(am)
-    print(*am[1:], sep="\n")
-
     return
 
 

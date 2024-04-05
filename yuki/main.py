@@ -2,133 +2,189 @@
 import sys
 sys.setrecursionlimit(10 ** 9)
 
-class LcaDoubling:
-    # 木であれば任意の点を根と見做せる。
-    def __init__(self, N, root=0):
-        self.N = N
-        self.root = root
-        self.G = [[] for _ in range(N)]
-        self.depths = [-1] * N
-        self.distances = [-1] * N
-        self.ancestors = [] # ダブリングによって求めた祖先の配列の配列 i番目の配列は過去ノードの2^i個祖先のノードを格納する。
-        return
-    
-    def addEdge(self, fromNode: int, toNode: int, cost: int):
-        self.G[fromNode].append((cost, toNode))
-        return
-    
-    def build(self):
-        """
-        O(NlogN)
-        """
-        prevAncestors = self._bfs()
-        self.ancestors.append(prevAncestors)
-        d = 1
-        max_depth = max(self.depths)
-        while d < max_depth:
-            nextAncestors = [prevAncestors[p] for p in prevAncestors]
-            self.ancestors.append(nextAncestors)
-            d <<= 1
-            prevAncestors = nextAncestors
-        return
+class SegTree:
+    def __init__(self, unit: int, bottomList: "list[int]", func: "function", isLogging: bool = False, convertLengthToThePowerOf2: bool = False):
+        self.unit = unit
+        self.func = func
+        self.bottomLen = self._getSegLenOfThePowerOf2(len(bottomList)) if convertLengthToThePowerOf2 else len(bottomList)
+        self.actualLen = len(bottomList)
+        self.offset = self.bottomLen        # セグ木の最下層の最初のインデックスに合わせるためのオフセット
+        self.segLen = self.bottomLen * 2
+        self.tree = [unit] * self.segLen
+        self.isLogging = isLogging
+        if self.isLogging:
+            self.logtree = [len(str(unit)) + 2] * self.segLen
+        self._build(bottomList)
 
-    def _bfs(self):
-        q = [(self.root, -1, 0, 0)]
-        directAncestors = [-1] * (self.N + 1)  # 頂点数より1個長くし、存在しないことを-1で表す。末尾(-1)要素は常に-1
-        while q:
-            now, parent, dep, dist = q.pop()
-            directAncestors[now] = parent
-            self.depths[now] = dep
-            self.distances[now] = dist
-            for cost, next in self.G[now]:
-                if next != parent:
-                    q.append((next, now, dep + 1, dist + cost))
-        return directAncestors
- 
-    def getLca(self, nodeA: int, nodeB: int):
+    def _build(self, seq):
         """
-        O(logN)
+        初期化
+        O(self.segLen)
         """
-        depthA, depthB = self.depths[nodeA], self.depths[nodeB]
-        if depthA > depthB:
-            nodeA, nodeB = nodeB, nodeA
-            depthA, depthB = depthB, depthA
+        # 最下段の初期化
+        for i, x in enumerate(seq, self.offset):
+            self.tree[i] = x
+            if self.isLogging:
+                self.logtree[i] = len(str(x)) + 2
+        # ビルド
+        for i in range(self.offset - 1, 0, -1):
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1])
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
+
+    def _getSegLenOfThePowerOf2(self, ln: int):
+        """
+        直近の2べきの長さを算出
+        """
+        if ln <= 0:
+            return 1
+        else:    
+            import math
+            decimalPart, integerPart = math.modf(math.log2(ln))
+            return 2 ** (int(integerPart) + (0 if decimalPart == float(0) else 1))
+
+    def pointAdd(self, i: int, val: int):
+        """
+        一点加算 他演算
+        O(log(self.bottomLen))
+        """
+        i += self.offset
+        self.tree[i] += val
+        if self.isLogging:
+            self.logtree[i] = len(str(self.tree[i])) + 2
+        # self.tree[i] = self.func(self.tree[i], val) <- こっちの方が都度の修正は発生しない。再帰が遅くないか次第。
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
+
+    def pointUpdate(self, i: int, val: int):
+        """
+        一点更新
+        O(log(self.bottomLen))
+        """
+        i += self.offset
+        self.tree[i] = val
+        if self.isLogging:
+            self.logtree[i] = len(str(self.tree[i])) + 2
+        while i > 1:
+            i >>= 1 # 2で割って頂点に達するまで下層から遡上
+            self.tree[i] = self.func(self.tree[i << 1], self.tree[i << 1 | 1]) # 必ず末尾0と1がペアになるのでor演算子
+            if self.isLogging:
+                self.logtree[i] = max(len(str(self.tree[i])) + 2, self.logtree[i << 1] + self.logtree[i << 1 | 1] + 1)
+
+    def getRange(self, l: int, r: int):
+        """
+        区間取得 (l ≦ X < r)
+        l ~ r-1までの区間 (0-indexed)。※右端を含まない。
+        O(log(self.bottomLen))
+        """
+        l += self.offset
+        r += self.offset
+        vL = self.unit
+        vR = self.unit
+        while l < r:
+            if l & 1:
+                vL = self.func(vL, self.tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                vR = self.func(self.tree[r], vR)
+            l >>= 1
+            r >>= 1
+        return self.func(vL, vR)
+
+    def getPoint(self, i: int):
+        """
+        一点取得
+        O(1)
+        """
+        i += self.offset
+        return self.tree[i]
+
+    def max_right(self, l, is_ok: "function"):
+        """
+        二分探索
+        O(log(self.bottomLen))
+        ※ セグ木上の二分探索をする場合は2べきにすること。
+        # !!!! ng側が返却される !!!!!
+        """
+        print("セグ木上の二分探索をする場合は2べきにすること。 convertLengthToThePowerOf2=True")
+        l += self.offset
+        idx = l // (l & -l) # lから始まる最も大きいセグメントのインデックス算出。(= 2で割れなくなるまで割る)
+        ans = self.unit
+        while is_ok(self.func(ans, self.tree[idx])): # そのセグメントが条件を満たすかどうかの判定
+            # 条件を満たす限り上へとより範囲を広げていく。
+            ans = self.func(ans, self.tree[idx])
+            idx += 1
+            idx //= (idx & -idx) 
+            if idx == 1: # 最上層まで到達したら全範囲満たすということ。 → (2べきになるようにモノイド埋めする前の)実際の長さを返す。
+                return self.actualLen
+        while idx < self.offset:
+            # 下へと降りていき境界値を見つける。
+            idx <<= 1 # 一階層下のセグメント(左側)へ移動 (=2倍)
+            #
+            # |           idx           |
+            # |   idx<<1   | idx<<1 + 1 |
+            #
+            if is_ok(self.func(ans, self.tree[idx])): # 条件を満たすなら同一階層の右側のセグメントの下層(左側)へ。満たさないならそのまま下層(左側)へ。
+                ans = self.func(ans, self.tree[idx])
+                idx += 1
+        return idx - self.offset - 1
+
+    # 未検証
+    def min_left(self, r, is_ok):
+        r += self.offset
+        rr = max(r // (~r & -~r), 1)
+        ans = self.unit
+        while is_ok(self.func(self.tree[rr], ans)):
+            ans = self.func(self.tree[rr], ans)
+            rr -= 1
+            while rr & 1:
+                rr >>= 1
+            if rr == 0:
+                return -1
+        while rr < self.offset:
+            rr <<= 1
+            if is_ok(self.func(self.tree[rr+1], ans)):
+                ans = self.func(self.tree[rr+1], ans)
+            else:
+                rr += 1
+        return rr - self.offset
+
+    def __str__(self) -> str:
+        if not self.isLogging:
+            return "[" + ", ".join([str(i) for i in self.tree]) + "]"
         
-        # 2ノードを同じ深さまで揃える。
-        tu = nodeA
-        tv = self.upstream(nodeB, depthB - depthA)
-
-        # 遡上させて行き2つが衝突する位置が共通祖先。
-        if nodeA == tv:
-            return nodeA
-        for k in range(depthA.bit_length() - 1, -1, -1):
-            mu = self.ancestors[k][tu]
-            mv = self.ancestors[k][tv]
-            if mu != mv:
-                tu = mu
-                tv = mv
-        lca = self.ancestors[0][tu]
-        assert lca == self.ancestors[0][tv]
-        return lca
- 
-    # 2つのノードの間の距離を返す。
-    def getDistance(self, nodeA, nodeB):
-        """
-        O(logN)
-        """
-        lca = self.getLca(nodeA, nodeB)
-        return self.distances[nodeA] + self.distances[nodeB] - 2 * self.distances[lca]
-
-    # targetNodeが2つのノード間のパス上に存在するかを返す。
-    def isOnPath(self, nodeA: int, nodeB: int, evalNode: int):
-        """
-        O(logN)
-        """
-        return self.getDistance(nodeA, nodeB) == self.getDistance(nodeA, evalNode) + self.getDistance(evalNode, nodeB) 
-
-    # ノードvからk個遡上したノードを返す。
-    def upstream(self, v, k):
-        i = 0
-        while k:
-            if k & 1:
-                v = self.ancestors[i][v]
-            k >>= 1
-            i += 1
-        return v
+        res = []
+        PowerOf2Set = set([2 ** i for i in range(8)]) # どうぜログ出力で確認できるのはせいぜいこの辺まで
+        for i in range(1, self.segLen):
+            if i in PowerOf2Set:
+                res.append("\n|")
+            res.append(str(self.tree[i]).center(self.logtree[i], " "))
+            res.append("|")
+        return "".join(res)
 
 def main():
-    N = int(input())
-    ld = LcaDoubling(N)
-    for _ in range(N - 1):
-        u, v = map(int, input().split())
-        ld.addEdge(u - 1, v - 1, 1)
-        ld.addEdge(v - 1, u - 1, 1)
-    ld.build()
-    imos = [0] * N
-
-    def dfs(pre: int, now: int):
-        for _, next in ld.G[now]: 
-            if next == pre: 
-                continue
-            dfs(now, next)
-        if pre != -1:
-            imos[pre] += imos[now]
-        return
-
-    Q = int(input())
-    for i in range(Q):
-        a, b = map(int, input().split())
-        imos[a - 1] += 1
-        imos[b - 1] += 1
-        lc = ld.getLca(a - 1, b - 1)
-        imos[lc] -= 2
-    print(imos)
-    dfs(-1, 0)
-    print(imos)
-    # ans = 0
-    # for num in imos:
-    #     ans += num * (num + 1) // 2
-    # print(ans)
+    N, Q = map(int, input().split())
+    A = list(map(int, input().split()))
+    B = [A[i + 1] - A[i] for i in range(N - 1)]
+    C = [0 if B[i] == 0 else 1 for i in range(N - 1)]
+    seg = SegTree(unit=0, bottomList=C, func=lambda a, b: a + b, isLogging=True)
+    for _ in range(Q):
+        t, *args = map(int, input().split())
+        if t == 1:
+            l, r, x = args[0] - 1, args[1] - 1, args[2]
+            if l > 0:
+                B[l - 1] += x
+                seg.pointUpdate(l - 1, 0 if B[l - 1] == 0 else 1)
+            if r < N - 1:
+                B[r] -= x
+                seg.pointUpdate(r, 0 if B[r] == 0 else 1)
+        else:
+            l, r = args[0] - 1, args[1] - 1
+            print(seg.getRange(l, r + 1 - 1) + 1)
     return
         
 if __name__ == '__main__':

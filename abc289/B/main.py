@@ -3,22 +3,6 @@ import sys
 
 
 def solve(N: int, M: int, a: "List[int]"):
-    ans = []
-    tmp = []
-    for i in range(1, N + 1):
-        if i in a:
-            tmp.append(i)
-        else:
-            tmp.append(i)
-            if len(tmp) != 0:
-                for tt in tmp[::-1]:
-                    ans.append(tt)
-                tmp = []
-            else:
-                ans.append(i)
-    for tt in tmp[::-1]:
-        ans.append(tt)
-    print(*ans, sep=" ")
     return
 
 

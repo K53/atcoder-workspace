@@ -94,35 +94,48 @@ class Eratosthenes():
                     res.append(res[i] * v)
         return res
 
-# Usage
-N = 12
-er = Eratosthenes(N)
-print(er.primes)
-"-> [2, 3, 5, 7, 11]"
-print(er.isPrime(2))
-"-> True"
-print(er.isPrime(3))
-"-> True"
-print(er.isPrime(4))
-"-> False"
+    """ 平方数判定
+    計算量 : O(NlogN)
+    """
+    def isSquare(self, n):
+        for _, exp in self.factorize(n):
+            if exp % 2 == 1:
+                return False
+        return True
 
-M = 10 ** 5
-er = Eratosthenes(M)
-print(er.factorize(120))
-"-> [(2, 3), (3, 1), (5, 1)]"
-# 120 = 2^3 + 3^1 + 5^1
+def main():
+    # Usage
+    N = 12
+    er = Eratosthenes(N)
+    print(er.primes)
+    "-> [2, 3, 5, 7, 11]"
 
-M = 10 ** 5
-er = Eratosthenes(M)
-print(er.getDivisors(120))
-"-> [1, 2, 4, 8, 3, 6, 12, 24, 5, 10, 20, 40, 15, 30, 60, 120]"
+    print(er.isPrime(2))
+    "-> True"
+    print(er.isPrime(3))
+    "-> True"
+    print(er.isPrime(4))
+    "-> False"
 
-# data structure
-er = Eratosthenes(12)
-print(er.primeTable) # 0-indexed
-"-> [False, False, True, True, False, True, False, True, False, False, False, True, False]"
-print(er.minfactor) # 数iの最小の素因数 (iは0-indexed))
-"-> [0, 1, 2, 3, 2, 5, 2, 7, 2, 3, 2, 11, 2]"
-print(er.primes) # 素数リスト
-"-> [2, 3, 5, 7, 11]"
+    M = 10 ** 5
+    er = Eratosthenes(M)
+    print(er.factorize(120))
+    "-> [(2, 3), (3, 1), (5, 1)]"
+    # 120 = 2^3 + 3^1 + 5^1
 
+    M = 10 ** 5
+    er = Eratosthenes(M)
+    print(er.getDivisors(120))
+    "-> [1, 2, 4, 8, 3, 6, 12, 24, 5, 10, 20, 40, 15, 30, 60, 120]"
+
+    # data structure
+    er = Eratosthenes(12)
+    print(er.primeTable) # 0-indexed
+    "-> [False, False, True, True, False, True, False, True, False, False, False, True, False]"
+    print(er.minfactor) # 数iの最小の素因数 (iは0-indexed))
+    "-> [0, 1, 2, 3, 2, 5, 2, 7, 2, 3, 2, 11, 2]"
+    print(er.primes) # 素数リスト
+    "-> [2, 3, 5, 7, 11]"
+
+if __name__ == "__main__":
+    main()

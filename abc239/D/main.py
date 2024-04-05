@@ -31,40 +31,11 @@ class Eratosthenes():
     def isPrime(self, n: int) -> bool:
         return self.primeTable[n]
 
-    """ 高速素因数分解
-    計算量 : O(NlogN)
-    """
-    def factorize(self, n: int) -> list:
-        res = [] # (p, exp)
-        while n > 1:
-            p = self.minfactor[n]
-            exp = 0
-            while self.minfactor[n] == p:
-                n //= p
-                exp += 1
-            res.append((p, exp))
-        return res
-
-    """ 高速約数列挙
-    計算量 : O(σ(N)) 
-    注) σ(N) : 数Nの約数の数
-    """
-    def getDivisors(self, n: int) -> list:
-        res = [1]
-        for p in self.factorize(n):
-            for i in range(len(res)):
-                v = 1
-                for _ in range(p[1]):
-                    v *= p[0]
-                    res.append(res[i] * v)
-        return res
-
 def solve(A: int, B: int, C: int, D: int):
-    er = Eratosthenes(200)
-    s = set(er.primes)
+    er = Eratosthenes(10001)
     for i in range(A, B + 1):
         for j in range(C, D + 1):
-            if i + j in s:
+            if er.isPrime(i + j):
                 break
         else:
             print("Takahashi")

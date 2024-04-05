@@ -1,44 +1,36 @@
 #!/usr/bin/env python3
 import sys
-import math
 
 MOD = 998244353  # type: int
-# MAX = 10 ** 6   # Pypyで 260~280 msくらい
-
-fac, finv, inv = [1, 1], [1, 1], [0, 1]
-# fac : 階乗(1,2,6,...)
-# inv : 逆元(1,2,...N) -> inv[i] = pow(i, 10 ** 9 + 5, 10 ** 9 + 7)
-# finv: 逆元(階乗の逆元 = 1の逆元, 2の逆元, 6の逆元)
-def cmbInit():
-    for i in range(2, 301):
-        fac.append(fac[i - 1] * i % MOD)
-        # inv.append(MOD - inv[MOD % i] * (MOD // i) % MOD)
-        # finv.append(finv[i - 1] * inv[i] % MOD)
-
-# 二項係数計算
-# def cmbMod(n: int,k: int):
-#     if n < k: return 0
-#     if n < 0 or k < 0: return 0
-#     return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD
 
 def solve(N: int, M: int, A: int, B: int, C: int, D: int, E: int, F: int, X: "List[int]", Y: "List[int]"):
-    cmbInit()
-    dp = [[["0x0" for _ in range(N + 1)] for _ in range(N + 1)] for _ in range(N + 1)]
-    n1 = fac[N]
-    ans = 0
+    S = set()
+    for xx, yy, in zip(X, Y):
+        S.add((xx, yy))
+    dp = [[[0] * (N + 1) for _ in range(N + 1)] for _ in range(N + 1)]
+    dp[0][0][0] = 1
     for i in range(N):
-        for j in range(N):
-            if i + j + 1 > N:
-                break
-            for k in range(N):
-                if i + j + k + 1 > N:
-                    print(n1 / (fac[i]*fac[j]*fac[k]))
-                    break
-                xx, yy = map(int, dp[i][j][k].split("x"))
-                dp[i + 1][j][k] = str(xx + A) + "x" + str(yy + B)
-                dp[i][j + 1][k] = str(xx + C) + "x" + str(yy + D)
-                dp[i][j][k + 1] = str(xx + E) + "x" + str(yy + F)
+        for xx in range(N):
+            for yy in range(N):
+                zz = i - xx - yy
+                if zz < 0:
+                    continue
+                new_x = A * xx + C * yy + E * zz
+                new_y = B * xx + D * yy + F * zz
+
+                if (new_x + A, new_y + B) not in S:
+                    dp[i + 1][xx + 1][yy] += dp[i][xx][yy]
+                    dp[i + 1][xx + 1][yy] %= MOD
+                
+                if (new_x + C, new_y + D) not in S:
+                    dp[i + 1][xx][yy + 1] += dp[i][xx][yy]
+                    dp[i + 1][xx][yy + 1] %= MOD
+
+                if (new_x + E, new_y + F) not in S:
+                    dp[i + 1][xx][yy] += dp[i][xx][yy]
+                    dp[i + 1][xx][yy] %= MOD
     
+    print(sum([sum(l) for l in dp[-1]]) % MOD)
     return
 
 

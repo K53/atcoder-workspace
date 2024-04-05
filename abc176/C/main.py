@@ -3,14 +3,6 @@ import sys
 
 
 def solve(N: int, A: "List[int]"):
-    ans = 0
-    for i in range(1, N):
-        diff = A[i] - A[i - 1]
-        if diff >= 0:
-            continue
-        ans += -diff
-        A[i] = A[i - 1]
-    print(ans)
     return
 
 

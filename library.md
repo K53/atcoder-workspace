@@ -10,7 +10,15 @@ for i in range(M):
     G[b[i] - 1].append(a[i] - 1)
 
 print(G)
+
+# 周囲を"#"などで囲う場合、 W + 2にすることに注意！
+F = []
+F.append("#" * (W + 2))
+for _ in range(H):
+    F.append("#" + input() + "#")
+F.append("#" * (W + 2))
 ```
+
 
 ## インタラクティブな問題のバッファのフラッシュ
 

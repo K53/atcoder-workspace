@@ -1,0 +1,100 @@
+#!/bin/bash
+set -eu
+
+function catch {
+    for i in $(seq 1 10) ; do
+        if [ ! -f ./in_${i}.txt ]; then
+            cat ./$INPUT_FILE_NAME > ./in_${i}.txt
+            cat ./$OUTPUT_FILE_GREEDY_NAME > ./out_${i}.txt
+            echo "------------------------------------------------------"
+            echo "Created Killer Case!!! -> in_${i}.txt and out_${i}.txt"
+            echo "------------------------------------------------------"
+            break
+        fi
+    done
+    exit 1
+}
+# trap catch ERR
+
+if [ $# -lt 3 ]; then
+    echo Invalid Parameter: $*
+    echo "--- How to use ----------"
+    echo "param1 : target contest name. Eg.) /Users/username/atcoder-workspace"
+    echo "param2 : target contest name. Eg.) abc123"
+    echo "param3 : target problem. Eg.) D"
+    echo "param4 [OPTION] : target case. Eg.) 4 (it means in_4.txt)"
+    exit 1
+fi
+
+ATCODER_WORKSPACE_PATH=$1
+TARGET_CONTEST_NAME=$2
+TARGET_PROBLEM=$3
+TARGET_FILE_NAME="main.py"
+TARGET_FILE_PATH=$ATCODER_WORKSPACE_PATH"/"$TARGET_CONTEST_NAME"/"$TARGET_PROBLEM"/"$TARGET_FILE_NAME
+GREEDY_FILE_NAME="greedy.py"
+GREEDY_FILE_PATH=$ATCODER_WORKSPACE_PATH"/"$TARGET_CONTEST_NAME"/"$TARGET_PROBLEM"/"$GREEDY_FILE_NAME
+INPUT_FILE_NAME="detect_random_1.txt"
+INPUT_FILE_PATH=$ATCODER_WORKSPACE_PATH"/"$TARGET_CONTEST_NAME"/"$TARGET_PROBLEM"/"$INPUT_FILE_NAME
+OUTPUT_FILE_GREEDY_NAME="detect_out_expected_1.txt"
+OUTPUT_FILE_GREEDY_PATH=$ATCODER_WORKSPACE_PATH"/"$TARGET_CONTEST_NAME"/"$TARGET_PROBLEM"/"$OUTPUT_FILE_GREEDY_NAME
+OUTPUT_FILE_TARGET_NAME="detect_out_actual_1.txt"
+OUTPUT_FILE_TARGET_PATH=$ATCODER_WORKSPACE_PATH"/"$TARGET_CONTEST_NAME"/"$TARGET_PROBLEM"/"$OUTPUT_FILE_TARGET_NAME
+GENERATE_RANDOM_INPUT_NAME="generateRandomInput.py"
+GENERATE_RANDOM_INPUT_PATH=$ATCODER_WORKSPACE_PATH"/lib/KillerCaseDetector/"$GENERATE_RANDOM_INPUT_NAME
+COMPARE_FILE_NAME="compare.py"
+COMPARE_FILE_PATH=$ATCODER_WORKSPACE_PATH"/lib/KillerCaseDetector/"$COMPARE_FILE_NAME
+TRY_COUNT=10
+
+echo "TARGET : "$TARGET_FILE_PATH
+
+if [ $# == 4 ]; then
+    echo option directed
+    echo "run greedy.py files"
+    # # 貪欲法解の出力
+    python $GREEDY_FILE_PATH < in_$4.txt > $OUTPUT_FILE_GREEDY_PATH
+    echo "OK"
+
+    echo "run main.py files"
+    # # 提出解の出力
+    python $TARGET_FILE_PATH < in_$4.txt > $OUTPUT_FILE_TARGET_PATH
+    echo "OK"
+
+    echo "run compare.py files"
+    # # 貪欲法解と提出解の出力差異の検証
+    python $COMPARE_FILE_PATH $OUTPUT_FILE_GREEDY_PATH $OUTPUT_FILE_TARGET_PATH
+    echo "OK"
+    exit 0
+fi
+
+
+for i in $(seq 1 ${TRY_COUNT}) ; do
+    echo "-------------------------------------"
+    echo "case${i} ... running"
+    echo "init in/out files"
+    # 入出力ファイルの初期化
+    cp /dev/null $INPUT_FILE_PATH
+    cp /dev/null $OUTPUT_FILE_GREEDY_PATH
+    cp /dev/null $OUTPUT_FILE_TARGET_PATH
+
+    echo "generate input files"
+    # 入力の生成
+    python $GENERATE_RANDOM_INPUT_PATH $INPUT_FILE_PATH
+    echo "OK"
+
+    echo "run greedy.py files"
+    # # 貪欲法解の出力
+    python $GREEDY_FILE_PATH < $INPUT_FILE_PATH > $OUTPUT_FILE_GREEDY_PATH
+    echo "OK"
+
+    echo "run main.py files"
+    # # 提出解の出力
+    python $TARGET_FILE_PATH < $INPUT_FILE_PATH > $OUTPUT_FILE_TARGET_PATH
+    echo "OK"
+
+    echo "run compare.py files"
+    # # 貪欲法解と提出解の出力差異の検証
+    python $COMPARE_FILE_PATH $OUTPUT_FILE_GREEDY_PATH $OUTPUT_FILE_TARGET_PATH || catch
+    echo "OK"
+
+    echo "case${i} ... succeeded!"
+done

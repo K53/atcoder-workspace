@@ -3,7 +3,10 @@ import sys
 
 
 def solve(N: int):
-    
+    dp = [0] * N
+    for i in reversed(range(1, N)):
+        dp[i - 1] = dp[i] + N / (N - i)
+    print(dp[0])
     return
 
 

@@ -2,3 +2,4 @@ in_*.txt
 out_*.txt
 metadata.json
 .vscode
+**/__pycache__/**

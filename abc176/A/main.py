@@ -3,10 +3,6 @@ import sys
 
 
 def solve(N: int, X: int, T: int):
-    p, q = divmod(N, X)
-    if q != 0:
-        p += 1
-    print(p * T)
     return
 
 

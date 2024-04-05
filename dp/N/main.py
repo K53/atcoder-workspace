@@ -1,8 +1,40 @@
 #!/usr/bin/env python3
 import sys
+from itertools import accumulate
+INF = 10 ** 9
 
+    
 
 def solve(N: int, a: "List[int]"):
+    N = 3
+    a = [10, 20, 80]
+    dp = [[INF] * (N + 1) for _ in range(N + 1)]
+    *acc, = accumulate(a)
+    acc = [0] + acc
+    def get(l, r): # r含まない
+        return acc[r] - acc[l]
+    
+    def rec(l, r):
+        print(l, r, dp)
+        print("--")
+        if dp[l][r] != INF:
+            return dp[l][r]
+        
+        if r - l <= 1:
+            dp[l][r] = 0
+            return 0
+
+        for mid in range(l + 1, r - 1 + 1):
+            print("mid", mid)
+            p = rec(l, mid)
+            q = rec(mid, r)
+            print(l, mid, mid, r)
+            print(p, q, get(l, r))
+            dp[l][r] = min(dp[l][r], p + q + get(l, r))
+        
+        return dp[l][r]
+    print(rec(0, N))
+    print(dp)
     return
 
 

@@ -4,93 +4,45 @@ import sys
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-class BIT:
-    def __init__(self, N):
-        self.N = N
-        self.bit = [0] * (self.N + 1) # 1-indexedのため
-        
-    def add(self, pos, val):
-        '''Add
-            O(logN)
-            posは0-index。内部で1-indexedに変換される。
-            A[pos] += val 
-        '''
-        i = pos + 1 # convert from 0-index to 1-index
-        while i <= self.N:
-            self.bit[i] += val
-            i += i & -i
 
-    def deleteNonNegative(self, pos, val) -> int:
-        '''Add
-            O(logN)
-            ※ multisetで使用される関数
-            posは0-index。内部で1-indexedに変換される。
-            すでにMultiSetに含まれている個数以上は削除されない。
-            A[pos] -= val 
-        '''
-        actualSubstractVal = min(val, self.sum(pos) - self.sum(pos - 1)) # pos - 1は負になってもself.sum()は大丈夫
-        i = pos + 1 # convert from 0-index to 1-index
-        while i <= self.N:
-            self.bit[i] -= actualSubstractVal
-            i += i & -i
-        return actualSubstractVal
 
-    def sum(self, pos):
-        ''' Sum
-            0からposまでの和を返す(posを含む)
-            O(logN)
-            posは0-index。内部で1-indexedに変換される。
-            Return Sum(A[0], ... , A[pos])
-            posに負の値を指定されるとSum()すなわち0を返すのでマイナスの特段の考慮不要。
-        '''
-        res = 0
-        i = pos + 1 # convert from 0-index to 1-index
-        while i > 0:
-            res += self.bit[i]
-            i -= i & -i    
-        return res
-    
-    def lowerLeft(self, w):
-        '''
-        O(logN)
-        A0 ~ Aiの和がw以上となる最小のindex(値)を返す。
-        Ai ≧ 0であること。
-        '''
-        if (w < 0):
-            return 0
-        total = self.sum(self.N - 1)
-        if w > total:
-            return -1
-        x = 0
-        k = 1 << (self.N.bit_length() - 1)
-        while k > 0:
-            if x + k < self.N and self.bit[x + k] < w:
-                w -= self.bit[x + k]
-                x += k
-            k //= 2
-        return x
-        
-    def __str__(self):
-        '''
-        index0は不使用なので表示しない。
-        '''
-        return "[" + ", ".join(f'{v}' for v in self.bit[1:]) + "]"
-    
 
 def solve(N: int, H: int, W: int, A: "List[int]", B: "List[int]"):
-    # usage
-    Shw = H * W
-    field = [BIT(W) for _ in range(H)]
-
-    def put(i_useTiles, tileidx):
-        for stAt_hh in range(H):
-            for stAt_ww in range(W):
-                if stAt_hh + A[i_useTiles[tileidx]] > H or stAt_ww + B[i_useTiles[tileidx]] > W:
-                    continue
+    Ar = []
+    Br = []
+    for aa, bb in zip(A, B):
+        Ar.append(aa)
+        Br.append(bb)
+        if aa != bb:
+            Ar.append(bb)
+            Br.append(aa)
+    # print(Ar, Br)
+    N = len(Ar)
+    # [1, 3, 4, 2, 3, 2, 5] [1, 3, 4, 3, 2, 5, 2]
+    def put(i_useTiles, tileidx): # start_hh, start_ww):
+        for hh in range(H):
+            for ww in range(W):
+                if field[hh][ww] == 0:
+                    break
+            else:
+                continue
+            break
+        else:
+            print(YES)
+            exit()
+        if tileidx > len(i_useTiles):
+            return
+        # print(field, i_useTiles, tileidx, i_useTiles[tileidx])
+        
+        for start_hh in range(H):
+            for start_ww in range(W):
                 is_ok = True
-                for aa in range(A[i_useTiles[tileidx]]):
-                    for bb in range(B[i_useTiles[tileidx]]):
-                        if field[stAt_hh + aa].sum(stAt_ww, stAt_ww + bb) != 0:
+                for aa in range(Ar[i_useTiles[tileidx]]):
+                    for bb in range(Br[i_useTiles[tileidx]]):
+                        if start_hh + aa >= H or start_ww + bb >= W:
+                            is_ok = False
+                            break
+                        if field[start_hh + aa][start_ww + bb] != 0:
                             is_ok = False
                             break
                     else:
@@ -98,46 +50,40 @@ def solve(N: int, H: int, W: int, A: "List[int]", B: "List[int]"):
                     break
                 if not is_ok:
                     continue
-                for aa in range(A[i_useTiles[tileidx]]):
-                    for bb in range(B[i_useTiles[tileidx]]):
-                        field[stAt_hh + aa][stAt_ww + bb] = 1
-                
-                for hh in range(H):
-                    for ww in range(W):
-                        if field[hh][ww] == 0:
-                            break
-                    else:
-                        continue
-                    break
-                else:
-                    print(YES)
-                    exit()
-                if tileidx <= len(i_useTiles):
-                    put(i_useTiles, tileidx + 1)
-                for aa in range(A[i_useTiles[tileidx]]):
-                    for bb in range(B[i_useTiles[tileidx]]):
-                        field[stAt_hh + aa][stAt_ww + bb] = 0
+                for aa in range(Ar[i_useTiles[tileidx]]):
+                    for bb in range(Br[i_useTiles[tileidx]]):
+                        field[start_hh + aa][start_ww + bb] = 1
+                put(i_useTiles, tileidx + 1)
+                break
+            else:
+                continue
+            break
+        else:
+            return
+        for aa in range(Ar[i_useTiles[tileidx]]):
+            for bb in range(Br[i_useTiles[tileidx]]):
+                field[start_hh + aa][start_ww + bb] = 0
 
 
-    
+    Shw = H * W
+    field = [[0] * W for _ in range(H)]
     for b in range(2 ** N):
         s = 0
         i_useTiles = []
         for i in range(N):
             if (b >> i) & 1:
                 i_useTiles.append(i)
-                s += A[i] * B[i]
+                s += Ar[i] * Br[i]
                 if s > Shw:
                     break
         else:
             if s != Shw:
                 continue
             # print(s, i_useTiles)
-            for i in range(N):
-                if (b >> i) & 1:
-                    put(field, i_useTiles, 0)
+            put(i_useTiles, 0)
                             
-    
+    print(NO)
+
 
     return
 

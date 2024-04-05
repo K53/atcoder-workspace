@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 import sys
+import functools
 
-
+@functools.lru_cache(maxsize=None)
 def solve(N: int):
-    s = [1]
-    for i in range(1, N):
-        s = s + [i + 1] + s
-    print(*s, sep=" ")
+    def S(i):
+        if i == 1:
+            return [1]
+        return S(i - 1) + [i] + S(i - 1)
+
+    print(*S(N), sep=" ")
     return
 
 

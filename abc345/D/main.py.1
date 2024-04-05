@@ -1,59 +1,39 @@
 #!/usr/bin/env python3
 import sys
+from itertools import permutations
 
 YES = "Yes"  # type: str
 NO = "No"  # type: str
 
-
-
-
 def solve(N: int, H: int, W: int, A: "List[int]", B: "List[int]"):
-    Ar = []
-    Br = []
-    for aa, bb in zip(A, B):
-        Ar.append(aa)
-        Br.append(bb)
-        if aa != bb:
-            Ar.append(bb)
-            Br.append(aa)
-    # print(Ar, Br)
-    N = len(Ar)
-    # [1, 3, 4, 2, 3, 2, 5] [1, 3, 4, 3, 2, 5, 2]
+    # usage
+    Shw = H * W
     field = [[0] * W for _ in range(H)]
-    def put(i_useTiles, tileidx): # start_hh, start_ww):
-        # for hh in range(H):
-        #     for ww in range(W):
-        #         if field[hh][ww] == 0:
-        #             break
-        #     else:
-        #         continue
-        #     break
-        # else:
-        #     print(YES)
-        #     exit()
-        # if tileidx > len(i_useTiles):
-        #     return
-        # print(field, i_useTiles, tileidx, i_useTiles[tileidx])
-        
-        for start_hh in range(H):
-            for start_ww in range(W):
-                if start_hh + Ar[i_useTiles[tileidx]] > H or start_ww + Br[i_useTiles[tileidx]] > W:
+
+    def put(tiles, idx, start_hhww):
+        start_hh, start_ww = divmod(start_hhww, W)
+        # print(field, bin(tiles), start_hh, start_ww)
+        aa, bb = A[tiles[idx]], B[tiles[idx]]
+        l = [(aa, bb)]
+        if aa != bb:
+            l.append((bb, aa))
+        for dh, dw in l:
+            if start_hh + dh > H or start_ww + dw > W:
+                continue
+
+            for ddh in range(dh):
+                for ddw in range(dw):
+                    if field[start_hh + ddh][start_ww + ddw] != 0:
+                        break
+                else:
                     continue
-                is_ok = True
-                for aa in range(Ar[i_useTiles[tileidx]]):
-                    for bb in range(Br[i_useTiles[tileidx]]):
-                        if field[start_hh + aa][start_ww + bb] != 0:
-                            is_ok = False
-                            break
-                    else:
-                        continue
-                    break
-                if not is_ok:
-                    continue
-                for aa in range(Ar[i_useTiles[tileidx]]):
-                    for bb in range(Br[i_useTiles[tileidx]]):
-                        field[start_hh + aa][start_ww + bb] = 1
-                
+                break
+            else:
+                for ddh in range(dh):
+                    for ddw in range(dw):
+                        field[start_hh + ddh][start_ww + ddw] = 1
+            
+                # Check
                 for hh in range(H):
                     for ww in range(W):
                         if field[hh][ww] == 0:
@@ -64,34 +44,36 @@ def solve(N: int, H: int, W: int, A: "List[int]", B: "List[int]"):
                 else:
                     print(YES)
                     exit()
-                if tileidx <= len(i_useTiles):
-                    put(i_useTiles, tileidx + 1)
-                for aa in range(Ar[i_useTiles[tileidx]]):
-                    for bb in range(Br[i_useTiles[tileidx]]):
-                        field[start_hh + aa][start_ww + bb] = 0
+                
+                if idx + 1 != len(tiles):
+                    for next_hhww in range(start_hhww, Shw):
+                        next_hh, next_ww = divmod(next_hhww, W)
+                        if field[next_hh][next_ww] == 0:
+                            put(tiles, idx + 1, next_hhww)
+                            break
+                # 0に戻す
+                for ddh in range(dh):
+                    for ddw in range(dw):
+                        field[start_hh + ddh][start_ww + ddw] = 0
+                
 
-
-    Shw = H * W
     for b in range(2 ** N):
         s = 0
-        i_useTiles = []
+        tiles = []
         for i in range(N):
             if (b >> i) & 1:
-                i_useTiles.append(i)
-                s += Ar[i] * Br[i]
+                s += A[i] * B[i]
+                tiles.append(i)
                 if s > Shw:
                     break
         else:
             if s != Shw:
                 continue
-            # print(s, i_useTiles)
-            for i in range(N):
-                if (b >> i) & 1:
-                    put(i_useTiles, 0)
+            for p in permutations(tiles):
+                put(p, 0, 0)
                             
+    
     print(NO)
-
-
     return
 
 

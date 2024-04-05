@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 import sys
 from itertools import accumulate
-from collections import defaultdict
+from collections import Counter
 
 def solve(N: int, K: int, A: "List[int]"):
     L = [0] + list(accumulate(A))
-    # s = set(L)
-    d = defaultdict(int)
-    for ll in L:
-        d[ll] += 1
-    # print(L)
-    # print(dict(d))
+    d = Counter(L)
     ans = 0
     for i in range(N):
-        # print("#", i, L[i] + K, d[L[i] + K])
         d[L[i]] -= 1
         ans += d[L[i] + K]
     # return ans

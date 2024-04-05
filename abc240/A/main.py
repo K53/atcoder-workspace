@@ -6,7 +6,9 @@ NO = "No"  # type: str
 
 
 def solve(a: int, b: int):
-    if abs(a - b) == 1 or abs(a % 10 - b % 10) == 1:
+    a -= 1
+    b -= 1
+    if ((a + 1) % 10 == b) or ((b + 1) % 10 == a):
         print(YES)
     else:
         print(NO)

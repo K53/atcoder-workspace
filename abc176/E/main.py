@@ -1,24 +1,8 @@
 #!/usr/bin/env python3
 import sys
-from collections import defaultdict
+
 
 def solve(H: int, W: int, M: int, h: "List[int]", w: "List[int]"):
-    b = set([(hh - 1, ww - 1) for hh, ww in zip(h, w)])
-    dh = defaultdict(int)
-    dw = defaultdict(int)
-    for i in range(M):
-        dh[h[i] - 1] += 1
-        dw[w[i] - 1] += 1
-    maxvh = max(dh.values())
-    maxvw = max(dw.values())
-    hs = [k for k, v in dh.items() if v == maxvh]
-    ws = [k for k, v in dw.items() if v == maxvw]
-    for hh in hs:
-        for ww in ws:
-            if (hh, ww) not in b:
-                print(maxvh + maxvw)
-                return
-    print(maxvh + maxvw - 1)
     return
 
 

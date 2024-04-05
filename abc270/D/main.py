@@ -1,20 +1,14 @@
 #!/usr/bin/env python3
 import sys
-import bisect
 
 def solve(N: int, K: int, A: "List[int]"):
-    A = sorted(A)
-    m = min(A)
-    l = []
-    while N >= m:
-        idx = bisect.bisect_right(A, N)
-        N -= A[idx - 1]
-        l.append(A[idx - 1])
-    ans = 0
-    for i in range(len(l)):
-        if i % 2 == 0:
-            ans += l[i]
-    print(ans)
+    dp = [0] * (N + 1)
+    for i in range(N + 1):
+        for kk in range(K):
+            if i - A[kk] < 0:
+                continue
+            dp[i] = max(dp[i], i - dp[i - A[kk]])
+    print(dp[-1])
     return
 
 
