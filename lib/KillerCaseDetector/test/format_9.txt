@@ -1,0 +1,10 @@
+A B C
+K L M N
+W X Y Z
+
+    ■ 条件
+    ------------------
+    ■ 入力形式
+    A B C
+    K L M N
+    W X Y Z

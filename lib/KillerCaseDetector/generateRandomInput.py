@@ -5,70 +5,117 @@ import bisect
 import string
 import time
 import re
-from collections import deque
-from collections import defaultdict
+from collections import deque, defaultdict
 
-FORMAT_CONFIG = "config_format.txt"
-CONDITION_CONFIG = "config_condition.txt"
-PARAMS = {}
+CONDITION_LOWERCASES = "a"
+CONDITION_UPPERCASES = "A"
+CONDITION_NUMBERS = "0"
+CONDITION_PRIMES = "prime"
+
+GENERATOR_TYPE_LIST = "list"
+GENERATOR_TYPE_GRID = "grid"
+GENERATOR_TYPE_PAIR = "pair"
+
+ELEMENT_CONDITION_TYPE_STRING = "str"
+ELEMENT_CONDITION_TYPE_PRIME = "prime"
+
+class FixedParams():
+    def __init__(self) -> None:
+        self.parameters = {}
+    
+    def setParams(self, variable_name: str, value: "list[int|str|list]") -> None:
+        self.parameters[variable_name] = value
+    
+    def __str__(self) -> str:
+        return "\n".join([f"{k}: {val}" for k, val in self.parameters.items()])
 
 class ReplacableParameter():
     def __init__(self, num_str: str, default_value: str = None) -> None:
         self.num_str = num_str
         self.default_value = default_value
+        self.skip_count = 0
+        self.calced = None
     
-    def getParameter(self, idx: int = 0): # Nなど
-        try:
-            if re.match('-?\d', self.num_str):
-                return int(self.num_str)
-            else:
-                if self.num_str not in PARAMS and self.default_value is not None:
-                    print("default_value was selected")
-                    return int(self.default_value)
-                if len(PARAMS[self.num_str]) == 1:
-                    return PARAMS[self.num_str][0]
+    def _calc(self):
+        if self.calced is not None:
+            return self.calced
+        if self.num_str[0] == "(" and self.num_str[-1] == ")":
+            formula = self.num_str[1:-1]
+            if "*" in formula:
+                self.calced = 1
+                for param in formula.split("*"):
+                    self.calced *= ReplacableParameter(num_str=param).getParameter()
+            if "/" in formula:
+                if self.calced is not None:
+                    raise Exception("[NOT IMPREMENTED] Now, ReplacableParameter calcuration support to process only one operator")
+                params = formula.split("/")
+                if len(params) > 2:
+                    raise Exception("[NOT IMPREMENTED] Now, ReplacableParameter calcuration support to divide with only one operator")
+                self.calced = ReplacableParameter(num_str=params[0]).getParameter() // ReplacableParameter(num_str=params[1]).getParameter()
+            if "+" in formula:
+                if self.calced is not None:
+                    raise Exception("[NOT IMPREMENTED] Now, ReplacableParameter calcuration support to process only one operator")
+                self.calced = 0
+                for param in formula.split("+"):
+                    self.calced += ReplacableParameter(num_str=param).getParameter()
+            if "-" in formula:
+                if self.calced is not None:
+                    raise Exception("[NOT IMPREMENTED] Now, ReplacableParameter calcuration support to process only one operator")
+                params = formula.split("-")
+                if len(params) > 2:
+                    raise Exception("[NOT IMPREMENTED] Now, ReplacableParameter calcuration support to subtract with only one operator")
+                self.calced = ReplacableParameter(num_str=params[0]).getParameter() - ReplacableParameter(num_str=params[1]).getParameter()
+            return self.calced
+        else:
+            return None
+
+    def getParameter(self, idx: int = 0):
+        calced = self._calc()
+        if calced is not None:
+            return calced
+        
+        if re.match('-?\d', self.num_str):
+            return int(self.num_str)
+        else:
+            if self.num_str in fixed_params.parameters:
+                if len(fixed_params.parameters[self.num_str]) == 1:
+                    return fixed_params.parameters[self.num_str][0]
                 else:
-                    return PARAMS[self.num_str][idx]
-        except Exception as e:
-            print(f"[ERROR] Unknown length parameter : {self.num_str}, {idx} : {PARAMS}") # ここは例外発生してるのは正常 なんとかしたい
-            raise e
+                    return fixed_params.parameters[self.num_str][idx]
+            else:
+                if self.skip_count > 0 and self.default_value is not None:
+                    print("default_value was selected")
+                    return int(self.default_value)     
+                else:
+                    self.skip_count += 1
+                    print(f"[ERROR] Unknown length parameter : {self.num_str}, {idx} : {fixed_params}") # ここは例外発生してるのは正常 なんとかしたい
+                    raise ValueError("[ERROR] parameter is not defined.")       ## default_valueは廃止予定 |L|がなければdefault_valueで同時に作成する方が望ましい。
+        # except Exception as e:
+        #     print(f"[ERROR] Unknown length parameter : {self.num_str}, {idx} : {fixed_params}") # ここは例外発生してるのは正常 なんとかしたい
+        #     raise e
+    
+    def __str__(self) -> str:
+        return f"{self.num_str}: {self.getParameter()}, default_value: {self.default_value}"
 
 class ElementCondition():
-    def __init__(self, 
-                 variable_name: str,
-                 integer_min_val_replacable: ReplacableParameter = None,
-                 integer_max_val_replacable: ReplacableParameter = None,
-                 is_prime = False, 
-                 string_candidates: int = None, 
-                 string_length_replacable: ReplacableParameter = None,
-                 eliminateDuplicatedElements: bool = False) -> None:
-        
-        """
-            "variable_name": ${変数名},
-            "integer_min_val_replacable": ${数値の最小値の文字列表記},
-            "integer_max_val_replacable": ${数値の最小値の文字列表記},
-            "is_prime": ${素数かどうか},
-            "string_candidates": [${文字列の候補値},...],
-            "string_length_replacable": ${文字列長の文字列表記},
-            "eliminateDuplicatedElements": ${ True|False : 配列内の重複排除をするかどうか},
-        """
-        self.variable_name = variable_name
-        self.integer_min_val_replacable = integer_min_val_replacable
-        self.integer_max_val_replacable = integer_max_val_replacable
-        self.is_prime = is_prime
-        self.string_candidates = string_candidates
-        self.string_length_replacable = string_length_replacable
-        self.eliminateDuplicatedElements = eliminateDuplicatedElements
-        self.type = None
-        # self._validateRange()
+    def __init__(self):
+        self.variable_name: str = None
+        self.integer_min_val_replacable: ReplacableParameter = None
+        self.integer_max_val_replacable: ReplacableParameter = None
+        self.is_prime = False
+        self.string_candidates: int = None
+        self.string_length_replacable: ReplacableParameter = None
+        self.eliminateDuplicatedElements = False
+        self.type: str = None
     
     def setAttr(self, key: str, val: any):
         if key == "type":
             raise Exception("[ERROR] explicit change of 'type' parameter is not allowed.")
         if self.type is not None:
             raise Exception("[ERROR] parameter type has already fixed.")
+        if self.integer_min_val_replacable is not None and self.integer_max_val_replacable is not None and self.integer_min_val_replacable.getParameter(idx=0) > self.integer_max_val_replacable.getParameter(idx=0):
+            raise Exception("[ERROR] integer_min_val imust be less than integer_max")
         setattr(self, key, val)
-
     
     def _isIntegerCondition(self) -> bool:
         return self.integer_min_val_replacable is not None and \
@@ -97,9 +144,9 @@ class ElementCondition():
         if self._isIntegerCondition():
             self.type = "int"
         elif self._isPrimeIntegerCondition():
-            self.type = "prime"
+            self.type = ELEMENT_CONDITION_TYPE_PRIME
         elif self._isStringCondition():
-            self.type = "str"
+            self.type = ELEMENT_CONDITION_TYPE_STRING
         else:
             raise Exception("[ERROR] Condition parameter is invalid")
         return self.type
@@ -116,6 +163,9 @@ class ElementCondition():
     def getStringLength(self, idx: int):
         return self.string_length_replacable.getParameter(idx=idx)
     
+    def __str__(self) -> str:
+        return f"{self.string_length_replacable}"
+
 class ListCondition():
     def __init__(self, length_replacable: ReplacableParameter = ReplacableParameter(num_str="1"), allowDuplicatedElementsInList = True) -> None:
         self.length_replacable = length_replacable
@@ -123,6 +173,21 @@ class ListCondition():
     
     def getLength(self):
         return self.length_replacable.getParameter()
+
+class GridCondition():
+    def __init__(self, width_length_replacable: ReplacableParameter, height_length_replacable: ReplacableParameter, allowDuplicatedElementsInList = True) -> None:
+        self.width_length_replacable = width_length_replacable
+        self.height_length_replacable = height_length_replacable
+        self.allowDuplicatedElementsInList = allowDuplicatedElementsInList
+    
+    def getWidth(self):
+        return self.width_length_replacable.getParameter()
+    
+    def getHeight(self):
+        return self.height_length_replacable.getParameter()
+
+    def __str__(self) -> str:
+        return f"{self.width_length_replacable}, {self.height_length_replacable}"
     
 class PairCondition():
     def __init__(self, 
@@ -134,12 +199,111 @@ class PairCondition():
         self.allowDuplicatedPairInLists = allowDuplicatedPairInLists
     
 class RandIntListGenerator():
+    eratosthenes = None
     def __init__(self, variable_names: "list[str]", tmp_username: str) -> None:
         self.variable_names = variable_names
         self.element_conditions: "list[ElementCondition]" = []
         self.list_conditions: "list[ListCondition]" = []
+        self.grid_conditions: "list[GridCondition]" = []
         self.pair_conditions: "list[PairCondition]" = []
         self.tmp_username = tmp_username
+
+    def _getGeneratorType(self):
+        if len(self.pair_conditions) > 1:
+            raise Exception("[ERROR] Not Defined and Implemented")
+        if len(self.grid_conditions) > 1:
+            raise Exception("[ERROR] Not Defined and Implemented")
+        if len(self.pair_conditions) > 0 and len(self.grid_conditions) == 0:
+            return GENERATOR_TYPE_PAIR
+        if len(self.pair_conditions) == 0 and \
+            len(self.grid_conditions) == 1 and \
+            len(self.list_conditions) == 0 and \
+            len(self.element_conditions) == 1:
+            return GENERATOR_TYPE_GRID
+        if len(self.pair_conditions) == 0 and \
+            len(self.grid_conditions) == 0 and \
+            len(self.list_conditions) == 1 and \
+            len(self.element_conditions) == 1:
+            return GENERATOR_TYPE_LIST
+        raise Exception("[NOT IMPREMENTED] Unexpected Case")
+
+    @classmethod
+    def initEratosthenes(cls):
+        from Eratosthenes import Eratosthenes
+        cls.eratosthenes = Eratosthenes(10000)
+
+    def _generateStrList(self, duplicatable=True):
+        res = []
+        candidates = self.element_conditions[0].string_candidates
+        for idx in range(self.list_conditions[0].getLength()):
+            element_count = self.element_conditions[0].getStringLength(idx=idx)
+            print(self.element_conditions[0])
+            if duplicatable:
+                res.append("".join(random.choices(candidates, k=element_count)))
+            else:
+                if len(candidates) < element_count:
+                    raise Exception(f"[ERROR] candidates length ({len(candidates)} : {candidates}) must be larger than element_count ({element_count}).")
+                res.append("".join(random.sample(candidates, k=element_count)))
+        
+        return { self.variable_names: { self.variable_names: res } }
+                         
+    def _generateIntegerList(self, prime=False, duplicatable=True):
+        ### 移設予定
+        sys.path.append(f"/Users/{self.tmp_username}/atcoder-workspace/lib/")   # 場所ー＞ class変数に持ってく
+        RandIntListGenerator.initEratosthenes()
+        
+        res = []
+        for idx in range(self.list_conditions[0].getLength()):
+            if duplicatable:
+                if prime:
+                    all_primes = RandIntListGenerator.eratosthenes.primes
+                    min_idx = bisect.bisect_left(all_primes, self.element_conditions[0].getIntegerMinVal(idx=idx))
+                    max_idx = bisect.bisect_left(all_primes, self.element_conditions[0].getIntegerMaxVal(idx=idx))
+                    primes = all_primes[min_idx:max_idx]        # candidates生成はConditionクラウ移植？
+                    res.append(random.choice(primes))
+                else:
+                    min_val = self.element_conditions[0].getIntegerMinVal(idx=idx)
+                    max_val = self.element_conditions[0].getIntegerMaxVal(idx=idx)
+                    res.append(random.randint(min_val, max_val))
+            else:
+                if prime:
+                    raise Exception("[ERROR] NOT IMPREMENTED")
+                else:
+                    candidates = self.element_conditions[0].getProvidableIntegerList(idx=0)
+                    element_count = self.list_conditions[0].getLength()
+                    if len(candidates) < element_count:
+                        raise Exception(f"[ERROR] candidates length ({len(candidates)} : {candidates}) must be larger than element_count ({element_count}).")
+                    random.shuffle(candidates)
+                    return {
+                        self.variable_names: {
+                            self.variable_names: candidates[:element_count]
+                        }
+                    }
+
+        return { self.variable_names: { self.variable_names: res } }
+
+    def _generateStringGrid(self, duplicatable=True):
+        raise Exception("[NOT IMPREMENTED]")
+
+    def _generateIntegerGrid(self, prime=False, duplicatable=True):
+        res = []
+        if duplicatable:
+            if prime:
+                raise Exception("[NOT IMPREMENTED]")
+            else:
+                for _ in range(self.grid_conditions[0].getHeight()):
+                    line = []
+                    for idx in range(self.grid_conditions[0].getWidth()):
+                        min_val = self.element_conditions[0].getIntegerMinVal(idx=idx)
+                        max_val = self.element_conditions[0].getIntegerMaxVal(idx=idx)
+                        line.append(random.randint(min_val, max_val))
+                    res.append(line)
+        else:
+            if prime:
+                raise Exception("[NOT IMPREMENTED]")
+            else:
+                raise Exception("[NOT IMPREMENTED]")
+        return { self.variable_names: { self.variable_names: res } }
 
     def generateParameter(self) -> "dict[str, dict[str, int|list]]":
         """
@@ -153,60 +317,39 @@ class RandIntListGenerator():
             }
         }
         """
-        # print(self.variable_names)
-        # print(self.element_conditions)
-        # print(self.list_conditions)
-        # print(self.pair_conditions)
-        if len(self.pair_conditions) == 0:
-            if self.list_conditions[0].allowDuplicatedElementsInList:
-                if self.element_conditions[0].getType() == "str":
-                    return {
-                        self.variable_names: {
-                            self.variable_names: ["".join(random.choices(self.element_conditions[0].string_candidates, k=self.element_conditions[0].getStringLength(idx=idx))) for idx in range(self.list_conditions[0].getLength())]
-                        }
-                    }
-                elif self.element_conditions[0].getType() == "prime":
-                    res = []
-                    sys.path.append(f"/Users/{self.tmp_username}/atcoder-workspace/lib/")
-                    from Eratosthenes import Eratosthenes
-                    eratosthenes = Eratosthenes(1000)
-                    all_primes = eratosthenes.primes
-                    for idx in range(self.list_conditions[0].getLength()):
-                        min_idx = bisect.bisect_left(all_primes, self.element_conditions[0].getIntegerMinVal(idx=idx))
-                        max_idx = bisect.bisect_left(all_primes, self.element_conditions[0].getIntegerMaxVal(idx=idx))
-                        primes = all_primes[min_idx:(max_idx + 1)]
-                        res.append(random.choices(primes, k=1))
-                    return {
-                        self.variable_names: {
-                            self.variable_names: res
-                        }
-                    }
+        if self._getGeneratorType() == GENERATOR_TYPE_LIST:
+            if self.list_conditions[0].allowDuplicatedElementsInList:       # LISTとGRIDは統合したい
+                if self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_STRING:
+                    return self._generateStrList()
+                elif self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_PRIME:
+                    return self._generateIntegerList(prime=True)
                 else:
-                    return {
-                        self.variable_names: {
-                            self.variable_names: [random.randint(self.element_conditions[0].getIntegerMinVal(idx=idx), self.element_conditions[0].getIntegerMaxVal(idx=idx)) for idx in range(self.list_conditions[0].getLength())]
-                        }
-                    }
+                    return self._generateIntegerList()
             else:
-                if self.element_conditions[0].getType() == "str":
-                    warnings.warn("[WARN] We have not complemented this case. only idx=0")
-                    return {
-                        self.variable_names: {
-                            self.variable_names: ["".join(random.choices(self.element_conditions[0].string_candidates, k=self.element_conditions[0].getStringLength(idx=idx))) for idx in range(self.list_conditions[0].getLength())]
-                        }
-                    }
+                if self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_STRING:
+                    return self._generateStrList(duplicatable=False)
+                elif self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_PRIME:
+                    return self._generateIntegerList(prime=True, duplicatable=False)
                 else:
-                    warnings.warn("[WARN] We have not complemented this case. only idx=0")
-                    l = self.element_conditions[0].getProvidableIntegerList(idx=0)
-                    if len(l) < self.list_conditions[0].getLength():
-                        raise Exception(f"[ERROR] value range must be longer than directed length with eliminateDuplicatedElements option.: {len(l)} {self.list_conditions[0].getLength()}")
-                    random.shuffle(l)
-                    return {
-                        self.variable_names: {
-                            self.variable_names: l[:self.list_conditions[0].getLength()]
-                        }
-                    }
-        elif len(self.pair_conditions) == 1:
+                    return self._generateIntegerList(duplicatable=False)
+
+        elif self._getGeneratorType() == GENERATOR_TYPE_GRID:
+            if self.grid_conditions[0].allowDuplicatedElementsInList:
+                if self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_STRING:
+                    return self._generateStringGrid()
+                elif self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_PRIME:
+                    return self._generateIntegerGrid(prime=True)
+                else:
+                    return self._generateIntegerGrid()
+            else:
+                if self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_STRING:
+                    return self._generateStringGrid(duplicatable=False)
+                elif self.element_conditions[0].getType() == ELEMENT_CONDITION_TYPE_PRIME:
+                    return self._generateIntegerGrid(prime=True, duplicatable=False)
+                else:
+                    return self._generateIntegerGrid(duplicatable=False)
+        
+        elif self._getGeneratorType() == GENERATOR_TYPE_PAIR:
             warnings.warn("[WARN] We have not complemented this case. ループしてマージすると重複するケースあり")
             if len(set([condition.getLength() for condition in self.list_conditions])) > 1:
                 raise Exception("[ERROR] All lists in a pair must be same length.")
@@ -221,12 +364,16 @@ class RandIntListGenerator():
                 for condition in self.element_conditions:
                     key = condition.variable_name
                     if condition.getType() == "int":
-                        min_val, max_val = condition.getIntegerMinVal(idx=0), condition.getIntegerMaxVal(idx=0) # 暫定0indexのみ
-                        tmp_lists[key] = genRandIntList(
-                            min_val=min_val, 
-                            max_val=max_val, 
-                            length=rest_length, 
-                            eliminateDuplicatedElements=not self.list_conditions[0].allowDuplicatedElementsInList)
+                        if self.list_conditions[0].allowDuplicatedElementsInList:
+                            tmp_lists[key] = [random.randint(condition.getIntegerMinVal(idx=0), condition.getIntegerMaxVal(idx=0)) for _ in range(rest_length)] # 暫定0indexのみ
+                        else:
+                            l = condition.getProvidableIntegerList(idx=0)
+                            if len(l) < rest_length:
+                                raise Exception(f"[ERROR] value range must be longer than directed length with eliminateDuplicatedElements option.: {len(l)} {self.list_conditions[0].getLength()}")
+                            random.shuffle(l)
+                            tmp_lists[key] = l[:rest_length]
+
+
                     # else: # condition.getType() == "st"
                     #     string_min_length, string_max_length, string_candidates = condition.string_min_length, condition.string_max_length, condition.string_candidates
                     #     tmp_lists[key] = genRandStrList(string_min_length, string_max_length, string_candidates, rest_length)
@@ -257,75 +404,78 @@ class RandIntListGenerator():
             return {
                 self.variable_names: res_lists
             }
+
         else:
-            raise Exception("[ERROR] ###")
+            raise Exception("[ERROR Unexpected case")
 
 class ParameterWriter():
-    def __init__(self, variable_names: "list[str]", vertical = False) -> None:
+    def __init__(self, variable_names: "list[str]", vertical = False, grid = False) -> None:
         self.variable_names = variable_names
         self.vertical = vertical
+        self.grid = grid
     
     def write(self, file_handler) -> None:
-        output_list = [PARAMS[variable_name] for variable_name in self.variable_names]
         output_line_strings = []
-        if self.vertical:
-            if len(set([len(L) for L in output_list])) != 1:
-                raise Exception("[ERROR] lists must be same length.")
-            for variables_on_same_line in zip(*output_list):
+        if self.grid:
+            for variables_on_same_line in fixed_params.parameters[self.variable_names[0]]:
                 output_line_strings.append(" ".join(list(map(str, variables_on_same_line))))
             delimiter = "\n"
         else:
-            for variables_on_same_line in output_list:
-                output_line_strings.append(" ".join(list(map(str, variables_on_same_line))))
-            delimiter = " "
+            output_list = [fixed_params.parameters[variable_name] for variable_name in self.variable_names]
+            if self.vertical:
+                if len(set([len(L) for L in output_list])) != 1:
+                    raise Exception("[ERROR] lists must be same length.")
+                for variables_on_same_line in zip(*output_list):
+                    output_line_strings.append(" ".join(list(map(str, variables_on_same_line))))
+                delimiter = "\n"
+            else:
+                for variables_on_same_line in output_list:
+                    output_line_strings.append(" ".join(list(map(str, variables_on_same_line))))
+                delimiter = " "
         file_handler.write(delimiter.join(output_line_strings))
         file_handler.write("\n")
 
 class ConditionManager:
     def __init__(self) -> None:
-        self.element_conditions: "dict[str, ElementCondition]" = {}
+        self.element_conditions: "dict[str, ElementCondition]" = defaultdict(ElementCondition)
         self.list_conditions: "dict[str, ListCondition]" = {}
+        self.grid_conditions: "dict[str, GridCondition]" = {}
         self.pair_conditions: "dict[str, PairCondition]" = {}
 
-    def addElementCondition(self, variable_name: str, conditions: "dict[str, int|str|list|ReplacableParameter]" = {}):
-        if variable_name not in self.element_conditions:
-            self.element_conditions[variable_name] = ElementCondition(**conditions)
-        else:
-            for condition_key, condition_value in conditions.items():
-                self.element_conditions[variable_name].setAttr(condition_key, condition_value)
+    def addElementCondition(self, variable_name: str, conditions: "dict[str, int|str|list|ReplacableParameter]" = {}, overwritable = True):
+        for condition_key, condition_value in conditions.items():
+            if not overwritable and getattr(self.element_conditions[variable_name], condition_key) is None:
+                # raise("[ERROR] Overwrite")
+                return
+            self.element_conditions[variable_name].setAttr(condition_key, condition_value)
     
     def addListCondition(self, variable_name: str, conditions: "dict[str, int|str|list|ReplacableParameter]" = {}):
         if variable_name not in self.list_conditions:
             self.list_conditions[variable_name] = ListCondition(**conditions)
-            for condition_key, condition_value in conditions.items():
-                print(getattr(self.list_conditions[variable_name], condition_key))
         else:
             for condition_key, condition_value in conditions.items():
                 setattr(self.list_conditions[variable_name], condition_key, condition_value)
     
+    def addGridCondition(self, variable_name: str, conditions: "dict[str, int|str|list|ReplacableParameter]" = {}):
+        if variable_name not in self.grid_conditions:
+            self.grid_conditions[variable_name] = GridCondition(**conditions)
+        else:
+            for condition_key, condition_value in conditions.items():
+                setattr(self.grid_conditions[variable_name], condition_key, condition_value)
+    
     def registerPairCondition(self, variable_name: str, condition: PairCondition):
         if type(condition) == PairCondition:
             self.pair_conditions[variable_name] = condition
-
-
-def genRandIntList(min_val: int, max_val: int, length: int = 1, eliminateDuplicatedElements: bool = False) -> "list[int]":
-    if min_val > max_val:
-        raise Exception(f"min_val ({min_val}) > max_val ({max_val})")
     
-    if eliminateDuplicatedElements:
-        if max_val - min_val + 1 < length:
-            raise Exception("[ERROR] value range must be longer than dorected length with eliminateDuplicatedElements option.")
-        l = list(range(min_val, max_val + 1))
-        random.shuffle(l)
-        return l[:length]
-    else:
-        return [random.randint(min_val, max_val) for _ in range(length)]
+def getIndicies(L: "str|list", target: "str|int"):
+    return [idx for idx, val in enumerate(L) if val == target]
 
-conditionMgr = ConditionManager()
-generators = {}
+condition_mgr = ConditionManager()
+fixed_params = FixedParams()
+generators: "dict[str, RandIntListGenerator]" = {}
 
 writers = []
-def readFormat(line):
+def readFormat(line: str):
     if "(" in line and "[" in line:
         idx_pair_l, idx_pair_r = line.index("("), line.index(")")
         variable_name_with_space = line[(idx_pair_l + 1):(idx_pair_r - 1 + 1)] # "C D"
@@ -333,6 +483,11 @@ def readFormat(line):
         idx_bracket_l, idx_bracket_r = line.index("["), line.index("]")
         isVertical = True if line[idx_bracket_l + 1] == ":" else False
         writers.append(ParameterWriter(variable_names=variable_names, vertical=isVertical))
+    elif line.count("[") == 2:
+        idx_bracket_l, idx_bracket_r = line.index("["), line.index("]") # index()は最初に一致したインデックスを返すことを利用
+        variable_name = line[idx_bracket_l - 1]
+        variable_names = [variable_name]
+        writers.append(ParameterWriter(variable_names=variable_names, grid=True))
     elif "[" in line:
         idx_bracket_l, idx_bracket_r = line.index("["), line.index("]")
         variable_name = line[idx_bracket_l - 1]
@@ -352,10 +507,10 @@ def readCondition(line: str):
         if line_splitted[2] == "/=":
             if line_splitted[1] == line_splitted[3]: # 同一配列内の要素間での制約
                 variable_name = line_splitted[1]
-                conditionMgr.list_conditions[variable_name].allowDuplicatedElementsInList = False
+                condition_mgr.list_conditions[variable_name].allowDuplicatedElementsInList = False
             else:
                 conbined = " ".join([line_splitted[1], line_splitted[3]])
-                conditionMgr.registerPairCondition(
+                condition_mgr.registerPairCondition(
                     variable_name=conbined, 
                     condition=PairCondition(
                         allowDuplicatedElementsInPair=False,
@@ -369,24 +524,24 @@ def readCondition(line: str):
     else:
         if "{" in line_splitted[3]:
             candidates = []
-            paramter_type = "str"
+            paramter_type = ELEMENT_CONDITION_TYPE_STRING
             for component in line_splitted[3][1:-1].split(","):
-                if component == "a":
+                if component == CONDITION_LOWERCASES:
                     candidates.extend([ch for ch in string.ascii_lowercase])
-                elif component == "A":
+                elif component == CONDITION_UPPERCASES:
                     candidates.extend([ch for ch in string.ascii_uppercase])
-                elif component == "0":
+                elif component == CONDITION_NUMBERS:
                     candidates.extend([str(i) for i in range(0, 10)])
-                elif component == "prime":
-                    paramter_type = "prime"
+                elif component == CONDITION_PRIMES:
+                    paramter_type = ELEMENT_CONDITION_TYPE_PRIME
                 elif '"' in component or "'" in component:
                     candidates.append(component[1:-1])
                 else:
                     raise Exception("[ERROR] Unknown candidate")
             
             variable_name = line_splitted[0]
-            if paramter_type == "str":
-                conditionMgr.addElementCondition(
+            if paramter_type == ELEMENT_CONDITION_TYPE_STRING:
+                condition_mgr.addElementCondition(
                     variable_name=variable_name, 
                     conditions={
                         "variable_name": variable_name,
@@ -394,8 +549,18 @@ def readCondition(line: str):
                         "string_length_replacable": ReplacableParameter(num_str=f"|{variable_name}|", default_value="1")    # |S|が提供されない場合はselectの挙動とするためdefault_value=1
                     }
                 )
-            elif paramter_type == "prime":
-                conditionMgr.addElementCondition(
+                # condition_mgr.addElementCondition(
+                #     variable_name=variable_name, 
+                #     conditions={
+                #         "variable_name": f"|{variable_name}|",
+                #         "integer_min_val_replacable": ReplacableParameter(1),
+                #         "integer_max_val_replacable": ReplacableParameter(1)
+                #     },
+                #     overwritable=False
+                # )
+                # print([condition_mgr.element_conditions[i]. for  i in range(len(condition_mgr.element_conditions))])
+            elif paramter_type == ELEMENT_CONDITION_TYPE_PRIME:
+                condition_mgr.addElementCondition(
                     variable_name=variable_name, 
                     conditions={
                         "variable_name": variable_name,
@@ -403,11 +568,11 @@ def readCondition(line: str):
                     }
                 )
             else:
-                raise Exception("[ERROR]")
+                raise Exception("[NOT IMPLEMENTED]")
 
         else:
             variable_name = line_splitted[0]
-            conditionMgr.addElementCondition(
+            condition_mgr.addElementCondition(
                 variable_name=variable_name, 
                 conditions={
                     "variable_name": variable_name,
@@ -416,25 +581,34 @@ def readCondition(line: str):
                 }
             )
         generator_kinds.append(variable_name)
-        if "[" in line_splitted[3]:# and "|" in line_splitted[3]:
+        if line_splitted[3].count("[") == 2:
+            indices_bracket_l = getIndicies(line_splitted[3], "[")
+            indices_bracket_r = getIndicies(line_splitted[3], "]")
+            condition_mgr.addGridCondition(
+                variable_name=variable_name, 
+                conditions={
+                    "width_length_replacable": ReplacableParameter(num_str=line_splitted[3][(indices_bracket_l[0] + 1):indices_bracket_r[0]]),
+                    "height_length_replacable": ReplacableParameter(num_str=line_splitted[3][(indices_bracket_l[1] + 1):indices_bracket_r[1]])
+                }
+            )
+        elif "[" in line_splitted[3]:
             idx_bracket_l, idx_bracket_r = line_splitted[3].index("["), line_splitted[3].index("]")
-            conditionMgr.addListCondition(
+            condition_mgr.addListCondition(
                 variable_name=variable_name, 
                 conditions={
                     "length_replacable": ReplacableParameter(num_str=line_splitted[3][(idx_bracket_l + 1):idx_bracket_r])
                 }
             )
         elif "[" in line_splitted[1]:
-            print(line)
             idx_bracket_l, idx_bracket_r = line_splitted[1].index("["), line_splitted[1].index("]")
-            conditionMgr.addListCondition(
+            condition_mgr.addListCondition(
                 variable_name=variable_name, 
                 conditions={
                     "length_replacable": ReplacableParameter(num_str=line_splitted[1][(idx_bracket_l + 1):idx_bracket_r])
                 }
             )
         else:
-            conditionMgr.addListCondition(
+            condition_mgr.addListCondition(
                 variable_name=variable_name
             )
 
@@ -443,25 +617,25 @@ def readCondition(line: str):
 def main():
     args = sys.argv
     _, condition_config_file_name, format_config_file_name, out_file_name, tmp_username = args[0], args[1], args[2], args[3], args[4]
-    CONDITION_CONFIG = condition_config_file_name
-    FORMAT_CONFIG = format_config_file_name
     
     # 条件ファイルの読み込み
-    with open(CONDITION_CONFIG, "r") as condition_config:
+    with open(condition_config_file_name, "r") as condition_config:
         for line in [line.rstrip() for line in condition_config.readlines()]:
             if line == "":
                 break
             readCondition(line=line)
 
+    print(generator_kinds) # ペア条件の場合のみ"A B"みたいなのが入りうる。
     for g in generator_kinds:
         generators[g] = RandIntListGenerator(variable_names=g, tmp_username=tmp_username)
-        if g in conditionMgr.pair_conditions.keys():
-            generators[g].pair_conditions = [conditionMgr.pair_conditions[g]]
-        generators[g].element_conditions = [conditionMgr.element_conditions[variable_name] for variable_name in g.split(" ")]
-        generators[g].list_conditions = [conditionMgr.list_conditions[variable_name] for variable_name in g.split(" ") if variable_name in conditionMgr.list_conditions]
-    
+        if g in condition_mgr.pair_conditions.keys():
+            generators[g].pair_conditions = [condition_mgr.pair_conditions[g]]
+        generators[g].element_conditions = [condition_mgr.element_conditions[variable_name] for variable_name in g.split(" ")]
+        generators[g].list_conditions = [condition_mgr.list_conditions[variable_name] for variable_name in g.split(" ") if variable_name in condition_mgr.list_conditions]
+        generators[g].grid_conditions = [condition_mgr.grid_conditions[variable_name] for variable_name in g.split(" ") if variable_name in condition_mgr.grid_conditions]
+
     # 書式ファイルの読み込み
-    with open(FORMAT_CONFIG, "r") as format_config:
+    with open(format_config_file_name, "r") as format_config:
         for line in [line.rstrip() for line in format_config.readlines()]:
             if line == "":
                 break
@@ -485,9 +659,9 @@ def main():
                 continue
         for variable_names, generated in generated_parameters.items():
             for variable_name in variable_names.split(" "):
-                PARAMS[variable_name] = generated[variable_name]
+                fixed_params.setParams(variable_name, generated[variable_name])
     
-    print(PARAMS, "''")
+    print(fixed_params)
     with open(out_file_name, "w") as handler:
         for w in writers:
             w.write(handler)
