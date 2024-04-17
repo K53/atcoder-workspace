@@ -11,6 +11,6 @@ T T = {a}
 
     N
     M
-    P
+    P Q
     S
     T
